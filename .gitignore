@@ -1,0 +1,15 @@
+Thumbs.db
+*.obj
+*.exe
+*.pdb
+*.bak
+*.tmp
+*.cache
+*.ilk
+*.log
+.vs
+.idea
+_preview.html
+
+/Downloaded/
+/Drafts/

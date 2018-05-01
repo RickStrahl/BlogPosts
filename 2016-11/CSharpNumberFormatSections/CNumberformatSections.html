@@ -1,0 +1,73 @@
+﻿<h1>C# NumberFormat Sections</h1>
+<p><img src="formatstringex.png" alt="" /></p>
+<p>I'm not sure how I've missed this feature in all those years of working in C#: <code>String.Format()</code> supports <strong>Number Formatting Sections</strong> that allow you to show separate values for positive, negative and zero values.</p>
+<p>Take a look:</p>
+<p><img src="formatstring.png" alt="" /></p>
+<p>You can find the official (and very limited) documentation on this feature on MSDN:</p>
+<ul>
+<li><a href="https://msdn.microsoft.com/en-us/library/aa719871(v=VS.71).aspx">Custom Numeric Format Strings</a></li>
+</ul>
+<h3>Number Format Sections</h3>
+<p>Sections are meant to separate:</p>
+<ul>
+<li>Positive Values</li>
+<li>Negative Values</li>
+<li>Zero Values</li>
+</ul>
+<p>by using a single format string. The <code>;</code> character acts as a separator for those three values. But be aware that the format strings you use for the sections are very different than <em>normal</em> format strings - you can't use things like <code>n0</code> or <code>c2</code> but you have to be <strong>explicit</strong> about the number format. Instead you use <code>#</code> or <code>0</code> to specify number in the format string and <code>,</code> or <code>.</code> to specify thousands separator and decimal point respectively.</p>
+<p>In other words, sections are a special kind of format string using its own custom format for each section.</p>
+<p>So:</p>
+<pre><code>(12.3).ToString(&quot;0.00;(0.00);zero&quot;)  // 12.30
+(-12.3).ToString(&quot;0.00;(0.00);zero&quot;)  // 12.302.3.ToString(&quot;0.00;(0.00);zero&quot;)  // (12.30)
+0.ToString(&quot;0.00;(0.00);zero&quot;)  // 12.302.3.ToString(&quot;0.00;(0.00);zero&quot;)  // zero
+</code></pre>
+<p>produces the expected 2 decimal places of the number whereas using just <code>0</code> produces the integer values:</p>
+<pre><code>(12.30).ToString(&quot;0;(0);zero&quot;)  // 12
+(-12).ToString(&quot;0;(0);zero&quot;)  // 12.302.3.ToString(&quot;0.00;(0.00);zero&quot;)  // (12)
+0.ToString(&quot;0;(0);zero&quot;)  // 12.302.3.ToString(&quot;0.00;(0.00);zero&quot;)  // zero
+</code></pre>
+<p>You can use 0 or # for numbers to the left of the decimal point and <code>0</code> for numbers on the right of it. So this is the same as the last entries:</p>
+<pre><code>(12.30).ToString(&quot;#;(#);zero&quot;)  // 12
+(-12).ToString(&quot;#;(#);zero&quot;)  // 12.302.3.ToString(&quot;0.00;(0.00);zero&quot;)  // (12)
+0.ToString(&quot;#;(#);zero&quot;)  // 12.302.3.ToString(&quot;0.00;(0.00);zero&quot;)  // zero
+</code></pre>
+<p>You also need to be explicit about thousands separator, although you can use just <code>#,###.00</code> to specify that 1000s should be separated - even for larger numbers:</p>
+<pre><code>(112345.30).ToString(&quot;#,###.00;(0);zero&quot;)  // 112,345.30
+(-112345.30).ToString(&quot;#,###.00;(0);zero&quot;)  // (112,345.30)
+0.ToString(&quot;#,###.00;(0);zero&quot;)  // zero
+</code></pre>
+<p>Note that you can specify that the zero value is empty by not specifying it:</p>
+<pre><code class="language-csharp">val = 0.ToString(&quot;#;(#);&quot;);  // string.Empty
+</code></pre>
+<h3>String Interpolation</h3>
+<p>You can also use this functionality in C# 6.0's new <strong>String Interpolation</strong> template strings:</p>
+<pre><code class="language-cs">decimal number = 1355.55M;
+val = $&quot;{number:#,###.00;(#,###.00);}&quot;;
+val.Dump();
+</code></pre>
+<h3>Summary</h3>
+<p>So, this obviously isn't a game changer of a feature, but it's kinda cool in terms of being able to concisely format numbers especially in scenarios where the number formatting is inlined - like in templates are things like Razor where a function is a lot nicer to read than an immediate if expression.</p>
+<p>I'm filing it under - obscure C# things I didn't know...</p>
+<!-- Post Configuration -->
+<!--
+```xml
+<blogpost>
+<abstract>
+In all the years I've been using C#, I've completely missed that the NumberFormat features using .ToString() or string expressions support sections for positive, negative and zero values. In this post I describe the feature and how it works.
+</abstract>
+<categories>
+C#
+</categories>
+<keywords>
+NumberFormat, Section, Zero, Formatting
+</keywords>
+<weblogs>
+<postid>55307</postid>
+<weblog>
+Rick Strahl's Weblog
+</weblog>
+</weblogs>
+</blogpost>
+```
+-->
+<!-- End Post Configuration -->

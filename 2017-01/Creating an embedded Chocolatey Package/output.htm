@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<!-- saved from url=(0016)http://localhost -->
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <base href="C:\WebConnectionProjects\wwThreads\" />
+    <meta charset="utf-8" />
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link href="C:\projects2010\MarkdownMonster\MarkdownMonster\bin\Release\PreviewThemes\Dharkan\..\scripts\bootstrap\css\bootstrap.min.css" rel="stylesheet" />
+    <link href="C:\projects2010\MarkdownMonster\MarkdownMonster\bin\Release\PreviewThemes\Dharkan\..\scripts\fontawesome\css\font-awesome.min.css" rel="stylesheet" />
+
+    <link href="C:\projects2010\MarkdownMonster\MarkdownMonster\bin\Release\PreviewThemes\Dharkan\Theme.css" rel="stylesheet" />
+</head>
+<body>
+    <body>
+<h1 id="creating-a-portable-and-embedded-chocolatey-package">Creating a portable and embedded Chocolatey Package</h1>
+<div class="figure">
+<img src="BoxOfChocolates.jpg" alt="Box of chocolates" />
+<p class="caption">Box of chocolates</p>
+</div>
+<p>Over the last few weeks I've been getting quite a few requests for a portable Chocolatey package for <a href="https://markdownmonster.west-wind.com/">Markdown Monster</a>. A zip file version of a portable install has been available for some time <a href="https://markdownmonster.west-wind.com/download.aspx">from the download page</a>, but a Chocolatey package certainly would streamline the process quite a bit more.</p>
+<p>So a couple of weeks ago I finally also put out a portable Chocolatey package and in this post I want to describe the process of creating a portable package, both from creating a low impact installation and for creating an embedded Chocolatey package that contains all the raw source files embedded in the chocolatey package.</p>
+<p>But first lets talk Chocolatey - yumm - in general and also about creating standard packages.</p>
+<h3 id="chocolatey---distribution-made-easy">Chocolatey - Distribution made easy</h3>
+<p>For those of you that haven't used Chocolatey before: <a href="https://chocolatey.org">Chocolatey</a> is a package manager for Windows that makes it super easy to install and update software on your machine. A single command lets you easily install software and then at any point lets you check for and install updates with another simple command.</p>
+<p><a href="https://chocolatey.org/">Once Chocolatey is installed</a> you can install hundreds of common software packages both free and commercial using Chocolatey's silent install process. Note that installing commercial software doesn't remove any licensing requirements - you still have to apply license keys or register as you would have to with full software. Chocolatey simply provides a distribution mechanism for the software.</p>
+<p>Installing and updating software with Chocolatey becomes a single line of command line code:</p>
+<pre class="dos"><code>choco install markdownmonster</code></pre>
+<p>and to update to the latest version:</p>
+<pre class="dos"><code>choco upgrade markdownmonster</code></pre>
+<p>It's nice to be able to do this from the command prompt, but even nicer if you need to set up a new machine where you can create a batch file or POSH script to string a bunch of <code>choco install</code> commands together to build up a machine without user interaction.</p>
+<h3 id="creating-packages">Creating Packages</h3>
+<p>You can also <strong>create</strong> Chocolatey Packages either of your own software or - given permissions - from any software that is out there. Chocolatey makes the process of setting up a new package quite easy with:</p>
+<pre class="dos"><code>choco new markdownmonster</code></pre>
+<p>A new project creates a <code>.nuspec</code> meta data file that describes what the package is, and a <code>\tools</code> folder that contains a few Powershell scripts, and a license file. Here's what my full Markdown Monster Chocolatey package folder looks like:</p>
+<div class="figure">
+<img src="ChocoExeInstal.png" alt="A downloadable Chocolatey Package folder structure" />
+<p class="caption">A downloadable Chocolatey Package folder structure</p>
+</div>
+<p>This package downloads a setup.exe file from Github. I publish each version in a special repository and then build a custom <code>chocolateyInstall.ps1</code> file that contains the latest version's file name, url and SHA256. As you can see - there's not much to this folder structure.</p>
+<h4 id="nuspec-meta-data">Nuspec Meta Data</h4>
+<p>The main piece of a package is the <code>.nuspec</code> file which contains the meta data that describes what your package is and where to find out more. <code>.nuspec</code> should look familiar to .NET developers - it's the same <code>.nuspec</code> format that <strong>NuGet</strong> uses with a few additional enhancements. Under the covers the Chocolatey store runs an extended version of NuGet.</p>
+<p>The main piece of a package is the <code>.nuspec</code> file which is what's used to to show users what your package is and does. Here's what the Markdown Monster one looks like:</p>
+<div class="sourceCode"><pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;?xml</span> version=&quot;1.0&quot; encoding=&quot;utf-8&quot;<span class="kw">?&gt;</span>
+<span class="kw">&lt;package</span><span class="ot"> xmlns=</span><span class="st">&quot;http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd&quot;</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;metadata&gt;</span>
+    <span class="kw">&lt;id&gt;</span>MarkdownMonster<span class="kw">&lt;/id&gt;</span>
+    <span class="kw">&lt;version&gt;</span>1.1.20<span class="kw">&lt;/version&gt;</span>
+    <span class="kw">&lt;title&gt;</span>Markdown Monster<span class="kw">&lt;/title&gt;</span>
+    <span class="kw">&lt;authors&gt;</span>Rick Strahl, West Wind Technologies<span class="kw">&lt;/authors&gt;</span>
+    <span class="kw">&lt;owners&gt;</span>West Wind Technologies<span class="kw">&lt;/owners&gt;</span>
+    <span class="kw">&lt;licenseUrl&gt;</span>http://markdownmonster.west-wind.com/download.aspx#Licensing<span class="kw">&lt;/licenseUrl&gt;</span>
+    <span class="kw">&lt;projectUrl&gt;</span>http://markdownmonster.west-wind.com<span class="kw">&lt;/projectUrl&gt;</span>    
+    <span class="kw">&lt;iconUrl&gt;</span>http://markdownmonster.west-wind.com/images/MarkdownMonster_icon_128.png<span class="kw">&lt;/iconUrl&gt;</span>
+    <span class="kw">&lt;requireLicenseAcceptance&gt;</span>true<span class="kw">&lt;/requireLicenseAcceptance&gt;</span>    
+    <span class="kw">&lt;description&gt;</span>Markdown Monster is...
+    <span class="kw">&lt;/description&gt;</span>
+    <span class="kw">&lt;summary&gt;</span>Markdown Monster is an easy to use and extensible 
+    Markdown Editor and Viewer and Weblog Publisher
+    <span class="kw">&lt;/summary&gt;</span>
+    <span class="kw">&lt;releaseNotes&gt;</span>https://github.com/RickStrahl/MarkdownMonster/blob/master/Changelog.md<span class="kw">&lt;/releaseNotes&gt;</span>
+    <span class="kw">&lt;copyright&gt;</span>West Wind Technologies, 2016-2017<span class="kw">&lt;/copyright&gt;</span>
+    <span class="kw">&lt;tags&gt;</span>markdown text editor weblog-publishing weblog blog publishing documentation admin<span class="kw">&lt;/tags&gt;</span>
+    <span class="kw">&lt;bugTrackerUrl&gt;</span>https://github.com/rickstrahl/MarkdownMonster/issues<span class="kw">&lt;/bugTrackerUrl&gt;</span>
+    <span class="kw">&lt;docsUrl&gt;</span>http://markdownmonster.west-wind.com/docs<span class="kw">&lt;/docsUrl&gt;</span>
+    <span class="kw">&lt;mailingListUrl&gt;</span>https://support.west-wind.com<span class="kw">&lt;/mailingListUrl&gt;</span>
+    <span class="kw">&lt;packageSourceUrl&gt;</span>https://github.com/rickstrahl/MarkdownMonster<span class="kw">&lt;/packageSourceUrl&gt;</span>    
+  <span class="kw">&lt;/metadata&gt;</span>
+    <span class="kw">&lt;files&gt;</span>
+        <span class="kw">&lt;file</span><span class="ot"> src=</span><span class="st">&quot;tools\**&quot;</span><span class="ot"> target=</span><span class="st">&quot;tools&quot;</span> <span class="kw">/&gt;</span>
+    <span class="kw">&lt;/files&gt;</span>    
+<span class="kw">&lt;/package&gt;</span></code></pre></div>
+<p>As you can see most of this info is used to display info to the user when you browse the package contents.</p>
+<p>All the logic to actually deploy the package is handled via relatively simple Powershell scripts and a number of POSH helper functions that Chocolatey exposes. Specifically you need to build a <code>tools\chocolateyInstall.ps1</code> script, which <code>choco new</code> creates for you as a template. Creating this file is mainly an excercise in filling in the blanks: Providing a URL, the name of the executable, the type of install and a SHA checksum.</p>
+<p>By default <code>choco new</code> assumes you're creating an install for a downloadable installer, which then gets run silently to install the product. The base script very simple, and here is what my full Markdown Monster package script looks like:</p>
+<pre class="powershell"><code>$packageName = &#39;markdownmonster&#39;
+$fileType = &#39;exe&#39;
+$url = &#39;https://github.com/RickStrahl/MarkdownMonsterReleases/raw/master/v1.1/MarkdownMonsterSetup-1.1.20.exe&#39;
+
+$silentArgs = &#39;/SILENT&#39;
+$validExitCodes = @(0)
+
+
+Install-ChocolateyPackage &quot;packageName&quot; &quot;$fileType&quot; &quot;$silentArgs&quot; &quot;$url&quot;  -validExitCodes  $validExitCodes  -checksum &quot;5AA2549D88ED8557BA55D2C3EF0E09C15C526075E8E6083B8C703D0CC2679B3E&quot; -checksumType &quot;sha256&quot;</code></pre>
+<p>If you are creating a package for an existing installer this is likely all that you need, but because it is a Ppowershell script you can perform additional tasks here as necessary. If you do things beyond installing an installer package you'll also want to create a <code>tools\chocolateyUninstall.ps1</code> to undo whatever additional tasks you added.</p>
+<p>In the example above my build process generates <code>chocolateyInstall.ps1</code> this file based on the latest version available in a Releases folder, grabbing the file name and url, and generating the required SHA256 checksum that has to be provided as part of the package installer.</p>
+<pre class="powershell"><code># Script builds a Chocolatey Package and tests it locally
+# 
+#  Assumes: Uses latest release out of Pre-release folder
+#           Release has been checked in to GitHub Repo
+#   Builds: ChocolateyInstall.ps1 file with download URL and sha256 embedded
+
+cd &quot;$PSScriptRoot&quot; 
+
+#$file = &quot;MarkdownMonsterSetup-0.55.exe&quot;
+$file = gci &quot;..\..\..\MarkdownMonsterReleases\v1.1&quot; | sort LastWriteTime | select -last 1 | select -ExpandProperty &quot;Name&quot;
+write-host $file
+
+$sha = get-filehash -path &quot;..\..\..\MarkdownMonsterReleases\v1.1\$file&quot; -Algorithm SHA256  | select -ExpandProperty &quot;Hash&quot;
+write-host $sha
+
+$filetext = @&quot;
+`$packageName = &#39;markdownmonster&#39;
+`$fileType = &#39;exe&#39;
+`$url = &#39;https://github.com/RickStrahl/MarkdownMonsterReleases/raw/master/v1.1/$file&#39;
+
+`$silentArgs = &#39;/SILENT&#39;
+`$validExitCodes = @(0)
+
+
+Install-ChocolateyPackage &quot;`packageName&quot; &quot;`$fileType&quot; &quot;`$silentArgs&quot; &quot;`$url&quot;  -validExitCodes  `$validExitCodes  -checksum &quot;$sha&quot; -checksumType &quot;sha256&quot;
+&quot;@
+
+out-file -filepath .\tools\chocolateyinstall.ps1 -inputobject $filetext
+
+del *.nupkg
+
+# Create .nupkg from .nuspec
+choco pack
+
+choco uninstall &quot;MarkdownMonster&quot;
+
+choco install &quot;MarkdownMonster&quot; -fdv  -s &quot;.\&quot;</code></pre>
+<p>This build script isn't required of course, but for me this makes it super easy to create a new Chocolatey package whenever I'm ready to push a new version up to Chocolatey. If this script runs without errors I can do:</p>
+<pre class="dos"><code>choco push</code></pre>
+<p>and have my package published for review.</p>
+<p>If you have installer based software that you are distributing, setting up a new Chocolatey package like this is very quick and easy to do for either some commercial endeavor or even for an internal deployment type situation. This full install gives you a quick idea what a typical Chocolatey package looks like.</p>
+<p>To be clear, this is the <strong>opposite</strong> of a portable install and what the title suggests, but we'll get to that. An embedded install looks quite different - and in fact in the case of the Markdown Monster Portable install there's not even a Powershell script at all as we'll see in a minute.</p>
+<h3 id="portable-chocolatey-installs">Portable Chocolatey Installs</h3>
+<p>Quite a few people have been clamoring for a portable Chocolatey package for Markdown Monster, and so I've been looking into making that possible. A while back I built a portable install in a zip file.</p>
+<p>The zip install is just a snap shot of the application that can be copied into a single folder anywhere on your machine. The nice thing about .NET applications is, that for the most part, they are fully self contained and Markdown Monster has all related dependencies in a single folder structure. You can run the application from there as long as the basic pre-requisites have been installed: Windows 10-7 and .NET 4.5.2 or later and Internet Explorer 11.</p>
+<p>The zip install is a simple xcopy deploy, but even so installing updates at the torrid pace that MM updates are coming out these days becomes a bit tedious with a zip file that you have to download and then unzip into the proper folder. So no surprise that a number of people have been asking for a portable install Choco package that makes it much easier to update the installation.</p>
+<p>Chocolatey makes the process a lot easier by using a single command line command:</p>
+<pre class="dos"><code>choco install markdownmonster.portable.</code></pre>
+<p>and then:</p>
+<pre class="dos"><code>choco install markdownmonster.portable.</code></pre>
+<p>to update the portable install.</p>
+<p>The difference between a full install and a <strong>portable</strong> install is that the portable installs are self-contained and install in Chocolatey's private install folder hierarchy rather than Program Files and don't show up in the Installed Programs of the machine. Portable installs also should install without requiring admin privileges so they can be installed on locked down machines.</p>
+<p>Personally I think full installs are the way to go given you trust the publisher and you have admin rights to do a full install. There are advantages to full installs - you get all settings that the app is meant to have and an installer listed in <strong>Programs and Features</strong>. It's often also easier to update if the program offers newer versions which are likely to go through a full installer and not the portable one. There seems little point to give up potentially unavailable features for a portable install if you have the rights and trust a full package.</p>
+<p>But for those other use cases where permissions are just not there portable installs can be a good thing to provide.</p>
+<h2 id="ad">AD</h2>
+<h3 id="portable-installs---not-always-as-easy">Portable Installs - not always as easy</h3>
+<p>It's not quite as quick as you might think to create a portable install. Portable installs should be self-contained which in rough terms means you should be able to xcopy deploy except for some common pre-requisites.</p>
+<p>If you're building desktop applications, typically you end up pairing an installer with the application that handles common installation tasks.</p>
+<p>In Markdown Monster the full installer handles:</p>
+<ul>
+<li>An optional desktop shortcut</li>
+<li>Registry settings to properly enable the Web Browser control</li>
+<li>File associations (for .md and .markdown files)</li>
+<li>Adds to the user's path<br />
+(so you can launch from via <code>mm readme.md</code> from the command line)</li>
+<li>Install a custom font (Fontawesome)</li>
+<li>and of course it copies files into the proper system install location (program files)</li>
+</ul>
+<p>The full installer for Markdown Monster uses <a href="http://www.jrsoftware.org/isinfo.php">Inno Setup</a> and Inno does all of <a href="https://github.com/RickStrahl/MarkdownMonster/blob/master/Install/MarkdownMonster.iss">heavy lifting for these tasks with a few commands</a>. And that's what an Installer <strong>should be doing</strong>.</p>
+<h3 id="step-1---ditch-whats-not-needed">Step 1 - Ditch what's not needed</h3>
+<p>When building a portable install you can probably ditch some things that you normally do in an install. A portable install doesn't need a shortcut usually - users who install a portable install will know where the application lives and either access it via command line or if necessary create a shortcut themselves.</p>
+<p>Likewise file you don't have to worry about copying files to a specific location on disk as the install can go anywhere on disk and run. You can put a portable install on a USB stick and it will work.</p>
+<p>When installing a portable Chocolatey package, it'll go into <code>c:\ProgramData\Chocolatey\Lib\MarkdownMonster.Portable</code> for example with Chocolatey managing the executable launching automatically via its stub launchers (more on this later).</p>
+<h3 id="portable-friendly-applications">Portable Friendly Applications</h3>
+<p>In order to make the portable install work well there were a number of things that had to be handled as part of the application itself rather than letting the installer handle it:</p>
+<ul>
+<li>Installing registry key for IE <strong>FEATURE_BROWSER_EMULATION</strong></li>
+<li>Adding to the System path (so you can launch with <code>mm</code> or <code>markdownmonster</code>)</li>
+<li>Font installation for FontAwesome</li>
+<li>File associations for <code>.md</code> and <code>.markdown</code></li>
+</ul>
+<p>It turns out when I looked more closely at what's involved I could reduce a few of these and move them out of the installer and into the application.</p>
+<h3 id="registry-keys">Registry Keys</h3>
+<p>Markdown Monster uses the Web Browser control extensively and in order to work with some of the advanced editors used it requires that it runs the IE 11 engine. By default the Web Browser control runs IE 7 (yup compatibility) but luckily <a href="https://weblog.west-wind.com/posts/2011/may/21/web-browser-control-specifying-the-ie-version">there are registry hacks that let you set up an application to use a specific version of the IE engine</a>.</p>
+<p>The IE feature emulation and user path configuration both can be set in the <strong>HKEY_CURRENT_USER</strong> hive, so the application can actually handle that task. Markdown Monster now checks for those keys and if they don't exist creates them on the fly during app startup.</p>
+<p>Here are a couple of helpers to check for values and if they don't exist write them into the registry:</p>
+<pre class="csharp"><code>public static void EnsureBrowserEmulationEnabled(string exename = &quot;Markdownmonster.exe&quot;)
+{
+
+    try
+    {
+        using (var rk = Registry.CurrentUser.OpenSubKey(@&quot;SOFTWARE\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION&quot;, true))
+        {
+            dynamic value = rk.GetValue(exename);
+            if (value == null)
+                rk.SetValue(exename, (uint)11001, RegistryValueKind.DWord);
+        }
+    }
+    catch { }
+}
+public static void EnsureSystemPath()
+{
+    try
+    {                
+        using (var sk = Registry.CurrentUser.OpenSubKey(&quot;Environment&quot;, true))
+        {
+            string mmFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),&quot;Markdown Monster&quot;);                    
+            string path = sk.GetValue(&quot;Path&quot;).ToString();
+            if (!path.Contains(mmFolder))
+            {                        
+                var pathList = path.Split(new char[] { &#39;;&#39; }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                pathList.Add(mmFolder);                            
+                path = string.Join(&quot;;&quot;, pathList.Distinct().ToArray());
+
+                sk.SetValue(&quot;Path&quot;, path);
+            }                                        
+        }
+    }
+    catch { }
+}</code></pre>
+<p>Remember that this works only with keys in HKCU - you're not going to have access to HKLM keys due to the required Admin permissions. After all that's part of the point of a portable install - it runs anywhere even in a locked down environment.</p>
+<h3 id="fontawesome-fonts">FontAwesome Fonts</h3>
+<p>The FontAwesome font installation turned out to be unnecessary as I'm using the <a href="https://github.com/charri/Font-Awesome-WPF/">FontAwesome.WPF</a> library that embeds the font as a WPF resource and provides a number of useful helpers to get the font icons into image and button resources.</p>
+<p>I just had to make sure I always use the embedded resource rather than referencing the font directly as I was doing in a few places - oops.</p>
+<p>So instead of:</p>
+<div class="sourceCode"><pre class="sourceCode xml"><code class="sourceCode xml">FontFamily=&quot;FontAwesome&quot;</code></pre></div>
+<p>I have to use the embedded resource instead.</p>
+<div class="sourceCode"><pre class="sourceCode xml"><code class="sourceCode xml">FontFamily=&quot;pack://application:,,,/FontAwesome.WPF;component/#FontAwesome&quot;</code></pre></div>
+<p>Yeah, that WPF resource syntax is hellatious, but it works to ensure I don't need to have FontAwesome installed system wide.</p>
+<p>Removing the font makes the main install less intrusive and reduces the size a little as well.</p>
+<h3 id="unresolved-portable-issue--no-file-associations">Unresolved Portable Issue -No File Associations</h3>
+<p>The only unresolved issue left are the file associations. Markdown Monster registers itself as a handler for <code>.md</code> and <code>.markdown</code> files, which is nice so you can just double click a file in Explorer and open in Markdown Monster or at least see it as an option if you have something else mapped to it already.</p>
+<p>It's easy enough to fix by using <strong>Open With -&gt; Choose another app</strong> in Explorer:</p>
+<div class="figure">
+<img src="AssociateMarkdown.png" />
+
+</div>
+<h3 id="building-a-portable-install---creating-a-distribution-folder">Building a Portable Install - Creating a Distribution Folder</h3>
+<p>The first step in creating a portable install is to create a distribution folder that holds all of the xcopy-able files.</p>
+<p>As part of my deployment pipeline I create a <code>Distribution</code> folder that holds all of the raw, final files for the installation. I use a Powershell script to copy files from various locations, clearing out unneeded files (`CopyFiles.ps1).</p>
+<pre class="powershell"><code>Set-ExecutionPolicy Bypass -Scope CurrentUser
+
+$cur=&quot;$PSScriptRoot&quot;
+$source=&quot;$PSScriptRoot\..\MarkdownMonster&quot;
+$target=&quot;$PSScriptRoot\Distribution&quot;
+
+remove-item -recurse -force ${target}
+
+robocopy ${source}\bin\Release ${target} /MIR
+
+copy ${cur}\mm.exe ${target}\mm.exe
+
+del ${target}\*.vshost.*
+del ${target}\*.pdb
+del ${target}\*.xml
+
+del ${target}\addins\*.pdb
+del ${target}\addins\*.xml
+
+&amp; &quot;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Bin\signtool.exe&quot; sign /v /n &quot;West Wind Technologies&quot; /sm /s MY /tr &quot;http://timestamp.digicert.com&quot; /td SHA256 /fd SHA256 &quot;.\Distribution\MarkdownMonster.exe&quot;
+&amp; &quot;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Bin\signtool.exe&quot; sign /v /n &quot;West Wind Technologies&quot; /sm /s MY /tr &quot;http://timestamp.digicert.com&quot; /td SHA256 /fd SHA256 &quot;.\Distribution\mm.exe&quot;
+</code></pre>
+<p>I also end up signing the two EXEs in the distribution as well as the final Setup EXE for the full distribution.</p>
+<h3 id="portable-installs-and-chocolatey">Portable Installs And Chocolatey</h3>
+<p>Once you have a distribution folder and you've figured out how to handle the 'configuration' tasks that you may have to shift into your application to make it work properly, you're ready to build a Chocolatey package.</p>
+<p>Chocolatey has many options for building packages. Here are some of the common ones:</p>
+<ul>
+<li>Installer packages (exe, msi)</li>
+<li>Zip packages</li>
+<li>Self-contained Packages</li>
+</ul>
+<p>Then there are variations where you can embed your installers or binaries directly into the package, or you can download them.</p>
+<p>Most common commercial packages and also <a href="https://chocolatey.org/packages/MarkdownMonster">Markdown Monster's Main Package</a>, download an installer from the Internet and then execute it which is what I showed earlier in the post. This allows for packages that are small and files that can be maintained externally to Chocolatey server. It also allows third parties to create packages of software that they do not own so that more software is available through Chocolatey.</p>
+<h3 id="embedded-binary-packages">Embedded Binary Packages</h3>
+<p>You can also create embedded packages where the packages themselves contain the binary installers or even the raw source files. So rather than downloading the installer, the installer can be packaged right into the Chocolatey package. Various Chocolatey Powershell commands can then unpack the installer and install.</p>
+<p>The process for these tasks is well documented and usually involves just a few commands.</p>
+<p>The advantage of these kinds of installers is that you don't have to keep online versions of your installers as I have to do with my Markdown Monster releases. Currently I have a new release file on the Github MarkdownMonsterReleases repo for each and every version. Using an embedded package you don't have to hang on to anything yourself, but you can push the actual files directly into the package. This relieves you from having to host each and every release for all eternity on a server somewhere.</p>
+<p>Chocolately can effectively become your old version software archive.</p>
+<h3 id="embedded-source-packages">Embedded Source Packages</h3>
+<p>Another not so well documented package type is a completely embedded package, which means you ship the raw source files directly in your package's <code>tools</code> folder. This is what I used for the Markdown Monster Portable package and it basically contains all the files in my <code>Distribution</code> folder directly in the package.</p>
+<div class="figure">
+<img src="EmbeddedInstall.png" alt="An embedded Chocolatey Install" />
+<p class="caption">An embedded Chocolatey Install</p>
+</div>
+<p>What's nice about this approach is that if you already have an xcopy deployable application, all you have to do is dump all your source files into Chocolatey's <code>\tools</code> folder and create the Chocolatey <code>.nuspec</code> file that describes your package.</p>
+<p>If there are no additional configuration tasks, you don't even need to provide a Powershell script file at all because the files are simply copied to the destination folder. In my case there's no POSH script at all.</p>
+<p>All that's needed to complete the install then is the <code>.nuspec</code> which is pretty much the same as the one shown earlier save the name and a few tag changes (no <code>admin</code> tag):</p>
+<div class="sourceCode"><pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;?xml</span> version=&quot;1.0&quot; encoding=&quot;utf-8&quot;<span class="kw">?&gt;</span>
+<span class="kw">&lt;package</span><span class="ot"> xmlns=</span><span class="st">&quot;http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd&quot;</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;metadata&gt;</span>
+    <span class="kw">&lt;id&gt;</span>MarkdownMonster.Portable<span class="kw">&lt;/id&gt;</span>
+    <span class="kw">&lt;version&gt;</span>1.1.20<span class="kw">&lt;/version&gt;</span>
+    <span class="kw">&lt;title&gt;</span>Markdown Monster Portable Install<span class="kw">&lt;/title&gt;</span>
+    <span class="kw">&lt;authors&gt;</span>Rick Strahl, West Wind Technologies<span class="kw">&lt;/authors&gt;</span>
+    <span class="kw">&lt;owners&gt;</span>West Wind Technologies<span class="kw">&lt;/owners&gt;</span>
+    <span class="kw">&lt;licenseUrl&gt;</span>http://markdownmonster.west-wind.com/download.aspx#Licensing<span class="kw">&lt;/licenseUrl&gt;</span>
+    <span class="kw">&lt;projectUrl&gt;</span>http://markdownmonster.west-wind.com<span class="kw">&lt;/projectUrl&gt;</span>    
+    <span class="kw">&lt;iconUrl&gt;</span>http://markdownmonster.west-wind.com/images/MarkdownMonster_icon_128.png<span class="kw">&lt;/iconUrl&gt;</span>
+    <span class="kw">&lt;requireLicenseAcceptance&gt;</span>true<span class="kw">&lt;/requireLicenseAcceptance&gt;</span>    
+    <span class="kw">&lt;description&gt;</span>Markdown Monster is...
+    <span class="kw">&lt;/description&gt;</span>
+    <span class="kw">&lt;summary&gt;</span>Markdown Monster is an easy to use and extensible Markdown Editor and viewer and Weblog Publisher<span class="kw">&lt;/summary&gt;</span>
+    <span class="kw">&lt;releaseNotes&gt;</span>https://github.com/RickStrahl/MarkdownMonster/blob/master/Changelog.md<span class="kw">&lt;/releaseNotes&gt;</span>
+    <span class="kw">&lt;copyright&gt;</span>West Wind Technologies, 2016-2017<span class="kw">&lt;/copyright&gt;</span>
+    <span class="kw">&lt;tags&gt;</span>markdown text editor weblog-publishing weblog blog publishing documentation<span class="kw">&lt;/tags&gt;</span>
+    <span class="kw">&lt;bugTrackerUrl&gt;</span>https://github.com/rickstrahl/MarkdownMonster/issues<span class="kw">&lt;/bugTrackerUrl&gt;</span>
+    <span class="kw">&lt;docsUrl&gt;</span>http://markdownmonster.west-wind.com/docs<span class="kw">&lt;/docsUrl&gt;</span>
+    <span class="kw">&lt;mailingListUrl&gt;</span>https://support.west-wind.com<span class="kw">&lt;/mailingListUrl&gt;</span>
+    <span class="kw">&lt;packageSourceUrl&gt;</span>https://github.com/rickstrahl/MarkdownMonster<span class="kw">&lt;/packageSourceUrl&gt;</span>    
+  <span class="kw">&lt;/metadata&gt;</span>
+    <span class="kw">&lt;files&gt;</span>
+        <span class="kw">&lt;file</span><span class="ot"> src=</span><span class="st">&quot;tools\**&quot;</span><span class="ot"> target=</span><span class="st">&quot;tools&quot;</span> <span class="kw">/&gt;</span>        
+    <span class="kw">&lt;/files&gt;</span>    
+<span class="kw">&lt;/package&gt;</span></code></pre></div>
+<p>And you're done!</p>
+<p>I use a <code>build.ps1</code> file to copy the files from my application's release folder to the tools folder, add a license file and then build the package with <code>choco pack</code> and finally test it:</p>
+<pre class="powershell"><code>cd &quot;$PSScriptRoot&quot; 
+$sourceFolder = &quot;..\Distribution&quot; 
+
+remove-item &quot;.\tools&quot; -recurse -force
+
+robocopy $sourceFolder .\tools /MIR
+copy ..\license.txt .\tools\license.txt
+
+del *.nupkg
+
+# Create .nupkg from .nuspec
+choco pack
+
+choco uninstall &quot;MarkdownMonster.Portable&quot;
+
+choco install &quot;MarkdownMonster.Portable&quot; -fdv -y  -s &quot;.\&quot; </code></pre>
+<p>This lets me do a local install out of the current folder and I can then test the installation. If that all looks good I can publish with:</p>
+<pre class="dos"><code>choco push</code></pre>
+<p>If you're publishing for the first time on this machine you'll need to apply your api key (which you can find in your Account page on Chocolatey.org):</p>
+<pre class="dos"><code>choco apiKey -k &lt;your api key here&gt; -source https://chocolatey.org/</code></pre>
+<p>And that's it!</p>
+<p>Anytime you submit a package for the first time expect to wait a while for package approval - it can take quite a while. The MM portable package took 2 weeks to get approved, but times can vary depending on the Chocolatey backlog queue. Just don't plan on it showing up the next day.</p>
+<p>Overall creating an embedded choco package is among the easiest mechanisms to deploy and for many simple tools and utilities this is probably the preferred way to go even for a primary package. Even for bigger applications like Markdown Monster it makes sense for a secondary portable install which is easy to create assuming the application can self-configure without requiring special admin configuration settings.</p>
+<p>Yay for Chocolatey's flexibility to offering you a number of different options for publishing your packages.</p>
+<h3 id="summary">Summary</h3>
+<p>Chocolatey is an awesome tool to install your software. But it's also great as a vendor to have your software delivered easily to users. I'm finding that about 60% of downloads we track come from Chocolatey which is a significant chunk.</p>
+<p>Portable installs are more popular than I would have expected as I got a lot of requests for it (although actual install stats so far don't seem to bear that out yet).</p>
+<p>Creating a portable install took me a while to sort out, not because of Chocolatey, but just in making sure my app could install and work properly without requiring a full admin install. You have to judge carefully of whether your application can function properly without a full install. But if you can make it work, it's quite surprising how many people prefer a portable install.</p>
+<p>If you want to take a closer look at how Markdown Monster handles both the full installer, the full Chocolatey install and the Chocolatey portable install, the <a href="https://github.com/RickStrahl/MarkdownMonster/tree/master/Install">installation scripts and Choco packages are part of the source code on Github</a> to check out.</p>
+<div style="margin-top: 30px;font-size: 0.8em;border-top: 1px solid #eee;padding-top: 8px;">
+<pre><code>&lt;img src=&quot;https://markdownmonster.west-wind.com/Images/MarkdownMonster_Icon_256.png&quot; 
+     style=&quot;height: 20px;float: left; margin-right: 10px;&quot;/&gt;
+this post created with 
+&lt;a href=&quot;https://markdownmonster.west-wind.com&quot; target=&quot;top&quot;&gt;Markdown Monster&lt;/a&gt;</code></pre>
+</div>
+
+    <script src="C:\projects2010\MarkdownMonster\MarkdownMonster\bin\Release\PreviewThemes\Dharkan\..\scripts\jquery.min.js"></script>
+    <link href="C:\projects2010\MarkdownMonster\MarkdownMonster\bin\Release\PreviewThemes\Dharkan\..\scripts\highlightjs\styles\twilight.css" rel="stylesheet" />
+    <script src="C:\projects2010\MarkdownMonster\MarkdownMonster\bin\Release\PreviewThemes\Dharkan\..\scripts\highlightjs\highlight.pack.js"></script>    
+    <script src="C:\projects2010\MarkdownMonster\MarkdownMonster\bin\Release\PreviewThemes\Dharkan\..\scripts\preview.js"></script>
+</body>
+</html>
+<!-- Post Configuration -->
+<!--
+```xml
+<blogpost>
+<title>Creating a portable and embedded Chocolatey Package</title>
+<abstract>
+Chocolatey is an awesome tool to install software. As a publisher you have a lot of choices of how to create packages and in this post I describe the two packages that I use with Markdown Monster, which is a full downloaded installer package and a fully self contained embedded portable package. Here I cover the basics of Chocolatey package creation and some of the steps required to create a portable package from a full installation and some of the challenges you might run into along the way.
+</abstract>
+<categories>
+Chocolatey,Windows,Markdown Monster
+</categories>
+<keywords>
+Chocolatey, Package, Embedded Package, Installer
+</keywords>
+<isDraft>False</isDraft>
+<featuredImage>https://weblog.west-wind.com/images/2017/Creating-an-embedded-Chocolatey-Package/BoxOfChocolates.jpg</featuredImage>
+<weblogs>
+<postid>129680</postid>
+<weblog>
+West Wind Web Log
+</weblog>
+</weblogs>
+</blogpost>
+```
+-->
+<!-- End Post Configuration -->
