@@ -3,128 +3,397 @@ title: It's the Html Stupid
 weblogName: West Wind Web Log
 postDate: 2018-05-01T18:00:33.6880178-07:00
 ---
-# It's the Html Stupid
-I continue to be amazed how the state of HTML and the Web has not really improved drastically in the last 8 years. Some areas like JavaScript and frameworks have seen dramatic improvements. 
+# It's the HTML Stupid
 
-But the UI portion and the hardware integration, mobile support and general browser interoperability has pretty much come to a standstill since 2010 and the original push of HTML5. HTML5, CSS and the Browser DOM still feel like the dark ages with no hope of emerging out of the dark any time soon. 
+If you're a Web developer, you probably have noticed that our industry is thriving on extremely rapid change. You step away from the Web world for a month to work on something different and you come back and there are 20 new things you need to look at. The pace of change is exhilarating and frustrating both at the same time.
 
-### The Constant Focus on JavaScript is misplaced
-Today, we constantly hear about new JavaScript (or lately Web Assembly) frameworks coming. out Yet another way to do client side coding in the browser pops up every few months as if we didn't already have a myriad of choices. New frameworks don't usually offer anything drastically new, except a slightly different twist on the same thing. 
+But these days it seems most of the focus in Web development is on code. The Web UI - HTML and CSS -  and the browser (DOM and support features) as a platform feel like they are stagnating. We now have all the advanced coding tools to do cool stuff, but it seems that **HTML and the Web Browser's feature set are really what is holding us back**.
 
-The new breed of WebAssembly frameworks is probably the most drastically different part of this but as cool as that might be in the future - even this new paradigm is going to run into the same roadblocks with HTML and the DOM - it doesn't change a thing about how the core platform behaves.
+## Code Über Alles
 
-## Client Side Code is a solved Problem
-I'm going to argue that how to run code effectively in the browser has been mostly solved. Today we have rich JavaScript frameworks that allow you to manage very complex code in manageable chunks of abstraction. Frameworks like Angular, React, VueJs, Aurelia, Ember etc. have brought object models that encapsulate the application level development process into relatively well defined modules that allows for building very complex applications without getting overwhelmed by the size of the overall application. No doubt things can be improved - especially when it comes to the build process and tooling - but overall the process is manageable today.
+![](JavaScriptCode.png)
 
-Most of the frameworks use the same overall principles of components, modules, databinding, event handling in similar ways. There are definitely differences in ideology which is fine.
+Most of the focus in Web Development in recent years has been on the **code side of things**: JavaScript Frameworks, ever more complex build systems along with the tools that facilitate creating code efficiently. Huge improvements have been made in this space in the span of just a few short years, and it's now possible for most developers to build even very large applications in a modular and manageable fashion without having to piece together all the needed pieces themselves. There are established solutions for building Web applications from the code perspective and it's relatively approachable and consistent.
 
-We have tons of choices - too many perhaps - that make it relatively easy to build applications. Frameworks like Angular, React, VueJs, Aurelia, Ember to name but a few of the most popular ones all have comprehensive framework models that allow you to create applications out of smaller, manageable components. So instead of building a big monolith it's now relatively straight forward to piece together an application out of logically separated components while still running as a single SPA application.
+> **Client side JavaScript code development is mostly a solved problem that isn't holding us back anymore.**
 
-It's not easy but it's manageable and it follows what I consider a fairly predictable path. Pick a framework and stick to the master plan laid out by the framework and you can expect fairly consistent results. After the initial learning curve one can be very productive with these frameworks. I consider that a **big success** especially when you compare where we were at in the 2010 time frame.
+More recently, there's also been a movement to bring some language diversity to Web development with a push to replace JavaScript as the only language that can play in Web dev with [WebAssembly](https://webassembly.org/). WebAssembly promises to bring alternate languages to client side Web development. But maybe more importantly it might help break the choke hold of the crazy complex JavaScript build systems based on a million untraceable Node modules into more traditional compiler based approaches that produce single source output directly and offer some choices for client side code.
 
-And yet all the hype around the Web seems to focus seems to be on these frameworks on more new frameworks solving an already solved problem over and over again, which to me seems like an effort in diminishing returns. 
+Whether this pans out, or is any easier or less complex remains to be seen, but considerable effort has been invested in WebAssembly as a technology. I think this is something way overdue - JavaScript needs some competition in the Web space to break the house of cards mentality for the client stack.
+
+### Coding for the Web is a Solved Problem
+
+![](javascriptframeworks.png)
+
+Putting WebAssembly aside for a moment, the progress that has been made for code based solutions has been nothing short of amazing. Today you have a choice of a large array of frameworks like Angular, React, VueJs, Ember and Aurelia to build applications in a consistent manner and the process of doing so once you get to a working build setup is relatively easy, consistent and maintainable. Building JavaScript applications not so long ago used be a real Wild West experience, but today by way of frameworks and consistent approaches to modularizing applications the process of building complex applications is much easier and more consistent. With ES 2016 modules it's now even possible to get by without frameworks, although I'd argue for bigger applications frameworks provide so much support you'd be crazy not to take advantage of their core features.
+
+While there surely are more areas that can be improved, especially in the underlying JavaScript eco-system, overall the code bit of Web application is a mostly solved problem. 
+
+> Web code development is mostly a solved problem!
+
+## Let's talk about HTML and Web Browser
+Ask most Web developers about the biggest pain point in Web applications today, and they will likely tell you that **Web UI is their biggest time sink**. I know this is true for me. To get an application to look right and professional, to get the common input controls that most applications need, to be able to customize or create custom controls beyond the basics, the create a well rounded responsive UI is not something that just arrives as part of a single framework or tooling.
+
+And it sure as hell does not **come in the box** via HTML.
 
 ## HTML and DOM: The ugly StepChild
-In my mind the big problem in Web Development isn't the code - it's the HTML, CSS and DOM bits that seem to be stuck in the mud with antiquated technology that's not addressing the needs of modern application development. Compared to the rapid advances we've seen in the JavaScript world HTML, CSS and the DOM are stuck in the mud.
 
-Today we have all this talk of Progressive Web Apps taking over native mobile and even desktop (in the Windows Store) applications, but whenever I hear HTML replacing desktop or even mobile apps I just feel like laughing out loud given the **ridiculously limited functionality provided by HTML and the DOM**.
+![](UglyStepChild.png)
 
-Many years ago when HTML5 arrived it was supposed to be the panacea that was to deliver us the rich platform that would finally banish other platforms. **HTML über alles** they said. A new era of rapid improvements, new APIs etc was upon us. Soon we would be able to build mobile apps, talking to native APIs and find unicorns and rainbows that lead us to that pot of Gold...
+In my mind the weak point in Web Development now is HTML, CSS and DOM that's not keeping up with the change and ambitions we are seeing in the code space. Compared to the rapid advances we've seen in the JavaScript world, HTML, CSS and the DOM are stuck in the mud. HTML still seems like it's 90's technology it's so far behind the advanced of everything else around it.
+
+### HTML 5 was a LOOOOONG time ago
+Many years ago when HTML5 arrived and it was supposed to be the panacea that was to deliver us the rich platform that would finally banish other platforms. **HTML über alles** it was said. A new era of rapid improvements, new APIs etc was upon us. Soon we would be able to build mobile apps, talking to native APIs and find unicorns and rainbows that lead us to that pot of Gold...
 
 Cue the record scratching off the turn-table...
 
 ![Scratch That](https://media.giphy.com/media/kDWOrEBckWgln827na/giphy.gif)
 
-While HTML5 did bring a number of much needed improvements to the pitiful HTML4/XHTML standard, it didn't do nearly enough. Advocates were predicting *just give it another 2 years* until it's widely adopted.
+HTML5 did bring a number of much needed improvements to the pitiful HTML4/XHTML standard. Semantic HTML tags and a handful of much needed DOM APIs including Geolocation, various local storage solutions, and  maybe most importantly a consistent model respected by all browsers - including at the time,  Microsoft's browser and Internet Explorer 10 and 11 in particular.
 
-Well, those 4 years, ratification and adoption came and went - and nothing changed.
+HTML 5 improved Web development dramatically with more consistency and explicit rules for browser vendors to follow. But it wasn't exactly an earth shaking change or advancement of HTML. The biggest feature boosts came from CSS 3 improvements with many much needed new CSS attributes. But again - most of those had been in most browsers (except IE) for years, so when all of this finally landed it was kind of a ho hum moment.
 
-> For HTML advocates it's always the same: Just wait another 2 years and everything will be awesome!
+The biggest shortcomings in HTML is the lack of forward movement in a few areas:
 
-Now we're almost 10 years later and very little has changed. Look at the original HTML5 specfication from ~8 years ago and honestly think about what's changed since then. What can you think of?
+* Input controls. We basically still have the same 12 input controls HTML 1 had
+* Integration with the browser host OS/Platform
+
+*** FIX THIS
+> HTML Advocates: **Just wait another 2 years and everything will be awesome!**
+
+### HTML What have you done for me since 5.0?
+Now we're 8 years past wid-ish HTML5 adoption and very little has changed. Look at the original HTML5 specification from ~8 years ago and honestly think about **what's changed since then**. Not much...
+
+What can you think of?
+
+Here are a few I can think of for UI (not anything JavaScript or code related):
 
 * Flexbox
 * CSS Grid
 * Navigation and History Improvements
 
-Those are nice, but hardly ground breaking. Nav in particular was very necessary because without it SPA applications wouldn't be able to work. So that happened fast. FlexBox was cool when it came out, but alas it's going to be made obsolete by CSS Grid. Yeah, that was greeeeaaat planning too! 
+Crickets? Yes?
 
-There are lot of other small enhancements in CSS but most of those are also still a ways away, because... browser support even in evergreen browsers is not there yet. Microsoft lags behind as usual waiting for official ratification which is going at a snail's pace. Chicken and egg.
+Note I'm deliberately excluding big non-UI enhancements that are major components but don't directly affect UI:
 
-> Just wait another 2 years and everything will be awesome!
+* Service Worker (not directly UI related though)
+* Web Assembly
+* ES2015/2016
 
-I wrote a piece on [the state of mobile Web development in 2014](https://weblog.west-wind.com/posts/2014/Aug/18/The-broken-Promise-of-the-Mobile-Web) - I just re-read that blog post and looking at it I realize that none of the things I complained about have been fixed. In 4 years! It's also funny reading the comments on that posts as I took a significant amount of slack from the HTML apologists.
+With the minimal UI improvements in HTML, think about were we've gone with JavaScript and in the browser code space in general in the last 8 years by comparison. 
+
+Where have HTML, CSS and the DOM gone by comparison? Practically nowhere. The same issues we had when building applications that needed to interact with host OSs/platforms 8 years ago are no better than back then. You still can't build a decent mobile application **with just a Web browser** that interacts with native phone hardware or software APIs. To do something as simple as accessing your contacts, or sending an SMS (all with permissions of course) is still impossible. Controlling the camera or microphone beyond the very basics is still not possible anymore than it was back then. You still can't effectively save files without popping up a Save As prompt box, even if re-saving a file that you previously opened or saved. Camera and audio access is absolutely minimal and barely supported on some browsers.
+
+[whatwebcando.today](https://whatwebcando.today) shows an overview of features supported by various browsers and the while there are lot of features listed, many of them are not widely enough adopted to be used for general purpose Web access.
+
+There's a lot of red on this feature list and even some of the checked off items don't work in all browsers (here in FireFox):
+
+![](BrowserFeatureSupport.png)
+
+and it's worse if you do this on mobile phones. Here's the same page on iOS :
+
+![](iOsFeatures.png)
+
+But...
+
+> **Just wait another 2 years and everything will be awesome!**
+
+Bluetooth and USB support? Yeah right. Those are nice **experiments**, but don't expect those to be usable in all browsers the next 5 years in general purpose applications. It's same with many other APIs shown above. There are frantic articles about how wonderful this or that new **experimental** feature is, except well... you can't use because no browser actually supports it. Most of those 'APIs' have been around in experimental form for years.
+
+And so we wait. Specifications are available and have been proposed years ago. And they sit, sit and languish.
+
+### Change is possible: GeoLocation
+
+![](geolocation.png)
+
+Not surprising, rapid change is possible when there is some commercial interest. It happened with the browser GeoLocation API, which got into browsers very rapidly and was also ratified relatively quickly. Browser vendors had a vested interest in that technology (Google and Microsoft both have map solutions to sell and push advertising on) and so it got pushed hard and was adopted very quickly in all browsers.
+
+GeoLocation is also a good example of how security can and should work in terms of asking for permissions in the browser, caching permissions for some time without re-prompting for a given time. Geo location just works and demonstrates that it's possible to integrate with security sensitive features without being totally obnoxious and making the tech unusable due to security limitations. 
+
+Finally GeoLocation has also been one of the first APIs that **required use of SSL/TLS** for all API access and so has become a driver for moving forward towards a secure Web where most if not all (eventually) traffic runs over a secure connection.
+
+In other words: **Where there is a will there's a way** and GeoLocation was one of those cases where there was a lot of will. Unfortunately, the rest of the Web APIs under review and in proposal status seem to get none of that same love. 
+
+### Don't we have everything we need?
+
+![](HornOfPlenty.png)
+
+When it comes to HTML, I often hear - "we have everything we need in HTML" it doesn't need to change rapidly. 
+
+Really? There are so many shortcoming and hacks required to make even some of the most basic things work in HTML today. If you've been doing HTML development for a while you may just have forgotten how kludgey and funky a lot of HTML behavior is, especially when it comes to more complex interactive or input components.
+
+There are lot of other small enhancements in CSS but most of those are also still a ways away, because... browser support even in evergreen browsers is not there yet. Microsoft lags behind as usual waiting for official ratification which as usual is going at a snail's pace. Chicken and egg.
+
+> **Just wait another 2 years and everything will be awesome!**
 
 ### Doing Awesome Things? Yes, but at what Cost?
-Now I realize all of this is not keeping people from doing awesome stuff on the Web, despite the limitations, but the reality is that to really build professional looking applications is very hard for the **average developer** because there's no consistent path for building Web UIs.
+Now I realize all of this is not keeping people from doing awesome stuff on the Web. Many applications may never need integration with mobile or native features. A typical data over forms application may not need fancy UI interactions. And that's great.
 
-Not only that there is a tremendous amount of waste as people are reinventing the wheel over and over and over again. Reusability for UI on the Web is deplorable.
+Or local access to a folder and be able to save a file without constantly having to throw up a dialog. Maybe you don't need access to the mobile phone's address book, or the SMS app to send (after validating access) legit messages out of your app.  Or maybe the applications that you built don't require anything beyond using a UI framework like Bootstrap, Material Design or something more app like like KendoUi or DevExtreme etc.
 
-To be clear, I've always been a big advocate of Web technology. Most of the paid work I do revolves around Web technology. What I write about in my blog almost exclusively deals with Web tech. If I have a choice I much rather build applications for the Web than a native desktop or mobile app. But I am getting tired waiting hearing the *just give it another 2 years and then things will be awesome* mantra. Because it never actually arrives.
+But  if we are serious about putting more and more applications into a web browser, more complete access to integration features are required. To realize the real promise of the Web and for things like PWA to become a real force as an application platform - those things **have to be there**. If we plan on using the browser as an application platform that can address the needs of modern applications, why do we continue to hobble it by not advancing the core feature set that would allow it to integrate and provide access to those same native features that native applications have access to via UI abstractions that address common use cases.
 
-I want to be a big fan. And I'm doing it because - c'est la vie. But I'm gnashing my teeth while doing it.
+### Reinventing the Wheel over and over again
+
+![](reinventing%20the%20wheel.png)
+
+The reality is that to really build professional looking applications is very hard for the **average developer** because there's **no consistent path** for building Web UIs. Even if you choose one of the big frameworks that only gets you so far. You'll have to customize and hack your way around to fill in the gaps that a framework does not fill - which is usually quick complex due to the scattered dependencies and nested CSS styling nightmares most of these frameworks impose.
+
+On top of that is the tremendous amount of time wasted as developers are reinventing the same wheel over and over and over again. Reusability for UI on the Web is deplorable.
+
+I've always been a big advocate of Web technology. Most of the paid work I do revolves around Web technology. What I write about in my blog almost exclusively deals with Web tech. If I have a choice I much rather build applications for the Web than a native desktop or mobile app. But the longer I sit here looking at where HTML is going (nowhere) 
+
+But lately I've been feeling extremely frustrated with the Web space as I find myself in this place of never having a straight forward answer to what tools I should use to build a new application with. There are lots and lots of choices out there, but most of them have lots and lots of holes in them that need to be filled with time consuming busy work of reinventing that wheel.
+
+I am getting frustrated waiting, and hearing the *just give it another 2 years and then things will be awesome* mantra. Because it never actually arrives.
 
 ## Failure of Imagination: HTML
-If you're a Web developer raise your hand if you have ever struggled with putting together a UI feature that seems relatively simple. Maybe you needed a custom formatted list box, or dynamic tree or something as simple as a 'combo box'. If you're anything like me, you probably use some sort of framework that provides you a base set of features and 'controls' (air quotes that!), but when that base set doesn't have what you need, which happens regularilym you have to roll up your sleeves and start building a custom control from very, very, very low level DOM infrastructure.
+If you're a Web developer raise your hand if you have ever struggled with putting together a UI feature that seems relatively simple **without immediately going to a UI framework**. Maybe you needed a custom formatted list box, a masked input box, or dynamic tree or something as simple as an editable  'combo box'. Without a framework there are no good to make that happen.
 
-Because there's essentially no component platform in the DOM only a bunch of HTML controls that have been there since the mid-nineties since the first Web browser was created, 'controls' are built through simulation of other controls. To build a servicable combobox you draw boxes around an input control to simulate an input box. To display a drop down list you manually draw box and position the mouse at the mouse cursor and hope the algorithm is correct. And it handles the browser edge (ha ha) cases.
+If you're anything like me, you probably use a UI framework like [Bootstrap](https://getbootstrap.com/), [Material Design](https://material.io/design/) or UI toolkit like [Kendo UI](https://www.telerik.com/kendo-ui), [Wijmo](https://www.grapecity.com/en/wijmo) etc. that provides you a base set of features and 'controls' (air quotes that!). But when that base set doesn't have what you need, which happens regularily to me, you have to roll up your sleeves and start building a custom control from low level DOM infrastructure or using proprietary, and usually non-trivial and unintuitive framework abstractions. The fact that customization can be difficult is not really a vendor issue, but more so that each framework has a completely different set of implementation details so if you've built a customized component for one framework you can't use it anywhere else, nor can you just port over the logic to creat that component anywhere else.
 
-## Component History on the Desktop
-I know I'm dating myself, but I come from a background of Windows desktop development - I got my start in FoxPro, worked some in VB6 and MFC/C++ and then worked in .NET WinForms and WPF which I still use on occasion to this day for things that simply work better on the desktop - mostly tools or applications that need to interface with hardware. When I think back on those days one thing that stands out to me is how easy and fast it was to develop functional applications. 
+Because there's essentially no component platform in the DOM only a bunch of HTML controls that have been there since the mid-nineties since the first Web browser was created, 'controls' are built through simulation of other HTML elements and those base controls. To build a servicable combobox you draw boxes around an input control to simulate an input box. To display a drop down list you manually draw box and position the mouse at the mouse cursor and hope the algorithm is correct. And it handles the browser edge (ha ha) cases. 
 
-In these desktop environments you had an incredible amount of native controls that **were built in to the base framework** along with extensive tooling that allowed a rich design time experience. Controls like date pickers, comboboxes, grids, tree viewers, auto-selectors, even more custom things like masked input filters, validators and scroll viewers and so on were **just there** because they are part and parcel of the platform.
+The basic building blocks of HTML controls are just not there to provide for more complex controls in a more consistent fashion.
 
-But even more importantly beyond that these UI frameworks came with something that HTML can only dream about: An actual **well-defined and extensible object model** that allowed you to easily extend or create new controls of your own relatively easily. Not only could you create your own because it was relatively easy to use base components and enhance them, but it was also relatively easy for many third parties to build third-party controls that were for sale (or in some cases free - remember this is long before OSS and free became the norm). Tons of third party controls were also available both for pay and for free.
-
-## Compare that to HTML
-Now compare that to the dearth of controls in HTML. To this day HTML has 7 input controls. 7!!! And they all pretty very limited in terms of what features or customizability they provide. Most are not easily customizable via CSS even (checkbox, radio, select) and have a very limited set of properties and events. There is not a single rich component built into HTML. Not one. Not a date picker, not a combobox, and not any sort of list control except the utterly unconfigurable and nearly unstylable `<select>` and `<datalist>` (which is not well supported) controls.
-
-Here are the dirty seven:
+### Input controls
+The first and maybe biggest failing of HTML is that it has a pitiful set of input controls.
 
 1. input
 1. textarea
+1. file (upload)
 1. checkbox
-1. radiobutton
+1. radio
+1. radiogroup
 1. button
 1. select
 1. datalist
 
-Now to be fair `<input>` has a number of separate types `date`, `range`, `number` that provide a few input alternatives, but few serious sites actually use these extensions, because they are rendered inconsistently or not all in various browsers. And even if they do render they usually don't fit into the UI of the hosting framework. In short, most of the custom input types are really quite worthless from a UI control feature perspective.
+The `<input>` tag has quite a few additional variations for things like inputs for **password**, **date** and **datetime**, **number** and so on, although most of these are widely shunned because not all are supported on all browsers and because the more complex ones like the DatePicker are implemented in absolutely terrible ways and are not stylable.
 
-## Custom Drawn Controls
+The only even remotely complex control in native HTML is the `<select>` list control which is used for Listboxes and Dropdowns. This control is notoriously un-stylable. The API for selection handling in the list controls is so primitive it doesn't even track or allow setting the selected item(s) directly - you have to traverse the DOM children to find or mark selected items explicitly.
+
+### No Complex Input Controls
+There are no other complex input controls. There's no combobox that you can type into. There is no autocomplete control, no (usable) date picker, no editable grid or heck even a scrollable readonly grid. The List control that is available can barely be styled, so much so that most frameworks simply discard the native controls and use HTML primitives to redraw lists completely and then set values in a hidden control.
+
+Not only is the set of input controls really small, but these controls have almost no functionality associated with them.
+
+Where are controls like a templated list control? Or tree (Ok that's stretching it) and common controls like a **stylable** date picker, combobox or autocomplete control that can be re-used by just about any non-trivial application?
+
+No, instead we keep re-inventing the wheel over and over again for each application.
+
+### Extensibility for the Web
+
+![](Extensibility.png)
+
+We often hear that extensibility is difficult to implement for browsers because Web applications run across many browsers, OS platforms and implementations have to be built for each platform.
+
+But - we also know that tools like Cordova have existed for many moons now and that have made it possible to build extensions and integrations into native features. Why couldn't we have that sort of extensibility built right into the browser platform itself? This alone would potentially open a whole slew of features. 
+
+**Extensibility** is a feature! 
+
+**Security is obviously a concern** with any sort of extensibility, but that's something that browsers will have to address one way or another anyway going forward. We grant our native mobile platforms a lot of rights and yet we are supposed to feel secure when we install apps from an 'app store'. Whatever that model is, it can also be used for Web applications. Restricting behind permission prompts is the first line, and for additional security having an **optional** registry/repository for components might be another.
+
+Again - you don't hear anything about extensibility because it is outright dismissed. Should it be? Security is hard, but it's not an unsolvable problem.
+
+### HTML Layout
+
+![](GridLayout.png)
+
+To this day HTML has had a plethora of different layout engines, none of which have made page level layouts that most sites are made up of even reasonably intuitive. In the old days HTML Tables were the only way, then floats and fixed or absolutely positioned came into vogue. More recently there's been [FlexBox](https://css-tricks.com/snippets/css/a-guide-to-flexbox/) which I've spent quite a bit of time with in the last few years. Flexbox works reasonably well, but it's funky syntax and inconsistent layout concepts and language, have made that technology an uphill battle. This plus the fact that broad browser support took 6 years to come to fruition just at a time when the next new thing was showing up on the radar.
+
+That next new thing Layout engine is [CSS Grid](https://css-tricks.com/snippets/css/complete-guide-grid/). CSS Grid looks like finally there will be a standard that actually addresses most of the concerns for layout. It inherits most of the concepts of Flexbox behavior (with better syntax) plus templated and named layout sections that can be rearranged via CSS in media queries typically. CSS Grid is what Flexbox should have been really.
+
+What's frustrating here is that both FlexBox and CSS Grid happened nearly side by side with Flexbox getting to broader adoption first. And now well, you'll want to throw out Flexbox code and use CSS Grid instead. It took an extremely long time before Flexbox was usable on mainstream Web sites due to browser support.
+
+> **Just wait another 2 years and everything will be awesome.**
+
+The good news is FlexBox is pretty good with browser support now. CSS Grid works with all major evergreen browsers, but Internet Explorer - which sadly still has significant browser share - is not supported.
+
+All of this points to how bad the W3C 'design by committee' process is at bringing new features to the browser. Not only is it slow, but it's also bringing almost duplicated features that for the casual observer are not even easy to differentiate at glance. It would have been nice to have CSS Grid and Flexbox as a single spec since there is so much feature overlap, but no - two separate but similar standards just to make things a more difficult to decide.
+
+### Common Components
+If you've ever worked with any other type of UI framework you immediately realize that HTML has a tiny API for controlling rendering and interacting with these input controls. Input controls are one thing, but even beyond that common features are not provided by HTML. There's no support for menus or even a popups. There's no high level list control that can be customized with custom templates to render specialized content. Need a tree display -  you're on your own.
+
+Granted all of this can be done by hand. Building a tree display is not too much more work manually than it is with a native control. Except when you maybe also want to edit those else elements and track selection and add a slew of features that are expected to work in a tree. It can be done, but building controls that behave the way you expect them too **is a lot of work**. Work that usually has little to do with the business goals of an application that developers are building.
+
+As a result of this you either have to build your own set of 'controls' (which is possible but it takes time) or you might decide to use a UI framework of some sort.
+
+Building your own is no trivial task, because there's no API. We all know what happens when people just 'build their own' - all we have to do is look of the haphazard world of jQUery components. There are jQuery components for just about any type of functionality available, but man oh man, each and every one of these components looks different, uses it's own set of styling rules and nothing really fits together. 
+
+You might want to use this component, but it doesn't play nice with the framework you're trying to plug it into. 
+
+So much wasted time because there's no coherent standard, a very limited API that provides no constraints and essentially **encourages every one to do something different**!
+
+### UI Frameworks
+To fill this need of even the most basic UI constructs most Web developers use some sort of UI framework. Whether it's Bootstrap, Material Design, Ionic, or more component based libraries like KendoUI, Wijmo and so on. 
+
+UI Frameworks fill that basic need, but in many cases most of these frameworks also fall short of the providing complete solutions. I use Bootstrap for most apps I work with, and it has a fairly minimal set of UI 'controls'. I typically add some custom styling or use a purchased theme (which in most cases is an absolute nightmare to customize).  
+
+Once you get beyond the basic controls of the framework however, then the hunt is on to find a separate control that provides that functionality for the said framework. 
+
+How many times can I either build or try to find a Bootstrap Datepicker, AutoComplete control or grid that works with each version? What if on the next project I'm using is Material Design? I get to start all over and re-integrate. Each and every time you end up searching out or building a new component and trying to integrate that into the framework of choice.
+
+And it's not like there's any standardization amongst frameworks. For example, Bootstrap is easy to use, but extending its styling in order to integrate custom controls that fit the UI style is no walk in the park. If you end up building your own, you're likely to spend a day getting the details right. And even if you find an open source component that fits the bill, third party integrations tend to be finicky and often prone to small little bugs, because they usually tackle more ambitious controls than the simple ones packaged in the main framework in the first place.
+
+No doubt, UI frameworks make life easier but they are not an end-all solution to the more fundamental problem, which is that HTML lacks the core design essentials to build extensible components in a meaningful and consistent way.
+
+### Web Components
+Ah yes, Web Components: the mythical solution to all of the Web's problems for the last 7 years.
+
+Web Components sure sound promising. Always have since there was the initial discussion in the early 2011 timeframe. 
+
+Much like application frameworks like Angular and React etc., Web Components are meant to to create small self-contained islands of UX and functionality that can be reused.
+
+Web Components provide an isolated DOM space (Shadow DOM) in which controls can live so that they are optionally not affected by CSS rules and transformations from the host page except for explicitly pulled in styling and page logic. The idea is that you can build components that will behave consistently no matter where you drop them into a page or which framework you use.
+
+That sounds great and it **might** solve the problems I've described so far in providing a richer base line of base controls that can be reused. Even so even Web Components sure could benefit from a larger set of **built-in base controls**.
+
+But...
+
+> **Just wait another 2 years and everything will be awesome!**
+
+The way things stand only Chrome has support for all the required sub-features. Most other browsers are a sea of red:
+
+* [Web Components on caniuse.com](https://caniuse.com/#search=Web%20Component)
+
+![](WebComponentsBrowserSupport.png)  
+<small>**Figure** - WebComponents all sub-features browser support summary</small>
+
+Again, I have to ask this question: We know Web Components is a vital feature that everybody wants and the Web needs to move forward. All camps have been advocating Web Components for many years. So, why the heck are we 7 years into this technology without even a possible adoption date in sight?
+
+### JavaScript Frameworks
+Since the W3C Web Components standard has been slow moving, the big JavaScript frameworks have come up with their own component implementations that provide a higher level code based abstraction for components using code. Code uses isolated DOM and CSS the frameworks are providing the base features to make it possible to build reusable and easily accessible components using a fairly simple API.
+
+These implementations are probably the closest we've seen to a real component implementation in the actually usable space, but the model here is geared more towards building reusable application components rather than reusable 'UI controls' because at the end of the day this still all depends on the core shortcomings of HTML. What it does provide is an easy and semi-consistent way of exposing an API for these components.
+
+The big drawback with Application Frameworks is: Each framework has its own way of doing things, so there's consistency only with the same framework space.
+
+### Custom Drawn Controls
 As a result of this minimal feature set, HTML relies on custom controls that aren't really controls at all but a bunch of HTML elements laid in composition around the limited controls above meant to **mimic** real controls that live in a native operating system. 
 
-I can hear the HTML apologists just now:
+I can just hear the cries now:
 
 > But, but... HTML - I can draw whatever I want with HTML, right? Right?
 
 Sure given an unlimited amount of time I'm sure you can hand code any custom control you like, but the fact is most of us don't have that time. And we especially don't have it when we are switching to the UI and JavaScript framework du jour on the first full moon of every new year.
 
+If you need custom input controls you're also still confined by the extremely limited feature set of the few native input controls available. 
+
 How many times have you hunted around for a DatePicker control that works with jQuery UI, then jQUery Mobile, then Bootstrap, and then with your custom framework? The horror of it all is that even if you find something that works it usually only works **in the context of the framework it was designed for**. Throw it into a different UI context and the whole shebang no longer looks right, or worse no longer works.
 
-So maybe you're one of those 'no frameworks' guys that does build everything by hand. If you are - that's awesome and I **really admire** that if you're sticking with it. I say that because I have done that in the past but at some point realized that maintaining my own Web Framework is just to damn difficult for a single developer or even a small team. And in the end it's a tough sell to clients.
+So maybe you're one of those 'no frameworks' guys that does build everything by hand. If you are - that's awesome and I **really admire that** if you're sticking with it (most don't). I say that because I have done that in years past but at some point realized that maintaining my own Web Framework is just too damn difficult for a single developer or even a small team to keep up and manage. And in the end it's a tough sell to clients you do work for that generally want a more standardized solution that they can find developers for.
 
-Building UI components that display content is perhaps a reasonable endeavor that is fairly doable. But building user friendly controls that have common behavior, support accessibility standards, support OS shortcuts and behaviors are hard to build. There are tons of little details you probably didn't even think about when decided to build that custom list control. Handling keyboard and mouse input. Handle input searching. Handle multi-select. Handle... the list goes on. 
+Building UI components that display content is perhaps a reasonable endeavor. HTML is infinitely flexible with layout when it comes to visual layout but it absolutely sucks when it comes to behavior because there are no behavior standards at all.
 
-> Building usable controls is hard and it's not something that application developers should have to do. 
+When you account for **behavior** you realize quickly how complex it is to build even a reasonably simple control and make it behave like a control is expected to behave. For example, think of implementing selection behavior on a hand drawn list control, or handling expansion in a hand drawn tree control - these are not trivial implementation details. You need to account for mouse and keyboard behavior, for hover behavior. Handle input searching. Handle multi-select. Handle accessibility, localization and the list goes on... the list goes on. 
 
-Yet with HTML application developers are often forced to do just that because there are no decent built-in alternatives, or often there are no ready made components available for your platform du jour.
+Develelopers who specialize in Control development know all of these details, but the average application dev usually never gives these things a second thought - until you have to implement them yourself.
 
-To come back to the desktop metaphor here, what's missing in HTML is the underlying support platform - that common object model that provides the core semantics upon which you can then reasonably build new components.
+Building user friendly input controls that have common behavior, look professional, support accessibility standards, support OS shortcuts and behaviors is hard. 
 
-HTML is infinitely flexible with layout when it comes to visual layout but it absolutely sucks when it comes to behavior because there are no behavior standards at all.
+> Building re-usable controls is hard and it's not something that application developers should have to do. 
 
-When you account for **behavior** you realize quickly how complex it is to build even a reasonably simple control and make it behave like a control is expected to behave. For example, think of implementing selection behavior on a hand drawn list control, or handling expansion in a hand drawn tree control are not trivial implementation details. You need to account for mouse and keyboard behavior, for hover behavior and a million other little details. Control developers know all of these details, but the average application usually never gives these things a second though - until you have to implement them yourself.
+Yet with HTML applications application developers are often **forced to do just that** because there are no decent built-in alternatives or there are no ready made components available for your platform du jour.
+
+To come back to the desktop metaphor here, what's missing in HTML is the underlying support platform - that common object model that provides the core semantics upon which you can then reasonably build new components **in a consistent manner**.
 
 ### The unfulfilled lure of Third Parties
 
 > "Aha", I hear you say. "Why don't use a third party control, or control framework?"
 
-Yes there are powerful third party frameworks available from the big framework vendors and also from smaller vendors and even some free ones. Frameworks like Kendo UI, Wijmo, DevExtreme provide a huge set of controls, provide huge set of controls. But - these frameworks tend to be rather expensive and if you do go that route you are really buying into a specific framework's look and feel. If the framework can serve all of your needs - that's great. But... as is often the case when you need something above and beyond now your task will be to match the look and feel and behavior of that very same framework which is often difficult to achieve. Additionally, these frameworks implement their own object models 
+Yes there are powerful third party frameworks available from the big framework vendors and also from smaller vendors and even some free ones. Frameworks like Kendo UI, Wijmo, DevExtreme provide huge set of controls. But - these frameworks tend to be rather expensive with often complex licensing schemes and maintenance contracts, and if you do go that route you are really buying into a specific framework's look and feel.
 
-I also think that the extreme pricing on some of these frameworks is due to the sheer economics of - free. These once popular companies that used to provide components at reasonably prices are fighting against the tide of mediocre free components today and the only way they can stay afloat is by charging an arm and a leg to make up for the enormous development cost and by sticking that cost to Enterprise customers with deep pockets.
+If the framework can serve all of your needs - that's great. But... as is often the case - when you need something above and beyond, now your task will be to match the look and feel and behavior of that same framework which complicates the process of custom control creation even more. 
 
-This is a nasty devaluation side effect of OSS that has driven out the middle market - you now see either free (and often mediocre) or high end expensive components. There's no middle ground as it's too expensive to develop rich component suites by small developers and not exciting enough for OSS developers to provide content for this market. 
+Additionally, these frameworks implement their own object models that are often very complex to extend. While usage of frameworks is often well documented, extending them usually is not.
+
+I also think that the extreme pricing on some of these frameworks is due to the sheer economics of competing with... free. The component vendor  companies once enjoyed wide adoption of their frameworks at more reasonable costs. Now they are fighting against the tide of mediocre or at least much less featured free components today and the only way they can stay afloat is by charging an arm and a leg to make up for the enormous development cost and by sticking that cost to Enterprise customers with deep pockets. The little guy is pretty much priced out of the market for most of these frameworks.
+
+This is a nasty devaluation side effect of OSS that has driven out the middle market - you now see either free (and often mediocre) or high end expensive components. There's little middle ground.
+
+
+
+## Does it have to be this way?
+I know I'm dating myself, but I come from a background of Windows desktop development long before there even was 'Web development'. Say what you will about desktop development (or even Native development for devices these days) when it comes to providing consistent APIs and tooling to make it easier to build sophisticated UIs, native apps are doing a much better job.
+
+HTML is not like the desktop so it can't be expected to behave the same, but compared to desktop applications and APIs HTML is just very, very sparse. Some will take that as a positive, but I'm pretty sure that many are realizing that this lack of an underlying platform architecture causes a lot of the friction I describe above in the development process.
+
+It sucks to have to continually re-invent the same thing over and over again and when you have no real baseline model on which to build a custom implementation. You can't extend functionality that isn't there in the first place, so you often have to literally build from scratch.
+
+### Desktop Apps: APIs is what made them productive
+I got my start in FoxPro, worked some in VB6 and MFC/C++ and then worked in .NET WinForms and WPF which I still use on occasion to this day for things that simply work better on the desktop - mostly tools or applications that need to interface with hardware. 
+
+When I think back on those days one thing that stands out to me is how easy and fast it was to develop functional applications due to a plethora of pre-made components, easy to use visual tools that allow easy placement and visualization of content. And maybe more importantly a well defined underlying UI API that supported creation of common controls that addressed the most common use cases.
+
+HTML based UI development is lacking in all of these areas.
+
+In these desktop environments you had an lots native controls that **were built in to the base framework** along with extensive tooling that allowed a rich design time experience. Controls like date pickers, comboboxes, grids, tree viewers, auto-selectors, menus, context menu, popups, even more custom things like masked input filters, validators and scroll viewers and so on were **just there** because they are part and parcel of the platform.
+
+But even more importantly these UI frameworks came with something that HTML can only dream about: An actual **well-defined and extensible object model** that allowed you to easily extend or create new controls of your own relatively easily. Not only could you create your own because it was relatively easy to use base components and enhance them, but it was also relatively easy for many third parties to build third-party controls that were for sale (or in some cases free - remember this is long before OSS and free became the norm). Tons of third party controls were also available both for pay and for free.
+
+None of that exists in HTML. In HTML the only model you have is basically extend by composition of the limited base controls that you have.
+
+Having a base set of components provides a more solid base line for building applications without having to run out and build or find a third party component each and every time you need even a slightly complex controls.
+
+I often hear arguments that HTML is different than desktop because HTML layout is very fluid and that's why the model has to stay lean. 
+
+I don't really buy that argument. WPF on Windows also uses a compositional layout model and it's quite capable of supporting a rich component API along with a base set of controls. I'm not a huge fan of WPF and XAML, but it is good example of what is possible in terms of a rich API that works both as a compositional layout engine and provides the core needed for extensibility as well as a lot of built in components.
+
+There's no reason that HTML can't do something similar.
+
+### HTML ain't the Desktop, Dude!
+Lest you think I'm advocating building desktop applications: Not at all - I'm a Web developer at heart and I've built Web applications for well over 20 years now. I love what the Web stands for in terms of rapid deployment and making things publicly accessible without having to manage 'installations'. These days hot reloading and live building also make the development flow very smooth and yes I wish it could be that smooth for desktop apps as well (some parts of WPF support something similar). 
+
+But, I also would like  Web UI and DOM to move forward more rapidly and actually provide new functionality that seems appropriate for the types of applications that we are building today. 
+
+> The current form of HTML/CSS seems to be built for the platform and applications we had 10 years ago.
+
+I also build the occasional desktop application and in fact have spent a lot of time over the last year and a half building [Markdown Monster](https://markdownmonster.west-wind.com) in WPF on the side, so I've been working both in desktop and Web applications. I invariably think to myself, "Why can't I do `<insert feature here>` on the Web?" (and also vice versa). The thing that sticks with me when doing desktop work is that if something isn't built-in it's usually relatively easy to build something that does work with relatively minimal effort. 
+
+With HTML I dread hitting that point in any application where I need a component or UI bit that isn't built-in, because it usually means I'll go on a search hunt to try to find something that probably isn't going to solve my problem completely. Alternately I end up building something from scratch. Either way, I'm bound to loose a shitton of time doing work that has nothing to do with my problem domain. I don't mind building stuff - that's what we do, but doing it so often and with such a limited base line is what gnaws on me.
+
+Shouldn't the 'Web Platform' have built-in support for 'platform' features so that extensibility isn't something that I have to dread?
+
+## Ruffling Feathers
+My goal here is to ruffle some feathers into thinking about the future of HTML the Web as a platform and where we want to go. If we keep up the current pace of things as we have for the last 8 years or so we'll **continue to do the old dance**:
+
+> **Just wait another 2 years and everything will be awesome!** 
+
+Do we really want to be doing that? There's always the promise and more promises, but things just never seem to be moving forward...
+
+### Where to Go?
+If you are doing Web development, you can probably relate to at least a few of the pain points I'm pointing out here. Yet - it's very rare to hear people voice their concerns about these issues. 
+
+Most of the heated discussions around Web development is in the JavaScript space, and one or another framework and tooling to build those frameworks.
+
+I think that's a problem. It's clear that the Web is here to stay as the main platform for application development. But it seems that most Web developers have given up caring about what the UI platform looks like and how it might evolve in the future - accepting its limitations and just going with **put up and shut up**.
+
+> **Just wait another 2 years and everything will be awesome!** 
+
+I don't think that's healthy. If there are known pain points, they should be out in the open and should be discussed and possibly addressed.  
+
+I think we need to have this discussion: 
+
+Where are we going with HTML and Web technologies? It really doesn't seem clear where HTML and Web dev is headed. 
+
+### Crank it up
+Am I giving up on Web Development? No, and that's not the goal of this post.
+
+The last thing I want to see is us going back to native development as the first line for development. The Web has always been the future for application development and I believe it will win in the end. No, I believe in the Web as a platform and **I want** it to stay as the dominant platform. 
+
+I just would like to do more with it. I want to be able to build a Web application that can interface with the local file system more smoothly without a prompt for each file access. I want to be able to control a printer properly from a Web application. I want to be able to access mobile device features - natively and specifically for the device I'm working on. If a mobile app can do that why shouldn't the browser also be able to do that given the proper security barrier?
+
+I want to see improvements to make it easier, more consistent, and more integrated to allow us to tackle those things for which you traditionally still needed to use native applications because the browser's security UI gets in the way, or because features that are there are simply not accessible to generic (or even specific) browser APIs. 
+
+My reason for writing this post is, that I'm frustrated with the state of client side Web UI development and I'm voicing my concerns in hopes that it might spark some discussion. 
+
+I know I am not the only one because I hear similar complaints from others.To be fair I often work with developer customers and clients who are more of the "just get 'er done" type rather than keeping up with the latest new fad du jour.
+
+But maybe I'm just in an echo chamber and I need a reality check. 
+
+So let's hear it - do you share some of these concerns or do you feel the Web as it is is just doing fine? Leave a comment.
+
 
 
 

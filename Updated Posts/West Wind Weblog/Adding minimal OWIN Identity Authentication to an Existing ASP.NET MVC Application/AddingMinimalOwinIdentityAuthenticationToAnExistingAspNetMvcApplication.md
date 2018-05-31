@@ -5,6 +5,7 @@ keywords: OWIN,Identity,Minimal,SignIn,SignOut,Google,Twitter,GitHub
 categories: ' ASP.NET,MVC,OWIN'
 weblogName: West Wind Web Log
 postId: 1123302
+postDate: 2018-05-28T22:33:21.7555082-07:00
 ---
 # Adding minimal OWIN Identity Authentication to an Existing ASP.NET MVC Application
 
@@ -16,9 +17,9 @@ The process is not necessarily hard – but it’s not very well documented. It�
 
 ### A Real World Use Case
 
-I’ve come down this path myself over the last weekend as one of my old sites – [CodePaste.net](http://codepaste.net) – required an update to the old OpenID authentication I had running on that site. Codepaste is a pretty old site; in fact it is was the first MVC application I ever built :-). But it’s been running unencumbered for the last 7 years. That is until Google decided to pull the plug on the old OpenId implementation. Promptly I started getting a ton of emails, and decided I had to re-implement the external providers.
+I’ve come down this path myself over the last weekend as one of my old sites – [CodePaste.net](https://codepaste.net) – required an update to the old OpenID authentication I had running on that site. Codepaste is a pretty old site; in fact it is was the first MVC application I ever built :-). But it’s been running unencumbered for the last 7 years. That is until Google decided to pull the plug on the old OpenId implementation. Promptly I started getting a ton of emails, and decided I had to re-implement the external providers.
 
-The old implementation used [DotNetOpenAuth](http://dotnetopenauth.net/) combined with FormsAuthentication which [I blogged about years ago](http://weblog.west-wind.com/posts/2009/Sep/17/Integrating-OpenID-in-an-ASPNET-MVC-Application-using-DotNetOpenAuth), but DotnetOpenAuth seems to have fallen out of favor over the years, so I decided to bite the bullet and switch over to the newer, built-in OWIN based Identity functionality in ASP.NET 4.
+The old implementation used [DotNetOpenAuth](https://dotnetopenauth.net/) combined with FormsAuthentication which [I blogged about years ago](https://weblog.west-wind.com/posts/2009/Sep/17/Integrating-OpenID-in-an-ASPNET-MVC-Application-using-DotNetOpenAuth), but DotnetOpenAuth seems to have fallen out of favor over the years, so I decided to bite the bullet and switch over to the newer, built-in OWIN based Identity functionality in ASP.NET 4.
 
 When you first start looking at Identity the amount of information out there is rather overwhelming. Lots of intro articles that talk about how to use the stuff ‘as is’ without customization. But there’s not a lot of information on using the core Identity pieces _without_ the full bore UserManager and Entity Framework data store, in order to use just the Authentication/Authorization on their own and integrate them with my own business objects/domain model.
 
@@ -165,7 +166,7 @@ Note that you can pick and choose your providers. You can use only Cookie authen
 
 All of the code I’ll be discussing in relation to these logins is located in an MVC controller – specifically the AccountController. There are really 3 main set of features that need to implemented – local logins, external logins and the actual sign in/out operations. Here’s roughly what this looks like in AccountController class:
 
-[![AccountControllerOverview](http://weblog.west-wind.com/images/2015Windows-Live-Writer/Adding-oAuth-Authent.NET-MVC-Application_CC2E/AccountControllerOverview_thumb.png "AccountControllerOverview")](http://weblog.west-wind.com/images/2015Windows-Live-Writer/Adding-oAuth-Authent.NET-MVC-Application_CC2E/AccountControllerOverview_2.png)
+[![AccountControllerOverview](https://weblog.west-wind.com/images/2015Windows-Live-Writer/Adding-oAuth-Authent.NET-MVC-Application_CC2E/AccountControllerOverview_thumb.png "AccountControllerOverview")](https://weblog.west-wind.com/images/2015Windows-Live-Writer/Adding-oAuth-Authent.NET-MVC-Application_CC2E/AccountControllerOverview_2.png)
 
 There are also a few more traditional Controller actions that deal with some of the supporting feature of my implementation – password recovery and account activation specifically. This is my entire implementation, so as you can see it’s considerably simpler – and less featured – than the full (overkill?) Identity implementation you get in a default full features MVC site which is perfect for this post.
 
@@ -269,7 +270,7 @@ There are two steps for each login type: Creating the user and account initially
 
 Here’s what the User Registration form looks like:
 
-[![RegistrationForm](http://weblog.west-wind.com/images/2015Windows-Live-Writer/Adding-oAuth-Authent.NET-MVC-Application_CC2E/RegistrationForm_thumb.png "RegistrationForm")](http://weblog.west-wind.com/images/2015Windows-Live-Writer/Adding-oAuth-Authent.NET-MVC-Application_CC2E/RegistrationForm_2.png)
+[![RegistrationForm](https://weblog.west-wind.com/images/2015Windows-Live-Writer/Adding-oAuth-Authent.NET-MVC-Application_CC2E/RegistrationForm_thumb.png "RegistrationForm")](https://weblog.west-wind.com/images/2015Windows-Live-Writer/Adding-oAuth-Authent.NET-MVC-Application_CC2E/RegistrationForm_2.png)
 
 The top of the form holds the local login, while the bottom has the external provider logins. From this form you can choose to sign up with an external login, which fills the local user registration form with any data that might be received from the external provider. Google provides the email address, GitHub both email and name, and Twitter provides only the name for example. In either case a new user is created in the application.
 
@@ -344,7 +345,7 @@ The key item here that is different is simply that I set the **AppUserState** as
 
 Once an account is registered you can actually log in. Here’s what the login form looks like:
 
-[![LogInform](http://weblog.west-wind.com/images/2015Windows-Live-Writer/Adding-oAuth-Authent.NET-MVC-Application_CC2E/LogInform_thumb.png "LogInform")](http://weblog.west-wind.com/images/2015Windows-Live-Writer/Adding-oAuth-Authent.NET-MVC-Application_CC2E/LogInform_2.png)
+[![LogInform](https://weblog.west-wind.com/images/2015Windows-Live-Writer/Adding-oAuth-Authent.NET-MVC-Application_CC2E/LogInform_thumb.png "LogInform")](https://weblog.west-wind.com/images/2015Windows-Live-Writer/Adding-oAuth-Authent.NET-MVC-Application_CC2E/LogInform_2.png)
 
 The code to handle the login looks like this:
 
@@ -450,7 +451,7 @@ When the provider has validated (or failed to validate) the user, it makes  cal
 
 To illustrate check out this Fiddler trace of a Registration Link request, when already logged into my Google account:
 
-[![FiddlerRegistration](http://weblog.west-wind.com/images/2015Windows-Live-Writer/Adding-oAuth-Authent.NET-MVC-Application_CC2E/FiddlerRegistration_thumb.png "FiddlerRegistration")](http://weblog.west-wind.com/images/2015Windows-Live-Writer/Adding-oAuth-Authent.NET-MVC-Application_CC2E/FiddlerRegistration_2.png)
+[![FiddlerRegistration](https://weblog.west-wind.com/images/2015Windows-Live-Writer/Adding-oAuth-Authent.NET-MVC-Application_CC2E/FiddlerRegistration_thumb.png "FiddlerRegistration")](https://weblog.west-wind.com/images/2015Windows-Live-Writer/Adding-oAuth-Authent.NET-MVC-Application_CC2E/FiddlerRegistration_2.png)
 
 Notice all the **302** requests. The first request is initiated by your code using the ChallengeResult which redirects to Google. Google then redirects back to the OWIN internal endpoint to handle the provider OAuth parsing and finally the OWIN pipeline calls into your code with ExternalLinkLoginCallback().
 
@@ -532,7 +533,7 @@ There’s a fair bit of code in this snippet, but… most of the code is applica
 
 When done the user is logged in, but I want to re-display the Registration form to show the external account registration:
 
-[![LinkedAccountDisplay](http://weblog.west-wind.com/images/2015Windows-Live-Writer/Adding-oAuth-Authent.NET-MVC-Application_CC2E/LinkedAccountDisplay_thumb_1.png "LinkedAccountDisplay")](http://weblog.west-wind.com/images/2015Windows-Live-Writer/Adding-oAuth-Authent.NET-MVC-Application_CC2E/LinkedAccountDisplay_4.png)
+[![LinkedAccountDisplay](https://weblog.west-wind.com/images/2015Windows-Live-Writer/Adding-oAuth-Authent.NET-MVC-Application_CC2E/LinkedAccountDisplay_thumb_1.png "LinkedAccountDisplay")](https://weblog.west-wind.com/images/2015Windows-Live-Writer/Adding-oAuth-Authent.NET-MVC-Application_CC2E/LinkedAccountDisplay_4.png)
 
 ### Logging in with an External Login
 

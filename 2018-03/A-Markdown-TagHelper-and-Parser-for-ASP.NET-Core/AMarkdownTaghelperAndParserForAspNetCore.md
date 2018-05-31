@@ -5,7 +5,7 @@ keywords: Markdown, TagHelper, ASP.NET Core
 categories: ASP.NET Core, Markdown
 weblogName: West Wind Web Log
 postId: 708211
-postDate: 2018-03-23T01:11:43.8926586-10:00
+postDate: 2018-03-23T04:11:43.8926586-07:00
 ---
 # Creating an ASP.NET Core Markdown TagHelper and Parser
 
@@ -13,9 +13,9 @@ postDate: 2018-03-23T01:11:43.8926586-10:00
 
 A few months ago I wrote about creating a [literal Markdown Control for WebForms](https://weblog.west-wind.com/posts/2017/Sep/13/A-Literal-Markdown-Control-for-ASPNET-WebForms), where I described a simple content control that takes the content from within a tag and parses the embedded Markdown and then produces HTML output in its stead. I created a WebForms control mainly for selfish reasons, because I have tons of semi-static content on my content sites that still live in classic ASP.NET ASPX pages.
 
-Since I wrote that article I've gotten a lot of requests to write about an ASP.NET Core version for something similar and - back to my own selfishishness - I'm also starting to deploy a few content heavy sites that have mostly static html content that would be well served by Markdown using ASP.NET Core and Razor Pages. So it's time to build an ASP.NET Core version by creating a `<markdown>` TagHelper.
+Since I wrote that article I've gotten a lot of requests to write about an ASP.NET Core version for something similar and - back to my own selfishness - I'm also starting to deploy a few content heavy sites that have mostly static html content that would be well served by Markdown using ASP.NET Core and Razor Pages. So it's time to build an ASP.NET Core version by creating a `<markdown>` TagHelper which I cover in this post. Along the same lines, I also created a [generic markdown page processing Middleware component](https://github.com/RickStrahl/Westwind.AspNetCore/tree/master/Westwind.AspNetCore.Markdown#markdown-page-processor-middleware) that can be used to generically serve arbitrary Markdown documents in any ASP.NET Core site which I cover in a [separate post](https://weblog.west-wind.com/posts/2018/Apr/18/Creating-a-generic-Markdown-Page-Handler-in-ASPNET-Core) next week.
 
-There are already a number of implementations available, but I'm a big fan of the [MarkDig Markdown Parser](https://github.com/lunet-io/markdig), so I set out to create an **ASP.NET Core Tag Helper** that provides the same functionality as the WebForms control I previously created.
+There are already a number of Markdown TagHelper implementations available, but I'm a big fan of the [MarkDig Markdown Parser](https://github.com/lunet-io/markdig), so I set out to create an **ASP.NET Core Tag Helper** that provides the same functionality as the WebForms control I previously created.
 
 Using the TagHelper you can render Markdown like this inside of a Razor Page:
 
@@ -482,47 +482,54 @@ public class  MarkdownParserMarkdig : MarkdownParserBase
     }
 
     public virtual MarkdownPipelineBuilder CreatePipelineBuilder(Action<MarkdownPipelineBuilder> markdigConfiguration)
-    {
-        MarkdownPipelineBuilder builder = null;
-
-        // build it explicitly
-        if (markdigConfiguration == null)
         {
-            builder = new MarkdownPipelineBuilder()                    
-                .UseEmphasisExtras(Markdig.Extensions.EmphasisExtras.EmphasisExtraOptions.Default)
-                .UsePipeTables()
-                .UseGridTables()
-                .UseFooters()
-                .UseFootnotes()
-                .UseCitations();
+            MarkdownPipelineBuilder builder = null;
 
+            // build it explicitly
+            if (markdigConfiguration == null)
+            {
+                builder = new MarkdownPipelineBuilder()
+                    .UseEmphasisExtras()
+                    .UsePipeTables()
+                    .UseGridTables()
+                    .UseFooters()
+                    .UseFootnotes()
+                    .UseCitations()
+                    .UseAutoLinks() // URLs are parsed into anchors
+                    .UseAutoIdentifiers(AutoIdentifierOptions.GitHub) // Headers get id="name" 
+                    .UseAbbreviations()
+                    .UseYamlFrontMatter()
+                    .UseEmojiAndSmiley(true)
+                    .UseMediaLinks()
+                    .UseListExtras()
+                    .UseFigures()
+                    .UseTaskLists()
+                    .UseCustomContainers()
+                    .UseGenericAttributes();
 
-            builder = builder.UseAutoLinks();        // URLs are parsed into anchors
-            builder = builder.UseAutoIdentifiers();  // Headers get id="name" 
+                //builder = builder.UseSmartyPants();            
 
-            builder = builder.UseAbbreviations();
-            builder = builder.UseYamlFrontMatter();
-            builder = builder.UseEmojiAndSmiley(true);
-            builder = builder.UseMediaLinks();
-            builder = builder.UseListExtras();
-            builder = builder.UseFigures();
-            builder = builder.UseTaskLists();
-            //builder = builder.UseSmartyPants();            
+                if (_usePragmaLines)
+                    builder = builder.UsePragmaLines();
+
+                return builder;
+            }
+            
+            
+            // let the passed in action configure the builder
+            builder = new MarkdownPipelineBuilder();
+            markdigConfiguration.Invoke(builder);
 
             if (_usePragmaLines)
                 builder = builder.UsePragmaLines();
-
+            
             return builder;
         }
-        
-        // let the passed in action configure the builder
-        builder = new MarkdownPipelineBuilder();
-        markdigConfiguration.Invoke(builder);
 
-        if (_usePragmaLines)
-            builder = builder.UsePragmaLines();
-
-        return builder;
+        protected virtual IMarkdownRenderer CreateRenderer(TextWriter writer)
+        {
+            return new HtmlRenderer(writer);
+        }
     }
 
     protected virtual IMarkdownRenderer CreateRenderer(TextWriter writer)
@@ -543,7 +550,7 @@ var html = parser.Parse(markdown);
 
 and that's what the Markdown TagHelper uses to get a cached MarkdownParser instance for processing.
 
-### Overridign MarkDig Pipeline with Configuration
+### Overriding MarkDig Pipeline with Configuration
 This component uses the MarkDig Markdown Parser which allows for explicit feature configuration via many of its built-in extensions. The default configuration enables the most commonly used Markdown features and defaults to Github Flavored Markdown for most settings.
 
 If you need to customize what features are supported you can override the pipeline creation explicitly in the `Startup.ConfigureServices` method and calling `services.AddMarkdown()`:
@@ -573,6 +580,9 @@ services.AddMarkdown(config =>
 ```
 
 This code gets passed an empty `MarkDigPipelineBuilder` that you can use to create a custom parser pipeline with just the features you need. When set this configuration is used every time the Markdown parser instance is created instead of the default behavior.
+
+> #### Markdown Pipeline Configuration Options
+> The library also supports configuration of the Markdown pileline via configuration handler that can be set up in the `Startup.Configure` method. [I cover the details of configuration in my next post](https://weblog.west-wind.com/posts/2018/Apr/18/Creating-a-generic-Markdown-Page-Handler-in-ASPNET-Core#configuration-options) on the the Page Handling Markdown Middleware.
 
 ### Standalone Markdown Processing
 In addition to the TagHelper there's also a static class that lets you easily process Markdown in code or inside of a RazorPage, using a static `Markdown` class:
@@ -634,8 +644,9 @@ Enjoy...
 ### Resources
 * [Westwind.AspnetCore.Markdown NuGet Package](https://www.nuget.org/packages/Westwind.AspNetCore.Markdown)
 * [Westwind.AspNetCore.Markdown on GitHub](https://github.com/RickStrahl/Westwind.AspNetCore/tree/master/Westwind.AspNetCore.Markdown)
+* [Creating generic Markdown Page Handling Middleware for ASP.NET Core](https://weblog.west-wind.com/posts/2018/Apr/18/Creating-a-generic-Markdown-Page-Handler-in-ASPNET-Core)
 * [A literal Markdown Control for ASP.NET WebForms](https://weblog.west-wind.com/posts/2017/Sep/13/A-Literal-Markdown-Control-for-ASPNET-WebForms)
-* [Watch Jeff Fritz use the Markdown TagHelper on Twitch](https://youtu.be/aXkeJmlPDI4?list=PLVMqA0_8O85zHkvIMHgG74eskQTO5nfWy&t=5261)
+
 
 
 <div style="margin-top: 30px;font-size: 0.8em;

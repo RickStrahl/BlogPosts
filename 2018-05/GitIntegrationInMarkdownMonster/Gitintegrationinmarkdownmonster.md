@@ -4,7 +4,7 @@ weblogName: Markdown Monster (Medium)
 postDate: 2018-05-01T15:01:41.0986841-07:00
 ---
 # Git Integration in MarkdownMonster
-Git source control is becoming ubiquitous for just about any developer and documentation related scenario. Locking away stable versions and being able to roll back to them is vitally important as a backup mechanism and if you are working with multiple people on a project, Git's distributed nature makes it relatively easy to share your work, and most importantly allows you to work together and share your changes in a unified way.
+Git source control is becoming ubiquitous for just about any **developer** and **documentation** related scenario. Locking away stable versions and being able to roll back to them is vitally important as a backup mechanism and if you are working with multiple people on a project, Git's distributed nature makes it relatively easy to share your work, and most importantly allows you to work together and share your changes in a unified way.
 
 Markdown Monster is an editor and as such used extensively for writing developer related documents or just general documentation and Git and source control play a big role in most of those workflows.
 

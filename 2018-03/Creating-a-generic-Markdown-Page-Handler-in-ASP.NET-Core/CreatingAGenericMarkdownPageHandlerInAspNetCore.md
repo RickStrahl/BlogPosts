@@ -1,15 +1,15 @@
 ---
-title: Creating a generic Markdown Page Handler in ASP.NET Core
+title: Creating a generic Markdown Page Handler using ASP.NET Core Middleware
 abstract: I've been talking about Markdown a lot in recent blog posts and this time I'll cover a generic Markdown page handler that you just drop into any site to handle semi-static page editing more easily with Markdown from within an ASP.NET Core application. While Markdown is common fare in CMS or blog applications, it's not so apparent how to get similar generic Markdown document rendering within the context of an existing application. The middleware I describe here allows you to simply drop a markdown file into a configured folder and have it rendered into a stock template. Simple but very useful.
 keywords: Markdown, ASP.NET Core
 categories: ASP.NET Core, Markdown
 weblogName: West Wind Web Log
 postId: 744512
-postDate: 2018-04-18T01:47:01.8636657-10:00
+postDate: 2018-04-18T04:47:01.8636657-07:00
 ---
-# Creating a generic Markdown Page Handler in ASP.NET Core
+# Creating a generic Markdown Page Handler using ASP.NET Core Middleware
 
-![Book Scribe](Book.jpg)
+![Book Scribe] 
 
 I'm in the process of re-organizing a ton of mostly static content on several of my Web sites and in order to make it easier to manage the boat load of ancient content I have sitting around in many places. Writing content - even partial page content - as Markdown is a heck of a lot more comfortable than writing HTML tag soup.
 
@@ -256,7 +256,7 @@ services.AddMarkdown(config =>
     folderConfig.ProcessMdFiles = true; // default
 
     // Optional pre-processing
-    folderConfig.PreProcess = (folder, controller) =>
+    folderConfig.PreProcess = (model, controller) =>
     {
         // controller.ViewBag.Model = new MyCustomModel();
     };
@@ -296,7 +296,6 @@ Here's what is required
 * MVC Controller that handles the actual render request
 * The Razor template to render the actual rendered Markdown HTML
 
-
 ### A quick review of Middleware
 The core bit is the actual Middleware extension that is hooked into the ASP.NET Core middleware pipeline.
 
@@ -321,7 +320,7 @@ Implementing a dedicated middleware component usually involves creating the actu
 ### Implementing Markdown Page Handling as Middleware
 So lets look at the actual implementation of the Markdown Middleware.
 
-The primary job of the middleware is to figure out whether an incoming request is a Markdown request by checking the URL. If the request is to an `.md` Markdown file, the middleware effectively rewrites the request URL and routes it to a custom, well-known Controller endpoint that is provided as part of this component library.
+The primary job of the middleware is to figure out whether an incoming request is a Markdown request by checking the URL. If the request is to an `.md` Markdown file, the middleware effectively rewrites the request URL and routes it to a custom, well-known Controller endpoint that is provided as part of this component library (full code [on GitHub](https://github.com/RickStrahl/Westwind.AspNetCore/blob/master/Westwind.AspNetCore.Markdown/MarkdownPageProcessorMiddleware/MarkdownPageProcessorMiddleware.cs))
 
 ```csharp
 public class MarkdownPageProcessorMiddleware
@@ -330,9 +329,9 @@ public class MarkdownPageProcessorMiddleware
     private readonly MarkdownConfiguration _configuration;
     private readonly IHostingEnvironment _env;
 
-    public MarkdownPageProcessorMiddleware(RequestDelegate next, 
-                                           MarkdownConfiguration configuration,
-                                           IHostingEnvironment env)
+    public MarkdownPageProcessorMiddleware(RequestDelegate next,
+        MarkdownConfiguration configuration,
+        IHostingEnvironment env)
     {
         _next = next;
         _configuration = configuration;
@@ -355,7 +354,6 @@ public class MarkdownPageProcessorMiddleware
         relativePath = PathHelper.NormalizePath(relativePath).Substring(1);
         var pageFile = Path.Combine(basePath, relativePath);
 
-        // process any Markdown file that has .md extension explicitly
         foreach (var folder in _configuration.MarkdownProcessingFolders)
         {
             if (!path.StartsWith(folder.RelativePath, StringComparison.InvariantCultureIgnoreCase))
@@ -365,12 +363,10 @@ public class MarkdownPageProcessorMiddleware
                 continue;
 
             if (context.Request.Path.Value.EndsWith(".md", StringComparison.InvariantCultureIgnoreCase))
-            {
                 processAsMarkdown = true;
-            }
             else if (path.StartsWith(folder.RelativePath, StringComparison.InvariantCultureIgnoreCase) &&
-                 (folder.ProcessExtensionlessUrls && !hasExtension ||
-                  hasMdExtension && folder.ProcessMdFiles))
+                     (folder.ProcessExtensionlessUrls && !hasExtension ||
+                      hasMdExtension && folder.ProcessMdFiles))
             {
                 if (!hasExtension && Directory.Exists(pageFile))
                     continue;
@@ -385,10 +381,17 @@ public class MarkdownPageProcessorMiddleware
             }
 
             if (processAsMarkdown)
-            {             
-                context.Items["MarkdownPath_PageFile"] = pageFile;
-                context.Items["MarkdownPath_OriginalPath"] = path;
-                context.Items["MarkdownPath_FolderConfiguration"] = folder;
+            {
+                // create a model and store paths and put into Context
+                var model = new MarkdownModel
+                {
+                    FolderConfiguration = folder,
+                    RelativePath = path,
+                    PhysicalPath = pageFile
+                };
+
+                // push the model into the context for controller to pick up
+                context.Items["MarkdownProcessor_Model"] = model;
 
                 // rewrite path to our controller so we can use _layout page
                 context.Request.Path = "/markdownprocessor/markdownpage";
@@ -401,43 +404,45 @@ public class MarkdownPageProcessorMiddleware
 }
 ```
 
-The key bit in this middleware uses `Context.Request.Path.Value` to grab the request path and based on that path determines whether the request needs to be passed on to the Markdown controller that renders the template. Most of the code above deals with checking the URL and if it is a match via `processAsMarkdown` path is simply rewritten to point at the MVC controller that renders the Markdown.
+This code does a few things:
 
-Middleware constructors can inject requested components via Dependency Injection and I capture the active Request delegate (`next`) in order to call the next middleware component. I also capture Markdown configuration that was setup during startup so that I can look at the path configuration and map it to the current path if any. The configuration holds a few global configuration settings as well as well as the configuration for each of the folders mapped in the configuration.
+* Parses the Request path to a physical path
+* Figures out whether the request is a Markdown file
+* Creates a model and stores physical and relative paths
+* Stores the model into Context.Items
+* Rewrites the path to our well-known Markdown controller
 
-The code first tries to match the path to a configured path. If a matching path is found, it looks for a `.md` extension in the URL path. If it finds that it simply forwards the request to the controller by rewriting the URL to a fixed path that the controller is generically listening on.
+The key bit in this middleware uses `Context.Request.Path.Value` to grab the request path and based on that path determines whether the request needs to be passed on to the Markdown controller that renders the template. Most of the code above deals with checking the URL and if it is a match via `processAsMarkdown` path is simply rewritten to point at the MVC controller that renders the Markdown. 
 
-Rewriting is simple - just set the Request.Path to a new value:
+Since we are rewriting the path, the controller has to know where to find the original physical path, since the request path has changed when the controller fires. To make this work the middleware creates an initial model and stores the original file physical and relative paths on the model. The model is then stored in `Context.Items` to retrieve in the controller which can then pick it up when the request is re-routed to the controller.
+
+Rewriting an incoming request in middleware is simple - just set the `Request.Path` to a new value:
 
 ```cs
 context.Request.Path = "/markdownprocessor/markdownpage";
 ```
 
-If the URL is an extensionless URL things are a bit trickier. The code has to first check to see if the request is to a physical directory - if it is it's not a markdown file. It then has to append the `.md` extension and check for the file's existence the determine if the file can be found. If not the request is ignored and passed on in the middleware pipeline. If there is a matching markdown file on disk then it too gets re-written to the markdown controller's route path.
-
-If the URL is to be processed the original, un-re-written URL and the actual filename are written into `Context.Items` along with the folder configuration that was matched which makes these values available in the Controller so we don't have to repeat the expensive lookup logic in the controller.
-
 ##AD##
 
 ### The Generic Markdown Controller
-The request is forwarded to a controller that's implemented in the library. The controller has a single Action method that has a fixed and well-known attribute route: 
-
+The request is forwarded to a controller that's implemented in the library. The controller has a single Action method that has a fixed and well-known attribute route that was explicitly set in `context.Request.Path` of the middleware: 
 ```cs
 [Route("markdownprocessor/markdownpage")]
 public async Task<IActionResult> MarkdownPage()
 ```        
 
-This fixed route is found even though it lives in a library. Note that this route only works in combination with the middleware because it depends on preset `Context.Items` values that were stored by the middleware earlier in the request.
+This fixed route is found even though it lives in an imported library. Note that this route only works in combination with the middleware because it depends on preset `Context.Items` values that were stored by the middleware earlier in the request.
 
-Here's main action method in the controller (full code on Github):
+Here's main action method in the controller (full code [on Github](https://github.com/RickStrahl/Westwind.AspNetCore/blob/master/Westwind.AspNetCore.Markdown/MarkdownPageProcessorMiddleware/MarkdownPageProcessorController.cs)):
 
-```cs
+```csharp
 public class MarkdownPageProcessorController : Controller
 {
     public MarkdownConfiguration MarkdownProcessorConfig { get; }
     private readonly IHostingEnvironment hostingEnvironment;
 
-    public MarkdownPageProcessorController(IHostingEnvironment hostingEnvironment,
+    public MarkdownPageProcessorController(
+        IHostingEnvironment hostingEnvironment,
         MarkdownConfiguration config)
     {
         MarkdownProcessorConfig = config;
@@ -446,47 +451,50 @@ public class MarkdownPageProcessorController : Controller
 
     [Route("markdownprocessor/markdownpage")]
     public async Task<IActionResult> MarkdownPage()
-    {            
+    {
+        var model = HttpContext.Items["MarkdownProcessor_Model"] as MarkdownModel;
+
         var basePath = hostingEnvironment.WebRootPath;
-        var relativePath = HttpContext.Items["MarkdownPath_OriginalPath"] as string;
+        var relativePath = model.RelativePath;
         if (relativePath == null)
             return NotFound();
 
-        var folderConfig = HttpContext.Items["MarkdownPath_FolderConfiguration"] as MarkdownProcessingFolder;
-        var pageFile = HttpContext.Items["MarkdownPath_PageFile"] as string;
-        if (!System.IO.File.Exists(pageFile))
+        if (!System.IO.File.Exists(model.PhysicalPath))
             return NotFound();
-        
+
         // string markdown = await File.ReadAllTextAsync(pageFile);
         string markdown;
-        using (var fs = new FileStream(pageFile, FileMode.Open, FileAccess.Read))
+        using (var fs = new FileStream(model.PhysicalPath,
+            FileMode.Open,
+            FileAccess.Read))
         using (StreamReader sr = new StreamReader(fs))
-        {                
-            markdown = await sr.ReadToEndAsync();                
+        {
+            markdown = await sr.ReadToEndAsync();
         }
-        
+
         if (string.IsNullOrEmpty(markdown))
             return NotFound();
 
-        var model = ParseMarkdownToModel(markdown);
-    
-        if (folderConfig != null)
+        // set title, raw markdown, yamlheader and rendered markdown
+        ParseMarkdownToModel(markdown, model);
+
+        if (model.FolderConfiguration != null)
         {
-            folderConfig.PreProcess?.Invoke(folderConfig, this);
-            return View(folderConfig.ViewTemplate, model);
+            model.FolderConfiguration.PreProcess?.Invoke(model, this);
+            return View(model.FolderConfiguration.ViewTemplate, model);
         }
-        
+
         return View(MarkdownConfiguration.DefaultMarkdownViewTemplate, model);
     }
 
-    private MarkdownModel ParseMarkdownToModel(string markdown, MarkdownProcessingFolder folderConfig = null)
+    private MarkdownModel ParseMarkdownToModel(string markdown, 
+                                               MarkdownModel model = null)
     {
-        var model = new MarkdownModel();
+        if (model == null)
+            model = new MarkdownModel();
 
-        if (folderConfig == null)
-            folderConfig = new MarkdownProcessingFolder();
-
-        if (folderConfig.ExtractTitle)
+        
+        if (model.FolderConfiguration.ExtractTitle)
         {
             var firstLines = StringUtils.GetLines(markdown, 30);
             var firstLinesText = String.Join("\n", firstLines);
@@ -496,7 +504,10 @@ public class MarkdownPageProcessorController : Controller
             {
                 var yaml = StringUtils.ExtractString(firstLinesText, "---", "---", returnDelimiters: true);
                 if (yaml != null)
+                {
                     model.Title = StringUtils.ExtractString(yaml, "title: ", "\n");
+                    model.YamlHeader = yaml.Replace("---", "").Trim();
+                }
             }
 
             if (model.Title == null)
@@ -520,7 +531,7 @@ public class MarkdownPageProcessorController : Controller
 }
 ```
 
-The main controller code reads the path from `Context.Items` and then checks to ensure the file exists. If it does reads the markdown from disk and passes it to a helper that populates the model.
+The main controller code reads the model from `Context.Items`, retrieves the original path and then checks to ensure the file exists. If it does reads the markdown from disk and passes it to a helper that populates the model.
 
 The `ParseMarkdownToModel()` helper tries to extract a title and parses the markdown to HTML and stores those values on the model. The resulting model is then fed to the view specified in the folder configuration.
 

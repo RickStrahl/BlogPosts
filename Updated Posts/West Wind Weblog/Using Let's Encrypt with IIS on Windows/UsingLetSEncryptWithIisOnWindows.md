@@ -1,10 +1,11 @@
 ---
 title: Using Let's Encrypt with IIS on Windows
 abstract: Let's Encrypt is a new, open source certificate authority for creating free SSL certificates. In this post I show you how you can use some of the API clients on Windows to create Let's Encrypt certificates for use in IIS.
-categories: IIS,Security,LetsEncrypt
 keywords: LetsEncrypt,IIS,Powershell,ACMESharp
+categories: IIS,Security,LetsEncrypt
 weblogName: West Wind Web Log
 postId: 1503593
+postDate: 2018-05-28T22:39:09.5648496-07:00
 ---
 # Using Let's Encrypt with IIS on Windows
 
@@ -57,13 +58,13 @@ LetsEncrypt
 
 Here's what the interaction looks like (on my home machine which only has one host-headered site I added for testing):
 
-[![LetsEncrypt-Win-Simple](http://weblog.west-wind.com/images/2016Windows-Live-Writer/Using-LetsEncrypt-with-IIS-on-Windows_AFF3/LetsEncrypt-Win-Simple_thumb_1.png "LetsEncrypt-Win-Simple")](http://weblog.west-wind.com/images/2016Windows-Live-Writer/Using-LetsEncrypt-with-IIS-on-Windows_AFF3/LetsEncrypt-Win-Simple_4.png)
+[![LetsEncrypt-Win-Simple](https://weblog.west-wind.com/images/2016Windows-Live-Writer/Using-LetsEncrypt-with-IIS-on-Windows_AFF3/LetsEncrypt-Win-Simple_thumb_1.png "LetsEncrypt-Win-Simple")](https://weblog.west-wind.com/images/2016Windows-Live-Writer/Using-LetsEncrypt-with-IIS-on-Windows_AFF3/LetsEncrypt-Win-Simple_4.png)
 
 (note that the site you're using here has to be internet accessible and you have to run these tools from the machine that will receive the certificate)
 
 If all goes well, you'll end up with a new certificate installed in IIS on the Web site you specified.
 
-[![SiteBindings](http://weblog.west-wind.com/images/2016Windows-Live-Writer/Using-LetsEncrypt-with-IIS-on-Windows_AFF3/SiteBindings_thumb.png "SiteBindings")](http://weblog.west-wind.com/images/2016Windows-Live-Writer/Using-LetsEncrypt-with-IIS-on-Windows_AFF3/SiteBindings_2.png)
+[![SiteBindings](https://weblog.west-wind.com/images/2016Windows-Live-Writer/Using-LetsEncrypt-with-IIS-on-Windows_AFF3/SiteBindings_thumb.png "SiteBindings")](https://weblog.west-wind.com/images/2016Windows-Live-Writer/Using-LetsEncrypt-with-IIS-on-Windows_AFF3/SiteBindings_2.png)
 
 If an existing certificate is installed it will be replaced with the new one. The utility is smart enough to detect existing Let's Encrypt certs and removes the old one and replaces it with the new one leaving only the new one in place. Any other certificates are simply left in place, but are not unbound.
 
@@ -72,7 +73,7 @@ If an existing certificate is installed it will be replaced with the new one. Th
 
 If you open the site in a Web browser you can quickly check to see if the certificate is working, by clicking the secure icon and checking the certificate information. As you can see the certificate is the one created by Let's Encrypt.
 
-[![Certificate](http://weblog.west-wind.com/images/2016Windows-Live-Writer/Using-LetsEncrypt-with-IIS-on-Windows_AFF3/Certificate_thumb.png "Certificate")](http://weblog.west-wind.com/images/2016Windows-Live-Writer/Using-LetsEncrypt-with-IIS-on-Windows_AFF3/Certificate_2.png)
+[![Certificate](https://weblog.west-wind.com/images/2016Windows-Live-Writer/Using-LetsEncrypt-with-IIS-on-Windows_AFF3/Certificate_thumb.png "Certificate")](https://weblog.west-wind.com/images/2016Windows-Live-Writer/Using-LetsEncrypt-with-IIS-on-Windows_AFF3/Certificate_2.png)
 
 What's nice is that you can simply re-run **LetsEncrypt** and it will go out and create a new certificate and remove the old one, so at any time when you need to renew/revoke it's quick and easy to update the certificate as needed.
 
