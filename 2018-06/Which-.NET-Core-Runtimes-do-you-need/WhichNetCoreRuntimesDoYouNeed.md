@@ -147,6 +147,11 @@ Ideally I'd like to see better labeled installers that are in themselves clear a
 
 For me the path of least resistance on a full machine or VM is to install the .NET Core SDK. It includes everything needed for a specific platform. And if I'm doing a standalone install on a machine I control I sure as heck will need the dotnet SDK tooling so 
 
-
-
-
+<div style="margin-top: 30px;font-size: 0.8em;
+            border-top: 1px solid #eee;padding-top: 8px;">
+    <img src="https://markdownmonster.west-wind.com/favicon.png"
+         style="height: 20px;float: left; margin-right: 10px;"/>
+    this post created and published with 
+    <a href="https://markdownmonster.west-wind.com" 
+       target="top">Markdown Monster</a> 
+</div>
