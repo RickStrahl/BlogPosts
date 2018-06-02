@@ -90,7 +90,7 @@ The Windows x64 .NET Core runtime is ~24megs. These are used for deployed applic
 
 The runtime alone has no support for `dotnet.exe` so you can't build or publish - whatever you use the runtime for has to be a completely pre-compiled and be able to run **as is**.
 
-Here's what you see after a clean install:
+Here's what you see after a clean install: 
 
 ![](RuntimeInstall.png)
 
