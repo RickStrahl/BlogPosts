@@ -416,6 +416,10 @@ But maybe I'm just in an echo chamber and I need a reality check.
 
 So let's hear it - do you share some of these concerns or do you feel the Web as it is is just doing fine? Leave a comment.
 
+### Related Resources
+
+* [Reddit Discussion](https://news.ycombinator.com/item?id=17211573)
+
 <div style="margin-top: 30px;font-size: 0.8em;
             border-top: 1px solid #eee;padding-top: 8px;">
     <img src="https://markdownmonster.west-wind.com/favicon.png"
