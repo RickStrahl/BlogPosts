@@ -82,19 +82,26 @@ Here's what you see after a clean install of the .NET SDK:
 For me, almost always this what I need on a full server installation. If I install a .NET application in a VM this what I tend to install.
 
 ### .NET Core Runtimes
-The .NET Core Runtimes are the smallest self-contained and specific component and contain the absolute minimum to **run** a dotnet application on a specific platform. 
+The .NET Core Runtimes are the smallest self-contained and specific component and contain the absolute minimum to **run** a dotnet core application on a specific platform. Note it **does not** include the ASP.NET Core meta package runtime dependencies, so as is this won't run an ASP.NET Core application.
 
 The Windows x64 .NET Core runtime is ~24megs. These are used for deployed applications that have been previously built for a specific distribution target and basically can just be dropped into a folder and are ready to run.
 
 The runtime alone has no support for `dotnet.exe` so you can't build or publish - whatever you use the runtime for has to be a completely pre-compiled and be able to run **as is**.
 
+Here's what you see after a clean install:
+
+![](RuntimeInstall.png)
+
+Note that with just the Runtimes, running an ASP.NET Core application fails...
+
 #### What it contains
 * Specific Runtime for the given platform (ie 2.1.0 for x64)
-* ASP.NET Runtime Packages (Microsoft.AspNetCode.App/All)
+* Note: It **does not** include the ASP.NET Runtimes!
 
 #### When to use
 * For production installs **that are pre-compiled**
 * In containers when **not** building inside of containers
+* When building your application with explicit dependencies (no dependency on ASP.NET Meta package)
 
 ### .NET Core Windows Hosting Pack
 This is perhaps the most confusing of the packages available because the naming doesn't really describe what it provides.
@@ -126,7 +133,18 @@ Given all of this it seems to me that in most scenarios the thing you want to in
 The Windows hosting pack is perhaps the most perplexing of the downloads. I 
 
 ### Summary
-To me this seems all a lot more confusing than it should be. There should only be two packages IMHO - pure runtime and SDK. The Windows runtime could easily include the IIS Hosting components since that's not really that large. The misnamed Windows Hosting pack just confuses the rest of these components and makes you wonder what the hell you're getting. SDK and Runtime are pretty clear although even there it's not real clear that the SDK is installing a runtime - it does.
+To me this seems all a lot more confusing than it should be. It makes no sense that the runtime install doesn't include the Asp.net libraries, but the SDK does. If you're going to be very modular about this then there should be individual downloads for each of these components for each platform with a meta package that combines it all for the happy path.
 
-For clarity I would even suggest that you **always** should have to install a runtime and install the SDK **on top** of a runtime. And if that's too much offer another bundled installer that explicitly provides Runtime + SDK installation that explicitly mentions which versions of each are used.
+That meta package appears to be the Windows Hosting Bundle, which addresses that need more or less but then it it is overly big because it includes both 32 and 64 bit runtimes which seems odd given everything else is platform specific. At this point I doubt many people install the 32 bit version of .NET Core runtimes so why make this part of the happy path?
+
+Ideally I'd like to see better labeled installers that are in themselves clear about what they install. If we're going to be modular I'd expect to install:
+
+1. Dotnet Runtime
+2. AspNet Runtimes
+3. SDK Support
+
+For me the path of least resistance on a full machine or VM is to install the .NET Core SDK. It includes everything needed for a specific platform. And if I'm doing a standalone install on a machine I control I sure as heck will need the dotnet SDK tooling so 
+
+
+
 
