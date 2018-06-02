@@ -4,7 +4,7 @@ weblogName: West Wind Web Log
 postDate: 2018-06-01T18:56:10.2339465-07:00
 ---
 # Which .NET Core Runtimes do you need?
-.NET Core has a number of different runtime downloads that you can grab to install the runtimes and the SDK. It's not immediately obvious what you need, so since I just went through this myself and had a discussion with a few folks at Microsoft (thanks @DamianEdwards and @RowanMiller) I thought I'd summarize (if for nothing else than my own reference).
+.NET Core has a number of different runtime downloads that you can grab to install the runtimes and the SDK. It's not immediately obvious what you need, so since I just went through this myself and had a discussion with a few folks at Microsoft (thanks @DamianEdwards and @RowanMiller) I thought I'd summarize (if for nothing else than my own reference). 
 
 ### Checking what's installed
 The first thing you should probably know is what versions of the runtime and SDKs you have installed. The easiest way to do this is to run the following:
