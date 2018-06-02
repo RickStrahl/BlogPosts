@@ -13,25 +13,27 @@ The first thing you should probably know is what versions of the runtime and SDK
 dotnet --info
 ```
 
-If that doesn't work and you get an error, it means that there is no SDK installed and you need to download and install it.
+If that doesn't work and you get an error, it means that .NET Core is not installed at all. `dotnet.exe` installs as part of a runtime install and puts itself on the path so you you should be able to do `dotnet -info`.
 
-If it does work `dotnet --info` produces the following output:
+> `dotnet.exe` installs with a runtime installs, but it only provides **core features** to provide info and **run** (ie. `dotnet mydll.dll` and `dotnet --info`). You can't build, publish or do anything else - for that you need to install the SDK.
+
+If it does work `dotnet --info` produces the following output (here with the SDK installed):
 
 ![](DotnetInfo.png)
 
 The output tells you:
 
 * The installed SDK version
-* The active runtime version (based on active project if any)
+* The active runtime version that's running this `dotnet` command
 * A list of all installed runtimes and SDKs
 
-It's important to understand that you can have **multiple runtimes and multiple SDKs) installed** and each project can use something different. The runtime is determined by your project's runtime specifier in the .csproj file:
+It's important to understand that you can have **multiple runtimes and multiple SDKs) installed** and each project can use a different one. The runtime is determined by your project's runtime specifier in the .csproj file:
 
 ```xml
 <TargetFramework>netcoreapp2.1</TargetFramework>
 ```  
 
-The SDK is either the last globally installed SDK which is the default, or you can explicitly override the SDK in a `global.json` file like this:
+The SDK is either the last globally installed SDK which is the default, or you can explicitly override the SDK in a `global.json` placed in the **solution root folder**. The following explicitly forces my project to use the last RC SDK, instead of the RTM version:
 
 ```json
 {
