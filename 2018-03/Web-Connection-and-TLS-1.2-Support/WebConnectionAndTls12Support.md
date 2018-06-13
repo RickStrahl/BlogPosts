@@ -1,11 +1,11 @@
 ---
-title: 'Web Connection and TLS 1.2 Support
+title: Web Connection and TLS 1.2 Support
 abstract: This week Authorize.NET switched of support for TLS 1.0 and 1.1, requiring all clients to use TLS 1.2. No surprise this was announced two years ago, but as is often the case two years is a long time away and so many were still caught off guard if you're running an oldish version of Windows. In this post I look at what versions of Windows don't support TLS 1.2 and how you can enable TLS 1.2 in those versions that didn't originally have support but can enable it. Unfortunately there are also several versions of Windows that don't support TLS 1.2 and we'll cover that too.
-keywords: TLS 1.2,Windows,Web Connection,Internet Explorer
-categories: Web Connection,Security
+keywords: TLS,SSL,Security,Web Connection,wwHttp,wwDotnetBridge
+categories: Web Connection, Security
 weblogName: Web Connection Weblog
 postId: 937
-postDate: 2018-03-01T16:39:00.8160540-10:00
+postDate: 2018-06-13T14:33:39.5523185-07:00
 ---
 # Web Connection and TLS 1.2 Support
 
@@ -115,8 +115,42 @@ and you can apply them on any of the **Client** and **Server** protocol keys.
 > #### @icon-warning Be Careful Removing Protocol Support
 > Removing older protocols may seem secure, but it may bite you in unexpected ways. One customer I worked with removed all non-TLS 1.2 protocols and was then unable to connect to SQL server until a post SP patch was installed because SQL Servers client connectivity wasn't able to connect via TLS 1.2. Get it working first, then dial back and **test**! Going all TLS 1.2 may require updating many old components to latest version to ensure connectivity still works.
 
+### TLS in Web Connection and West Wind Client Tools
+There are several areas where TLS support will affect you in Web Connection and the client tools:
+
+* Using the wwHttp Class for HTTP access
+* Using wwDotnetBridge with anything that accesses the Web
+
+
+#### The wwHttp Class
+The `wwHttp` class uses the native **WinInet** components of Windows, so all the discussion above applies directly to use of the `wwHttp` requires either a recent version of Windows or the registry hacks described in the text above.
+
+#### wwDotnetBridge and .NET HTTP Access
+.NET uses its own network stack and bypass the stock Windows behavior, but 
+
+The full on default behavior of .NET is tied to the version of the .NET Framework that you
+
+* **NET 4.6 and later just works**
+You don’t need to do any additional work to support TLS 1.2, it’s supported by default.
+
+* **.NET 4.5 has to specify Protocol Support**  
+. TLS 1.2 is supported, but it’s not a default protocol. You need to opt-in to use it using the ServicePointManager with `ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12`.
+
+* **.NET 4.0 and earlier does not support TLS 1.2**   
+Old versions of .NET don't support TLS 1.2 explicitly but it still works **if running on .NET 4.5 or later of the runtime** and then explicitly setting `ServicePointManager.SecurityProtocol = SecurityProtocol.(SecurityProtocolType)3072` 
+
+wwDotnetBridge 6.15 and later automatically enables the SecurityProtocol for all versions of .NET that can run Tls1.2. 
+
+Older versions of wwDotnetBridge prior to 6.15 running on versions prior to .NET 4.62 will have to explicitly set the property:
+
+```foxpro
+loBridge = GetwwDotnetBridge()
+loBridge.SetStaticProperty("System.Net.ServicePointManager","SecurityProtocol",4080)
+```
 ### Keep Things Up To Date
-I've been harping on keeping software up to date recently and this is yet another reason why it's important to not neglect upgrades and keep on running with ancient versions of OS's. This goes for Operating Systems as well as critical server and client software. Keeping patched is extremely important and staying somewhat current with OS versions (no more than 2 OS releases behind is my rule) is critical to not be caught by surprise by something critical simply not being available. 
+I've been harping on keeping software up to date recently and this is yet another reason why it's important to not neglect upgrades and keep on running with ancient versions of OS's and tools. 
+
+This goes for Operating Systems as well as critical server and client software. Keeping patched is extremely important and staying somewhat current with OS versions (no more than 2 OS releases behind is my rule) is critical to not be caught by surprise by something critical simply not being available. 
 
 The same is true for server software - like Web Connection. We have a lot of customers that never went past version 4 which is now nearly 20 years old. That's a long time to be running an application and not be broken. 
 

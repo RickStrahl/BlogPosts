@@ -19,7 +19,7 @@ But these days most of the focus in front end Web development is on **code - Jav
 
 ![](JavaScriptCode.jpg)
 
-Most of the focus in Web Development in recent years has been on the **code side of things**: JavaScript Frameworks, ever more complex build systems along with the tools that facilitate creating code efficiently have gotten all the attention. Huge improvements have been made in this space in the span of just a few short years, and it's now possible for most developers to build even very large applications in a modular and manageable fashion without having to piece together all the needed pieces themselves. There are established solutions for building Web applications from the code perspective and it's relatively approachable and consistent.
+Most of the focus in Web Development in 'recent' years has been on the **code side of things**: JavaScript Frameworks, ever more complex build systems along with the tools that facilitate creating code efficiently have gotten all the attention. Huge improvements have been made in this space in the span of just a few short years, and it's now possible for most developers to build even very large applications in a modular and manageable fashion without having to piece together all the needed pieces themselves. There are established solutions for building Web applications from the code perspective and it's relatively approachable and consistent.
 
 It's not so long ago that this really wasn't the case when you had to piece together your own - mostly inadequate - frameworks and hoped for the best. Today we have established frameworks and at least some general best practice guidelines for the average developer to build applications using modular development techniques.
 
