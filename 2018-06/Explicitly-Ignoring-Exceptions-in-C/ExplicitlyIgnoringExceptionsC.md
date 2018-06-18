@@ -6,6 +6,10 @@ categories: C#,.NET
 weblogName: West Wind Web Log
 postId: 822354
 postDate: 2018-06-16T11:21:47.2145427-07:00
+customFields:
+  mt_github_url:
+    key: mt_github_url
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2018-06/Explicitly-Ignoring-Exceptions-in-C/ExplicitlyIgnoringExceptionsC.md
 ---
 # Explicitly Ignoring Exceptions in C#
 
@@ -26,11 +30,13 @@ catch
 This code, besides being very verbose, also triggers analyzer warnings that complain about the 'inappropriate use of a try/catch' block. And let's not forget to mention anybody who reviews the code immediately throwing the book at you (you know who you are **Mr. Bookthrower**).
 
 ## Ignored Exceptionalism 
-In this world of Exceptionalizm we all are very sensitive to taking exceptions. Let me be clear and be the first to say that ignoring exceptions generally is **a bad idea**. In just about all situations where you put a try/catch around a block of code, you should always have an appropriate `catch` handler that captures a specific exception like `(UnAuthorizedAccessException ex)` - or even a non-specific exception like `(Exception ex)` to pass on or otherwise handle the exception in the appropriate location.
+In this world of Exceptionalizm we all are very sensitive to taking exception. So, let me be clear to say that ignoring exceptions generally is **a bad idea**. In just about all situations where you put a try/catch around a block of code, you should always have an appropriate `catch` handler that captures a specific exception like `(UnAuthorizedAccessException ex)` - or even a non-specific exception like `(Exception ex)` to pass on or otherwise handle the exception in the appropriate location.
 
 It's best to handle exceptions as close as possible to the source because the closer you are the more context you have to do something useful with the exception.
 
-But, as with all rules in my book: Rules are meant to be broken! Cue Dr. Evil laugh track... Muuaaaahhaaaa!
+But, as with all rules in my book:  **Rules are meant to be broken!** 
+
+Cue Dr. Evil laugh track... Muuaaaahhaaaa!
 
 ## Ignorance is Bliss
 Alas, in almost every application I find myself in situations where I simply don't care about a thrown exception. So yeah, I can **pretend** to handle the exception properly with an exception filter, but then still really do nothing with it. This satisfies the analyzer rule engines, but certainly not your friendly neighborhood book thrower in a code review.
@@ -72,7 +78,7 @@ if (html == null)
    Model.Window.ShowStatusError("Download failed...");
 ```
 
-Take that book throwers!
+**Take that book throwers!**
 
 All kidding aside, this makes the code very explicit by stating my intent which is: **I am choosing to throw caution to the wind, just let me do my thing!**. To my eye this also reads cleaner and requires less bracket typing than a `try`/`catch` block which helps reduce code clutter.
 
@@ -129,7 +135,7 @@ public static class LanguageUtils
         return result;
     }
 }
-```
+``` 
 
 I kind of think of these functions as `SafeEval()` operations, because effectively that's what they are doing: They let you write lambda functions to pass in and execute inside of an exception handler. The first version returns true and false depending on whether the handler was triggered, the second one returns a result value or the default value for the passed generic argument.
 
