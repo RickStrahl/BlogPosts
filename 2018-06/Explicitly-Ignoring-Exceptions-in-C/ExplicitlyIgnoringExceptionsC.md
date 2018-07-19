@@ -30,7 +30,7 @@ catch
 This code, besides being very verbose, also triggers analyzer warnings that complain about the 'inappropriate use of a try/catch' block. And let's not forget to mention anybody who reviews the code immediately throwing the book at you (you know who you are **Mr. Bookthrower**).
 
 ## Ignored Exceptionalism 
-In this world of Exceptionalizm we all are very sensitive to taking exception. So, let me be clear to say that ignoring exceptions generally is **a bad idea**. In just about all situations where you put a try/catch around a block of code, you should always have an appropriate `catch` handler that captures a specific exception like `(UnAuthorizedAccessException ex)` - or even a non-specific exception like `(Exception ex)` to pass on or otherwise handle the exception in the appropriate location.
+In this world of Exceptionalizm we all are very sensitive to taking exception. So, let me start this post by saying that ignoring exceptions generally is **a bad idea**. In just about all situations where you put a try/catch around a block of code, **you should always have an appropriate `catch` handler** that captures a specific exception like `(UnAuthorizedAccessException ex)` - or even a non-specific exception like `(Exception ex)` to pass on or otherwise handle the exception in the appropriate location.
 
 It's best to handle exceptions as close as possible to the source because the closer you are the more context you have to do something useful with the exception.
 

@@ -9,6 +9,8 @@ postDate: 2018-06-14T23:57:37.4190622-07:00
 ---
 # Web Connection 6.21 is here
 
+![](webconnection.jpg)
+
 We've released [Web Connection 6.21](https://webconnection.west-wind.com) which is a relatively small update that has a few bug fixes and operational tweaks.
 
 There are also a few new features, one of which is not Web specific but a very useful generic FoxPro enhancement feature.
@@ -24,7 +26,7 @@ As always registered users of version 6.x, can download **free registered versio
 ## Event Handling for wwDotnetBridge
 This is a cool feature that opens up additional features of .NET to FoxPro. You can now use wwDotnetBridge to handle .NET events in an asynchronous manner. Similar to the behavior of async method calls that was introduces a few releases back you can now handle events in .NET and get called back, **without having to register the .NET component and implement a COM interface**.
 
-This was previously not possible or at the very least required that you created a COM object and interface that mapped the .NET type and was registered. With this new functionality you can now use only wwDotnetBridge without any sort of special registration or even having to implement a FoxPro interface. You can simple create a proxy object that can handle select events that you **choose to handle**. Other events are simple ignored.
+This was previously not possible or at the very least required that you created a COM object and interface that mapped the .NET type and was registered. With this new functionality you can now use only wwDotnetBridge without any sort of special registration or even having to implement a FoxPro interface. You can simply create a proxy object that can handle select events that you **choose to handle**. Other events are simply ignored.
 
 So what can you do with this? Here are a few example ideas:
 
