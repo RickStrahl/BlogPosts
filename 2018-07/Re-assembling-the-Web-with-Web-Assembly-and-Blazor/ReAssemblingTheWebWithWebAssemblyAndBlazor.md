@@ -21,6 +21,10 @@ A relatively new technology called **Web Assembly**, and `asm.js` before it, spe
 
 Web Assembly is a parallel technology to JavaScript and exists side by side with the JavaScript runtime in the Web Browser VM. Rather than using JavaScript to produce the byte code to execute code, Web Assembly Modules (WASM) contain lower level assembly-language intermediate code that can be produced by compilers of other languages. WASM code doesn't need to be parsed like JavaScript since it is already byte code that has resolved all the language logistics. Rather it takes the byte code and compiles into native code for the appropriate computer platform (x86 or ARM). This can be advantageous for creating very high performance computational code, that can potentially be optimized and execute considerably faster than JavaScript code both in terms of loading and runtime execution.
 
+![](WebAssemblyBasics.png)
+
+<small>**Figure XX** - Web Assembly sits side by side with JavaScript </small>
+
 ### Blazor - One way to .NET on the Web
 But even more interesting than performance, is the possibility of using WASM to bootstrap higher level runtimes that can then execute all sorts of different kinds of languages. Like say the .NET Runtime, which is exactly what Microsoft's **Blazor framework** does. 
 
@@ -46,16 +50,16 @@ As a result, in these early versions of Blazor don't expect performance miracles
 In short, it is very early days for both Web Assembly and Blazor and Microsoft explicitly states that Blazor is **not intended for production use!** It is very likely that a lot of the infrastructure and syntax is going to change significantly in the future. You've been warned...
 
 ## More Background on Web Assembly
-The key to everything I've described above is executing non-JavaScript code in the browser is Web Assembly. Web Assembly is relatively new browser tech, but it's now supported in the latest versions of all major browsers as shown in Figure 2. The one big omission here is Internet Explorer, although IE is supposed to be supported via an older `asm.js` technology that can polyfill for Web Assembly.
+The key to everything I've described above is executing non-JavaScript code in the browser is Web Assembly. Web Assembly is relatively new browser tech, but it's now supported in the latest versions of all major browsers as shown in Figure 2. It's notable that Internet Explorer is not supported by Web Assembly or Blazor.
 
 ![](WebAssemblyBrowserSupport.png)
 
 **Figure 2** - Web Assembly Support in Web Browsers (source: [Mozilla MDN](https://developer.mozilla.org/en-US/docs/WebAssemblyhttps://developer.mozilla.org/en-US/docs/WebAssembly))
 
-In simple terms Web Assembly provides a byte code level execution engine that can be targeted by compilers from other languages and so allows execution of non-JavaScript code. As to how other languages can execute there are a few different ways that can work, and I'll show native compilation here and indirect execution via runtime as Blazor does.
+So what is Web Assembly? In simple terms Web Assembly provides a byte code level execution engine that can be targeted by compilers from other languages and so allows execution of non-JavaScript code.
 
 ### Byte Code Representation -  Native Execution
-Web Assembly Modules (WASM) can be created by compilers that target a WASM output target. Today the most common WASM compilation platform is C/C++ using an LLVM module that can output WASM code. .NET has work in process with Mono for static compilation. Mono already supports a WASM module that does runtime interpretation of .NET code and that's what Blazor uses today, but in the future static Ahead of Time Compilation (AOT) may be supported for optimized binary module output.
+Web Assembly Modules (WASM) can be created by compilers that target a WASM output target. Today the most common WASM compilation platform is C/C++ using an LLVM module that can output WASM code. There is also work in process with Mono to produce static compilation of .NET code to WASM. Mono already supports a WASM module of the Mono .NET Runtime that can interpret .NET code at runtime, and that's what Blazor uses today. In the future static Ahead of Time Compilation (AOT) may be supported for optimized binary module output.
 
 A WASM module output is called **Intermediate Representation** or IR which is assembly-like byte code. This byte code is then loaded and compiled by the Web Assembly loader into processor specific native code that is executed by the Browser's VM. The IR code is not processor specific and it's the job of the Web Assembly engine to create the appropriate x86 or ARM native code that the browser VM can execute.
 
