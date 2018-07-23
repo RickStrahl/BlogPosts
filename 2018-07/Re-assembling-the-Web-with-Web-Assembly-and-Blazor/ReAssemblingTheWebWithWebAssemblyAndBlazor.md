@@ -710,34 +710,47 @@ async Task loadTodos()
 }
 ```
 
+### JavaScript Interop
+The white elephant in the room with Blazor is: How do I interact directly with the browser if I can't do what I need to via Razor templates? Blazor is a self-contained framework that completely abstracts away the DOM from your code. You can use HTML templates, and Razor code, but that's as close as you can get to the raw DOM.
+
+The idea of Blazor as it is with other frameworks is that you should be using the framework as much as possible to manage the UI and **not** resort to falling back to raw DOM updates. In this way the platform for rendering can potentially be changed without having to change your code. 
+
+Nevertheless sometimes you will need to call back into JavaScript to accomplish some task in the browser or to access Browser APIs that aren't available to Razor. For this scenario there are interop helpers available that allow you to call into JavaScript from Blazor and call into Blazor from JavaScript. The former is likely the more common scenario, to affect changes in the DOM that can't be otherwise handled, but the reverse process is often required if you need to shuttle data backs from an asynchronous call to the .NET code.
+
+This is a fairly involved topic that requires a bit of explanation and lots of little details that are too long to cover here, but I'll refer you to a great topic on the [Learn Blazor site](https://learn-blazor.com/architecture/interop/) which provides the basics and a more involved sample that uses these Reflection like APIs to do Interop. 
+
+There's also an `Interop.cshtml` sample page and additional JavaScript code in `index.html` of the sample that you can play around with.
+
+Keep in mind that this stuff in particular is very likely to change drastically as Web Assembly gains the ability to directly interact with the DOM. Once that's in place, it's very likely that Blazor will have high level DOM abstractions access the DOM and to provide an easier way to pass data back and forth.
+
+* [JavaScript Interop on Learn Blazor](https://learn-blazor.com/architecture/interop/)
 
 
+## Missing Pieces
+Now that you've seen some of the promise that Blazor brings to using .NET in the Browser it's time to put on the brakes and point at some issues you need to deal with.
+
+### It's a Prototype
+I know I mentioned this before but the current releases of blazor are previews/prototypes/early alphas or whatever you want to call it. **It is not production code** and while Blazor is quite functional I really wouldn't recommend you start building anything production with it. **It will change** - drastically most likely. 
+
+### No Debugging
+Currently there's no support for debugging in Blazor meaning you can't start Visual Studio or VS Code and 'run' your application by stepping through. Remember this code runs in the browser through Web Assembly and you are running interpreted .NET code which is an extremely long dev pipeline with no help from the browser tools to provide tooling. 
+
+Microsoft has indicated that this is a priority features and as I write this there have been a few Twitter posts from the usual suspects talking about early rough implementations of a .NET client side debugger. 
+
+In the meantime you don't have a lot of options for runtime debugging of code. The best way I've found is to use `Console.WriteLine()`, which writes its output to the JavaScript browser console. Unfortunately you are limited to string values. You can't see full object dumps, but you can use `JsonUtils.Serialize()` to turn objects to string and dump them as JSON to the JavaScript console or the screen
+
+### .NET Standard But Not All of it
+So the WASM Mono implementation supports .NET Standard 2.0 and it will load and execute any assembly built to that. However, there are many things that .NET Standard does that simply don't work and so there are quite a few things that might throw `NotSupported` exceptions.
+
+### Dates, Oh those JavaScript Dates
+We all know that JavaScript dates suck and that's reflected in the Mono WASM module at the moment in that Dates seem to not work very well for many things. Currently dates are always in UTC format with no way in .NET to turn them into local dates. The real issue here is that TimezoneInfo is not working properly so everything related to TimeZone's isn't working.
+
+This also has some side effects. For example I was trying to load JSON.NET to get formatted JSON output from my objects for debugging, but that failed due to some obscure date conversion errors. I had to stick with `JsonUtils.Serialize()` and unformatted output.
+
+This is likely to get resolved in future versions, but it just demonstrates that this is preview software not ready for production.
 
 
-
-> #### @icon-info-circle No Debugging Support
-> Currently there's no support for debugging Blazor code. Since the code runs client side in the browser and you are not running JavaScript you also can't use the browser dev tools to debug your code. Debugging is being worked on and should be available soon. In the meantime you don't have a lot of options for runtime debugging of code. The best way I've found is just using `Console.WriteLine()`, which writes its output to the JavaScript browser console. Unfortunately you are limited to string values with this approach - no way to display full object dumps, but you can use `JsonUtils.Serialize()` to turn objects to string and dump them as JSON.
-
-## Things to watch out for
-Blazor is still a prototype and as such there are many things that don't work. You can find out a lot of the issues by checking out the [GitHub issues](github.com/aspnet/Blazor/issues).
-
-Just working through my own experimentation here are some of common things I ran into:
-
-#### Update UI with `StateHasChanged()`
-If you perform operations that require a binding refresh that's outside of a standard browser event operation, make sure to call `StateHasChanged()` to let Blazor know that it needs to recheck bindings and update the UI.
-
-#### No Debugging Support - Use Console.WriteLine()
-In this early build of Blazor, there's no debugging support so you can't step through code as you run the application. Debugging is a high priority for future releases but it's not there yet and for now the best to debug live code is by using `Console.WriteLine()` which writes output into the Browser's Console window.
-
-#### TimeZones are broken in Mono
-In the current version DateTime values always default to UTC time with no clean way other than explicitly forcing the time offset by adding or subtracting the offset.
-
-#### Event Binding is Fixed
-Currently Blazor supports only specific event bindings for **bind=** operation. For example, the `<input>` bind operation fires `onchange()` rather than `onkeypress()` and there's no easy way to change this. As a workaround you can explicitly bind events like `onkeypress()` but that obviously requires more code. In the future there will be support for specific event binding syntax and more options on how bind events operate.
-
-
-
-### What's generated
+## What's generated
 If you want a look behind the scenes of how Blazor works at the .NET level you can peek into the client bin folder and check out your user assemblies. As mentioned earlier
 
 ![](RazorRenderTreeCSharp.png)
@@ -755,34 +768,32 @@ In the future it's quite easy to imagine that this sort of low level interface m
 
 Another interesting alternative for .NET developers is [Ooui](https://github.com/praeclarum/Ooui). Ouii provides a WebSocket based communication framework that lets you programmatically define a UI and controls rendered and passing events back over a WebSocket connection. Ouii has UI models both for DOM based layout as well as a Xamarin forms based layout that renders into HTML.
 
-### Where are we?
-It's easy to get excited around this technology. Blazor's development model certainly feels very comfortable with a relatively small learning curve that allows you to jump right in. Even better it sidesteps all the JavaScript build framework craziness that goes along with HTML based frameworks like Angular, React, Vue and so on.
+## Where are we?
+It's easy to get excited around this technology. Blazor's development model certainly feels very comfortable with a relatively small learning curve if you're already familiar with .NET and Razor.Even better it sidesteps all the JavaScript build framework craziness that goes along with HTML based frameworks like Angular, React, Vue and so on. Microsoft provides a fairly simple development environment where you compile and run, or publish with small set of compiled assemblies getting distributed.
 
-As for Blazor, using compiled .NET code that can take advantage of compile time validation of code, using rich tooling for project wide refactoring, and having nice integrated tooling and the ability to use standard .NET components opens up a world of possibilities that simply weren't an option before.
+There are also some downsides to this model. Everything that is in Razor templates is compiled C# code, meaning that in order to make even a minor change you have to recompile your application. This is no different than other frameworks like Angular, but it nevertheless makes this technology a two step process where compilation is required for any changes.
 
-On the flip side this is a framework from Microsoft. Microsoft has been known to try stuff and then abandon things. A framework like Blazor is also very likely to fight an adoption battle because it is a Microsoft product even if it is 100% open source. In my view, Microsoft has a commitment problem when it comes to client frameworks and Blazor very much needs a strong driving force to succeed both in terms of features and achieving 'hearts and minds'.
+On the flip side using compiled .NET code that can take advantage of compile time validation of code, using rich tooling for project wide refactoring, and having nice integrated tooling and the ability to use standard .NET components opens up a world of possibilities that simply weren't an option before. Blazor templates work in Visual Studio and give you most of the development time support you're used to when building server side Razor applications.
 
-It's also important to understand that for the most part this is **experimental software**. Vendors are still trying to figure out how to best integrate solutions like this into existing browser based UI. Web Assembly is still growing up and there are big holes in terms of JavaScript and DOM interactivity that Blazor relies on. Web Assembly is currently lacking the ability to directly access the DOM, so all rendering and event handling has to indirectly go through JavaScript. This means performance overhead, and maybe even more critically ugly and somewhat limited code in order for Web Assembly and JavaScript to talk to each other. Much of the interop is hidden internally in the Blazor framework, but at the edges if your code needs to interop - and it will - it's pretty ugly.
+On the flip side this is a framework from Microsoft. Microsoft has been known to try stuff and then abandon things. A framework like Blazor is also very likely to fight an adoption battle because it is a Microsoft product even if it is 100% open source. In my view, Microsoft has a commitment problem when it comes to client frameworks and Blazor very much needs a strong driving force to succeed both in terms of features and achieving 'hearts and minds'. But a lot has changed at Microsoft in recent years and time will tell how well they can build and support a client side product of this scope. 
 
-These issues are well known and they are already on the list of things to be addressed in Web Assembly, but we are not there yet. 
+It's also important to understand that for the most part this is **experimental software**. Vendors are still trying to figure out how to best integrate solutions like this into existing browser based UI. Web Assembly is still growing up and there are big holes in terms of JavaScript and DOM interactivity that Blazor relies on. Web Assembly is currently lacking the ability to directly access the DOM, so all rendering and event handling has to indirectly go through JavaScript. This means performance overhead, and maybe even more critically ugly and somewhat limited code in order for Web Assembly and JavaScript to talk to each other. Much of the interop is hidden internally in the Blazor framework, but at the edges if your code needs to interop - and it will - the code is pretty ugly.
 
+These issues are well known and they are already on the list of things to be addressed in Web Assembly, but we are not there yet. What all this means is that any tool that uses Web Assembly is going to be a rapidly changing target. **Microsoft specifically says not to use Blazor for production projects**, but I'm sure some people will just ignore that and do it anyway. Just realize that features and APIs are bound to change drastically before it becomes a stable production ready tool if at all. There has been no definite confirmation on whether Blazor is headed to become a real supported product, although indications from Microsoft clearly indicate that they are serious of pursuing this avenue. 
 
-What all this means is that anything Web Assembly based in the near future is going to be a rapidly changing target. **Microsoft specifically says not to use Blazor for production projects**, but I'm sure some people will just ignore that and do it anyway. Just realize that features and APIs are bound to change drastically before it becomes a stable production ready tool if at all. There has been no definite confirmation on whether Blazor is headed to become a real supported product, although it seems likely given all the interest that has been expressed around the overall concept and the speed with which this initial framework and tooling has come together. But it's all still open to interpretation by Microsoft.
+There's huge potential to for this technology to have wide ranging effects on the Microsoft eco-system perhaps even providing a path to building cross-platform capable applications that can run on many platforms in the browser, on the desktop and on mobile.
 
-### Experiment!
-So, if all of this sounds exciting to you, consider using current versions of Blazor to learn about Web Assembly and get a feel for what it's like to use .NET code to write your front end code. It has a very different feel from JavaScript based development which feels both familiar and unfamiliar at the same time. While you may not be able to build production ready code with this stuff yet, it helps to check out the technology and get a feel for what non-JavaScript based development might look like. Give it a try...
+We'll have to wait and see how that all turns out.
 
 ### Summary
-It's really cool to finally see some real noise with Web Assembly that aims at breaking the JavaScript mono-culture. Blazor certainly feels very comfortable to .NET developers and it gets a lot of things related to HTML frameworks right. In a lot of ways Blazor feel more natural than any of the other big frameworks. Part of this is the very code centric approach, but the ability to use .NET classes **and** also pull in a lot of .NET Standard compliant code on the client side is pretty exciting.
+It's really cool to finally see some real noise around Web Assembly that aims at breaking the JavaScript mono-culture in the Browser. Blazor certainly feels very comfortable to .NET developers and it gets a lot of things related to HTML frameworks right. In a lot of ways Blazor feel more natural than any of the other big frameworks. Part of this is the very code centric approach, the ability to use .NET classes **and** also pull in a lot of .NET Standard compliant code on the client side.
 
-On the flip side, this technology is not anywhere near ready. There are big missing features in Web Assembly, which are going to take a while to get addressed and then take more time to actually make it into browsers. The good news on that front is that most browser vendors are eager to make Web Assembly work, so once the specs are reasonably worked out browsers are likely to be close behind with implementations.
+On the flip side, this technology is not anywhere near ready. There are big missing features in Web Assembly, which are going to take a while to get addressed and then take more time to actually make it into browsers. The good news is that most browser vendors are eager to make Web Assembly work, so once the specs are worked out and in recommendation stage, browsers are likely to be close behind with implementations.
 
-There are also big issues with Mono both in general processing and with specific issues. It's amazing to think that it's even possible to compile down even a slimmed down version of the Mono Runtime to run in the browser, but there are many small issues that need to be resolved. 
+Blazor too is still discovering what works and what doesn't and frankly Microsoft doesn't have a great track record with client side frameworks. The good news here is that Blazor is different in that it is not based around JavaScript and Microsoft can leverage their skill in building .NET based frameworks and awesome tooling with Blazor.Given the short time since it was initially announced and put out I'd say Blazor has come a long way and it's actually mostly functional. But it's definitely not ready to be used in production any time soon due to performance, missing features and a number of bugs in the runtime. It's just a matter of time before these issues are resolved, but it's a waiting game.
 
-Blazor too is still discovering what works and what doesn't and frankly Microsoft doesn't have a great track record with client side frameworks. The good news here is that Blazor is different in that it is not based around JavaScript and Microsoft can leverage their skill in building .NET based frameworks with Blazor. Given the short time since it was initially announced and put out I'd say Blazor has come a long way and is actually mostly functional. But it's definitely not ready to be used in production any time soon.
+So as exciting as all of this new tech is, don't get too excited because I think it'll be quite a while before there's a stable and fully functional version of Blazor that we can use in production. 
 
-So as exciting as all of this new tech is, don't get too excited because I think it'll be quite a while before there's a stable and fully functional version of Blazor or whatever it will become that we can use in production. 
-
-It's not quite time to throw out the JavaScript baby with the bathwater. But in the meantime we can think about the possibilities what Web Assembly and Blazor can deliver. Get involved, play with the technology, report bugs and help out with discussions about features that you think you need and aren't there yet.
+It's not quite time to throw out the JavaScript baby with the bathwater yet. But in the meantime we can think about the possibilities that Web Assembly and Blazor can deliver. Get involved, play with the technology, report bugs and help out with discussions about features that you think you need.s
 
 
