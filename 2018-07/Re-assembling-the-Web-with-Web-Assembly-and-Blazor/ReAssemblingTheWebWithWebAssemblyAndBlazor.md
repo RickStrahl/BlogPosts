@@ -49,7 +49,7 @@ Blazor is a very specific use case, namely an HTML framework similar to somethin
 
 Currently there's a bit of overhead for all of this magic Blazor provides. You have to load a sizable WASM module, plus the JavaScript loader and interop handler code that has to be loaded into the browser for each page. These are not outrageously large especially when compared against full frameworks like Angular, Ember or Aurelia, but the payload is not small and has to be loaded on startup.
 
-There are also some serious limitations in Web Assembly that require quite a bit of JavaScript interop in order to access the DOM or other Web APIs. Data support for parameters and return values is also limited to numbers and pointers at the moment which require additional conversion in order to pass strings and references between JavaScript and Web Assembly. Both of these issues have a negative impact on performance of Web Assembly.
+There are also limitations in Web Assembly that require quite a bit of JavaScript interop in order to access the DOM or other Web APIs as Web Assembly cannot access the DOM or APIs directly. Data support for parameters and return values is also limited to numbers and pointers at the moment, which requires additional conversion in order to pass strings and references between JavaScript and Web Assembly. Both of these issues have a negative impact on performance.
 
 As a result, in these early versions of Blazor don't expect performance miracles or even performance that is on par with modern JavaScript frameworks. That will change as Web Assembly gets better DOM integration and type/reference support in the future and the Mono team continues to work on optimizing the WASM version of the Mono Runtime. There are also many optimizations that can be made in the Razor stack and with pre-rendering that are already being worked on in Blazor but aren't in the preview releases yet. 
 
@@ -64,14 +64,14 @@ The key to everything I've described above is executing non-JavaScript code in t
 
 ![](WebAssemblyBrowserSupport.png)
 
-**Figure 2** - Web Assembly Support in Web Browsers (source: [Mozilla MDN](https://developer.mozilla.org/en-US/docs/WebAssembly))
+**Figure XX** - Web Assembly Support in Web Browsers (source: [Mozilla MDN](https://developer.mozilla.org/en-US/docs/WebAssembly))
 
 So what is Web Assembly? In simple terms Web Assembly provides a byte code level execution engine that can be targeted by compilers from other languages and so allows execution of non-JavaScript code.
 
 ### Byte Code Representation -  Native Execution
-Web Assembly Modules (WASM) can be created by compilers that target a WASM output target. Today the most common WASM compilation platform is C/C++ using an Emscripten and an LLVM module that can output WASM code. There is also work in process with Mono to produce static compilation of .NET code to WASM although currently Blazor uses a different approach of use Mono as a hosted runtime via WASM to execute/interpret .NET code at runtime.
+Web Assembly Modules (WASM) can be created by compilers that target a WASM output target. Today the most common WASM compilation platform is C/C++ using an Emscripten and an LLVM module that can output WASM byte code. There is also work in process with Mono to produce static Ahead of Time (AOT) compilation of .NET code to WASM although currently Blazor uses a different approach of use Mono as a hosted runtime via WASM to execute/interpret .NET code at runtime.
 
-WASM modules are made up of binary content called **Intermediate Representation** or IR which is assembly-like byte code. This low level byte code is then loaded and compiled by the Web Assembly loader into processor specific native code that is executed by the Browser's VM. The IR code is not processor specific and it's the job of the Web Assembly engine to create the appropriate x86 or ARM native code for the specific Browser VM to execute.
+WASM modules consist of binary content called **Intermediate Representation** (IR) which is assembly-like byte code. This low level byte code is then loaded and compiled by the Web Assembly loader into processor specific native code that is executed by the Browser's VM. The IR code is not processor specific and it's the job of the Web Assembly engine to create the appropriate x86 or ARM native code for the specific Browser VM to execute.
 
 WASM modules can be loaded from JavaScript in the browser using a set of WebAssembly APIs. Eventually the goal is to be able to load WASM modules using `<script src="myapp.wasm" type="module"></script>` syntax, with loaded module using the same module loader used by EcmaScript 2016 and later. For Blazor use this doesn't really matter as all the Web Assembly interaction is performed internally by the Blazor JavaScript framework that's responsible for loading the Mono WASM module and interactive with via JavaScript shims.
 
@@ -82,28 +82,22 @@ With the advent of WebAssembly the browser runtimes can now load and run two typ
 ### Web Assembly limitations
 All this certainly sounds very promising, but Web Assembly is relatively new Browser technology and in its current state has a couple of big limitations.
 
-### No access To the HTML DOM and APIs
-Currently Web Assembly has no way to directly access the browser's DOM or APIs, so in order to interact with HTML page content, Canvas or any Browser API, Web assembly has to use interop with JavaScript. A function inside of WASM is essentially a self-contained block of code that is isolated from the environment it's hosted in. Think of it as a static function where all dependencies have to be passed in or maintained within the internal context. 
+* **No access To the HTML DOM and APIs**
+Currently Web Assembly has no way to directly access the browser's DOM or APIs, so in order to interact with HTML page content, Canvas or any Browser API, Web assembly has to use interop with JavaScript. A function inside of WASM is essentially a self-contained block of code that is isolated from the environment it's hosted in. Think of it as a static function where all dependencies have to be passed in or maintained within the internal context. JavaScript Interop is required to access DOM and APIs.
 
-This makes WASM ideal for code centric scenarios where performance is important or where HTML or the DOM aren't even involved directly. Game engines for example, may use their own rendering logic in memory to handle the heavy lifting for of creating and updating UI, but then still have to rely on the JavaScript interop to actually move the final content to the HTML DOM, Canvas or WebGL in the Browser to display the results.
+* **Numeric Parameters and Return Values Only**
+Web Assembly functions currently support only numeric types as parameters. There's no support for strings or references or any other non-numeric type. Any type of data has to be passed to Web Assembly functions via pointers to array buffers. In the real world this means a lot of serialization and copying of data has to be done to move data between JavaScript and Web Assembly.
 
-JavaScript interop is the key that currently lets Web Assembly interact, and it's a bottleneck to WASM's otherwise superior native performance.
+While these issues are pretty major, they have (slow) workarounds with some extra code gymnastics and interop with JavaScript via shims. Both of these issues are abstracted and hidden by frameworks like Blazor as we'll see, but the interop performance tax is a real issue.
 
-### Numeric Parameters and Return Values Only
-Web Assembly functions currently support only various numeric types as parameters. There's no support for strings or references or any other non-numeric type. Any type of data has to be passed to Web Assembly functions via pointers to buffers. In the real world this means a lot of serialization and copying of data has to be done to move data between JavaScript and Web Assembly.
+These issues are well known and will be fixed in future versions but for now current frameworks have to work around these issues.
 
-Most frameworks that run ontop of Web Assembly provide JavaScript shims to make the parameter thunking between JavaScript and WASM easier, but this is relative slow and makes for clunky interfaces.
+## Blazor: Browser based Razor Pages
+Blazor is a framework that sits on top of Web Assembly and gets its name from using **Razor** templates in the **Browser**. Behind the scenes Blazor uses a single Web Assembly module which is a WASM targeted version of the Mono .NET Runtime. Mono is a flavor of the .NET runtime that underlies the various Xamarin platforms as well as many flavors of Linux, Mac and small devices. WASM is yet another custom target for the Mono runtime that allows execution of .NET Standard assemblies and code. This Mono WASM version is customized and kept as small as possible for the browser environment. 
 
-There are proposals that will improve this interaction in the future, but for now these limitations exist.
+What this means is that once the Mono WASM module is loaded you can execute code in plain old .NET Standard 2.0 compatible assemblies directly inside of a browser. There's obviously a bit of setup required to bootstrap the runtime, and Blazor provides that bootstrapping mechanism in addition to the HTML framework using Razor Pages.
 
-While these issues are pretty major, they have (slow) workarounds for now with some extra code gymnastics and slow interop with JavaScript via shims. Both of these issues can be bstracted and hidden by Frameworks like Blazor as we'll see, but the interop performance tax is a real issue.
-
-## Blazing ahead with Browser based Razor Pages
-Blazor is a framework that sits on top of Web Assembly and gets it's name from using Razor style templates in the Browser. Behind the scenes Blazor uses a single Web Assembly module which is a WASM targeted version of the Mono .NET Runtime. Mono is a flavor of the .NET runtime that underlies the various Xamarin platforms as well as many flavors of Linux, Mac and small devices. WASM is yet another custom target for the Mono runtime that allows execution of .NET Standard assemblies and code. This Mono WASM version is customized and kept as small as possible for the browser environment. 
-
-What this means is that once the Mono WASM module is loaded you can execute code in plain old .NET Standard 2.0 compatible assemblies directly inside of a browser. There's obviously a bit of setup required to bootstrap the runtime, and Blazor provides that bootstrapping mechanism in addition to the HTML framework using Razor Pages. 
-
-The Mono WASM module supports .NET Standard 2.0 where it makes sense but will throw **NotSupported** exceptions for features that don't work. I had no issue importing several of my own utility libraries from NuGet and accessing a number of utility methods from them in my Blazor code. How cool is that?
+The Mono WASM module supports .NET Standard 2.0 where it makes sense but will throw **NotSupported** exceptions for features that don't work. I had no issue importing several of my own .NET Standard utility libraries from NuGet and accessing a number of utility methods from them in my Blazor code. How cool is that?
 
 Blazor works by:
 
@@ -128,17 +122,18 @@ If you look at the output of a 'compiled' Blazor application as shown in **Figur
 
 Note that there are no `.cshtml` template files sent to the browser. All Razor pages, as well as any loose C# files you create to reference support classes and logic are compiled and shipped as code to the client in the `BlazorDemo.dll` file.
 
-
 You can also see a `bin` folder with a bunch of core .NET Runtime assemblies are loaded alongside your user code (`BlazorDemo.dll` in **Figure XX**). 
 
 ![](NetworkSizesAndRequests.png)
 
 <small>**Figure XX** - Network sizes for the Blazor runtime is not small but also not excessive</small>
 
-Neither of these files are small so running a Blazor app will have at least a 800k payload at the moment plus any of the runtime and user code assemblies that your Razor code.
+Neither of these files are small so running a Blazor app will have at least a 800k payload at the moment plus any of the runtime and user code assemblies that your application creates.
 
-## Blazor 101
-In this article I'll keep my example very short and simple to give you an idea how some interesting Blazor features work. This is more to get a feel for the overall concepts than the specific details which are very likely to be out of date soon as Blazor evolves.
+### Blazor 101
+In this article I'll keep my examples very simple to give you an idea how Blazor features work. This is more to get a feel for the overall concepts than the specific implementation details which are very likely to change as this technology is in its very early stages.
+
+All the code I talk about here uses **Blazor 0.2**.
 
 ### What do you need?
 To give Blazor you're going to need to install a couple of things:
@@ -361,6 +356,13 @@ Figure XX shows what it looks like added to the Hello page:
 I removed the host page's timer code, and now only the timer component's time value is updated which is why Figure XX shows two different times.
 
 Components are very powerful and easily created so much like Partials in MVC you want to use components to isolate behavior into the the smallest manageable units to avoid creating monolithic pages or components. It's much better to break out functionality into smaller units of work that are easier to reason about.
+
+### What's generated
+If you want a look behind the scenes of how Blazor works at the .NET level you can peek into the client bin folder and check out your user assemblies. Razor views are compiled into code that holds both the static template content and the code for your embedded expressions, code blocks and `@function` directives. **Figure XX** shows the generated code for the HTML content of the template.
+
+![](RazorRenderTreeCSharp.png)
+
+<small>**Figure XX** - Razor Components render HTML and code into C#</small>
 
 ## A simple Todo List
 Lets go through another example that's a little more involved and deals with a little more data: The venerable ToDo list SPA sample. **Figure XX** shows the finished sample application:
@@ -750,13 +752,6 @@ This also has some side effects. For example I was trying to load JSON.NET to ge
 This is likely to get resolved in future versions, but it just demonstrates that this is preview software not ready for production.
 
 
-## What's generated
-If you want a look behind the scenes of how Blazor works at the .NET level you can peek into the client bin folder and check out your user assemblies. As mentioned earlier
-
-![](RazorRenderTreeCSharp.png)
-
-<small>**Figure XX** - Razor Components render HTML and code into C#</small>
-
 ### Web Assembly is not all about the DOM
 It's important to understand that **Blazor is just one way to implement a framework on top of Web Assembly**. Blazor explicitly interacts with the HTML DOM to defer all of its rendering and event handling. However, this is not a requirement.
 
@@ -794,6 +789,6 @@ Blazor too is still discovering what works and what doesn't and frankly Microsof
 
 So as exciting as all of this new tech is, don't get too excited because I think it'll be quite a while before there's a stable and fully functional version of Blazor that we can use in production. 
 
-It's not quite time to throw out the JavaScript baby with the bathwater yet. But in the meantime we can think about the possibilities that Web Assembly and Blazor can deliver. Get involved, play with the technology, report bugs and help out with discussions about features that you think you need.s
+It's not quite time to throw out the JavaScript baby with the bathwater yet. But in the meantime we can think about the possibilities that Web Assembly and Blazor can deliver. Get involved, play with the technology, report bugs and help out with discussions about features that you think you need.
 
 
