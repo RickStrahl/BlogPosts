@@ -64,7 +64,7 @@ The key to everything I've described above is executing non-JavaScript code in t
 
 ![](WebAssemblyBrowserSupport.png)
 
-**Figure 2** - Web Assembly Support in Web Browsers (source: [Mozilla MDN](https://developer.mozilla.org/en-US/docs/WebAssemblyhttps://developer.mozilla.org/en-US/docs/WebAssembly))
+**Figure 2** - Web Assembly Support in Web Browsers (source: [Mozilla MDN](https://developer.mozilla.org/en-US/docs/WebAssembly))
 
 So what is Web Assembly? In simple terms Web Assembly provides a byte code level execution engine that can be targeted by compilers from other languages and so allows execution of non-JavaScript code.
 
@@ -241,32 +241,34 @@ You can handle client side script events and route them to functions in your cod
  }
  ```
 
-This code adds a button with a click handler that updates the counter displayed on the button as shown in **Figure XX** above.
+This code adds a button with a click handler - `onclick="@IncrementCount"` - that updates the counter displayed on the button as shown in **Figure XX** above.
 
-Note that you can map events simply by pointing at a handler with the proper signature which in case of the click handler is a method with `MouseEventArgs`. Alternately you can also directly handle an event inline with a `Action` instance which allows you to reference in-scope variables for example inside of a loop structure.
+Note that you can map events simply by pointing at a handler with the proper signature which in case of the onclick handler is a method with `MouseEventArgs`. Alternately you can also directly handle an event inline with a `Action` instance. This is very useful because it allows you to reference in-scope variables for example inside of a loop structure:
 
 ```html
-<div onclick="@(()=> AddTodo(todoItem) )">
+@foreach(var todoItem in todoItems) {
+<div class="todo-item">
+    <a onclick="@(()=>RemoveTodo(todoItem))">
+       Remove
+    </a>
+</div>
+}
 ```
 
-### Non UI 'Events'
-Change tracking in Blazor is triggered by Browser events, but sometimes you might need to explicitly refresh the UI from code that triggers a change from within your .NET code. .NET can fire internal events and even run simulated multi-threading and timers.
+### Non UI Events
+Change tracking in Blazor is triggered by Browser DOM events, but sometimes you need to explicitly refresh the UI from code that triggers a change from within your .NET code. .NET can fire internal events and even run simulated multi-threading and timers.
 
-In the example above you may notice that when you click the **Increment Count** button, not only does the Count change, but also the date displayed in the alert box above it. This because the UI basically re-renders on the button click event and the change in the value.
+In the example above you may notice that when you click the **Increment Count** button, not only does the Count on the button change, but also the date displayed in the alert box above updates which is sort of weird UI behavior. It updates only when you click. This because the UI basically re-renders on the button click event and the change in the value but it doesn't update when the time changes.
 
-Assume for a minute that we want to see the date updated in real time every second to display the updated time. This can be done with a timer using code like this inside of `@functions{}`:
+If I want the time to change each second I can use a timer in .NET and **force** a UI change by adding a timer that forces the UI to rebind:
 
 ```csharp
 protected override Task OnInitAsync()
 {
     var timer = new System.Timers.Timer();
-    timer.Elapsed += (s, ev) =>
-    {
-        this.StateHasChanged();
-    };
+    timer.Elapsed += (s,ev)=>this.StateHasChanged();
     timer.Interval = 1000;
     timer.Start();
-
     return base.OnInitAsync();
 }
 ```
@@ -274,7 +276,7 @@ protected override Task OnInitAsync()
 Blazor components contain life cycle events and `OnInitAsync()` is one that you can use to fire code when the component is first loaded. In this example, I set up a timer and simply fire it every second and explicitly for `this.StateHasChanged()` which forces the UI to refresh. This has the effect that the time displayed is now updated every second even when no browser event is fired.
 
 > #### @icon-info-circle DateTime Format Issues
-> Due to a bug in Mono, DateTime values in Blazor **always display as UTC** even when using `.ToLocalTime()`. The problem is that timezone handling is currently not working in Mono but this will be fixed in future versions.
+> Due to a bug in Mono, `DateTime` values in Blazor **always display as UTC** even when using `.ToLocalTime()`. The problem is that timezone handling in Mono is currently not working, but this bug will be fixed in future versions.
 
 ### Layout Page
 You probably noticed that the Hello page shows more HTML layout than what this sample displays. This HTML is rendered as part of the Layout page.
@@ -300,16 +302,17 @@ The key point in this layout are the `@inherits BlazorLayoutComponent` (likely t
 To use the Layout you can use the `@layout` directive either in a specific page or by a `_ViewImports.cshtml` file by specifying the layout page type. Note that this is different than MVC where you specify the view - here you specify the type name.
 
 ### Components
-The lowest level UI element is a component which is simply a `.cshtml` file that can be embedded into a page. Notice the `<NavMenu>` tag in the Layout above - that's actually a component that contains sub component logic.
+Notice the `<NavMenu>` tag in the Layout page above. That's actually a component that contains the HTML and hide and show logic to show the sidebar nav menu.
 
-Components are richly supported in the developer tooling. You can create properties (`[Parameter]`) which are strongly typed and can be mapped from attributes to properties.
+Components are the lowest level UI element in Blazor. Components are simply `.cshtml` file. Any .cshtml you create has a matching class and that class component becomes available as an HTML tag to pull in the component. So the `NavMenu.cshtml` page becomes a `<NavMenu>` component you can embed into another page or component.
 
-Here's a simple component that takes the live time display logic I previously showed and creates a compoennt from it:
+Components are similar to MVC Partials, but they are much more powerful as you can pass values to the component. Inside of a component's implementation you can mark properties with a `[Parameter]` attribute that let the property access attribute values set on the host page/component. The values don't have to be strings - they can be any .NET value or reference which makes it very easy to pass data from parent to client.
+
+Here's a simple component that takes the time display logic I showed in the Hello page and creates a compoennt from it:
 
 ```html
-<div class="alert alert-secondary mt-4" role="alert">
+<div class="alert alert-secondary">
     <div>@Message</div>
-
     <i class="oi oi-clock"></i>&nbsp;
     <b style="font-size: 2.5em;">
         @Time.ToString(FormatString)
@@ -330,7 +333,6 @@ Here's a simple component that takes the live time display logic I previously sh
         var timer = new System.Timers.Timer();
         timer.Elapsed += (s, ev) =>
         {
-            Console.WriteLine("Updateing timer");
             Time = DateTime.Now;
             this.StateHasChanged();
         };
@@ -356,20 +358,147 @@ Figure XX shows what it looks like added to the Hello page:
 
 <small>**Figure XX** - The time component can update the UI independent of its parents</small>
 
+I removed the host page's timer code, and now only the timer component's time value is updated which is why Figure XX shows two different times.
+
 Components are very powerful and easily created so much like Partials in MVC you want to use components to isolate behavior into the the smallest manageable units to avoid creating monolithic pages or components. It's much better to break out functionality into smaller units of work that are easier to reason about.
 
-### A simple Todo List
+## A simple Todo List
+Lets go through another example that's a little more involved and deals with a little more data: The venerable ToDo list SPA sample. **Figure XX** shows the finished sample application:
+
+![](TodoSample.png)
+
+<small>**Figure xx** - The ToDo samples demonstrates more of the .NET features</small>
+
+### Client C# Business Logic
+One of the really nice things in Blazor is that you can create standalone .NET classes that isolate your business logic. Plain classes that can even reference classes in other .NET Standard assemblies imported via Nuget.
+
+I'm going to start with a pseudo business object, created in a separate class. I'll start out with static data, then later pull that same data from JSON data over the Web.
 
 
+Let's start simple by creating a new `TodoBusiness.cs` class with a static list of `TodoItem` object, so I have something to display. **Listing XX** shows both the business and data clases:
 
+```cs
+namespace BlazorDemo
+{
 
+public class TodoBusiness
+{
+    public static List<TodoItem> Todos { get; set; } = new List<TodoItem> {
+        new TodoItem { 
+          Title = "Go windsurfing", 
+          Description = "Hope it's windy" 
+        },
+        new TodoItem { 
+            Title = "Back to work", 
+            Description = "Write a new blog post. Get with it!" 
+        },
+        ...
+    };
+}    
 
+public class TodoItem
+{
+    public DateTime Entered { get; set; }
+    public string Title { get; set; }
+    public string Description { get; set; }
+    public bool Completed { get; set; }
 
-### Hello Blazor
-As I said I'm using the stock Blazor template and simply add a couple of new requests (and removing some of the stock ones).
+    public TodoItem()
+    {
+        Entered = DateTime.Now;
+    }
+}
 
+}
+```
 
-### Things to watch out for
+### Creating a Razor Page to display Todo Items
+This hardcoded list of Todo Items gives us a list that we can work with to display the Todo item list. To do this, let's create a new Razor Page called `TodoItems.cshtml`. The tooling in Visual Studio currently doesn't work for this so the easiest is to simply copy one of the existing pages as shown in **Listing XX**.
+
+```html
+@page "/todos"
+
+<link href="/css/todos.css" rel="stylesheet" />
+<div class="container">
+    <div class="todo-container">
+        @foreach (var todo in 
+                  todoItems.OrderByDescending(td => td.Entered))
+        {
+        <div class="todo-item @(todo.Completed ? "completed" : "")">
+    
+            <div class="pull-right">
+                <i class="fa fa-remove"
+                   onclick="@(()=> removeTodo(todo))"
+                   style="color: darkred; cursor: pointer"></i>
+            </div>
+            
+            <div class="todo-entered">
+                <i class="fa fa-clock-o"></i> @(todo.Entered.ToString("MMM dd @ H:mm"))
+            </div>
+            
+            <div class="pull-left" onclick="@(()=> toggleCompleted(todo) )">
+                <i class="fa @(todo.Completed ? "fa-check green-text larger" : "fa-bookmark-o")"
+                   style="cursor: pointer; font-size: 2em; margin-top:7px;">
+                </i>
+            </div>
+    
+            <div class="todo-content">
+                <div class="todo-header">
+                    @todo.Title
+                </div>
+                <div>
+                    @todo.Description
+                </div>
+            </div>
+        </div>
+        }
+    
+    </div>
+</div>
+```
+
+```cs
+@functions {
+    TodoItem activeTodo = new TodoItem();
+    List<TodoItem> todoItems = new List<TodoItem>();
+    
+    protected override async Task OnInitAsync()
+    {
+        await loadTodos();
+    }
+
+    async Task loadTodos()
+    {
+        Console.WriteLine("Loading Todos");
+        todoItems = TodoBusiness.Todos;
+    }
+}
+```
+<small>**Listing XX** - Looping through a list of Todo Items</small>
+
+There's a lot happening in this code so lets break down some of the highlights. The core bit of code deals with displaying a list of items and the code uses `@foreach(var todo in todoItems)` to do it. Note that you can use LINQ to easily filter the list or order the list as I've done here for demonstration purposes. Normally I would put the filtering and order logic probably into the 'business' logic. More on that later.
+
+Inside of the `foreach()` loop the `todo` object is in scope and can be used for other expressions to display things like `@todoItem.Title`. One of the nice things with Razor is that you also get to take advantage of the string formatting built into .NET, so you can format dates nicely like `todoItem.Entered.ToString("MMM dd, yy - HH:mm")` for example. These are things that are often a pain in JavaScript and provided by frameworks, but here it just comes naturally as part of the core .NET language which highlights one of the big plus points for using .NET in the first place. You have access to the core framework.
+
+Even better: You can also add NuGet packages that support .NET Standard 2.0. For example, I can add my own `Westwind.Utilities` package to my project and then change the date display to:
+
+```cs
+@Westwind.Utilities.TimeUtils.FriendlyDate(todo.Entered, showTime: true)
+```
+
+to display something like Today @ 2:30pm.
+
+Notice also that I can use the `todo` instance when handling events, so I can establish the proper context of which item should be removed or updated for example. You can easily pass
+
+```html
+<div class="pull-left" 
+     onclick="@(()=> toggleCompleted(todo))">
+```     
+
+> #### @icon-info-circle No Debugging Support
+> Currently there's no support for debugging Blazor code. Since the code runs client side in the browser and you are not running JavaScript you also can't use the browser dev tools to debug your code. Debugging is being worked on and should be available soon. In the meantime you don't have a lot of options for runtime debugging of code. The best way I've found is just using `Console.WriteLine()`, which writes its output to the JavaScript browser console. Unfortunately you are limited to string values with this approach - no way to display full object dumps, but you can use `JsonUtils.Serialize()` to turn objects to string and dump them as JSON.
+
+## Things to watch out for
 Blazor is still a prototype and as such there are many things that don't work. You can find out a lot of the issues by checking out the [GitHub issues](github.com/aspnet/Blazor/issues).
 
 Just working through my own experimentation here are some of common things I ran into:
@@ -422,5 +551,18 @@ What all this means is that anything Web Assembly based in the near future is go
 
 ### Experiment!
 So, if all of this sounds exciting to you, consider using current versions of Blazor to learn about Web Assembly and get a feel for what it's like to use .NET code to write your front end code. It has a very different feel from JavaScript based development which feels both familiar and unfamiliar at the same time. While you may not be able to build production ready code with this stuff yet, it helps to check out the technology and get a feel for what non-JavaScript based development might look like. Give it a try...
+
+### Summary
+It's really cool to finally see some real noise with Web Assembly that aims at breaking the JavaScript mono-culture. Blazor certainly feels very comfortable to .NET developers and it gets a lot of things related to HTML frameworks right. In a lot of ways Blazor feel more natural than any of the other big frameworks. Part of this is the very code centric approach, but the ability to use .NET classes **and** also pull in a lot of .NET Standard compliant code on the client side is pretty exciting.
+
+On the flip side, this technology is not anywhere near ready. There are big missing features in Web Assembly, which are going to take a while to get addressed and then take more time to actually make it into browsers. The good news on that front is that most browser vendors are eager to make Web Assembly work, so once the specs are reasonably worked out browsers are likely to be close behind with implementations.
+
+There are also big issues with Mono both in general processing and with specific issues. It's amazing to think that it's even possible to compile down even a slimmed down version of the Mono Runtime to run in the browser, but there are many small issues that need to be resolved. 
+
+Blazor too is still discovering what works and what doesn't and frankly Microsoft doesn't have a great track record with client side frameworks. The good news here is that Blazor is different in that it is not based around JavaScript and Microsoft can leverage their skill in building .NET based frameworks with Blazor. Given the short time since it was initially announced and put out I'd say Blazor has come a long way and is actually mostly functional. But it's definitely not ready to be used in production any time soon.
+
+So as exciting as all of this new tech is, don't get too excited because I think it'll be quite a while before there's a stable and fully functional version of Blazor or whatever it will become that we can use in production. 
+
+It's not quite time to throw out the JavaScript baby with the bathwater. But in the meantime we can think about the possibilities what Web Assembly and Blazor can deliver. Get involved, play with the technology, report bugs and help out with discussions about features that you think you need and aren't there yet.
 
 
