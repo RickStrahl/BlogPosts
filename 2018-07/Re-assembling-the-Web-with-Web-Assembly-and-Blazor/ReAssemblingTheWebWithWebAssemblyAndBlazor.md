@@ -472,11 +472,18 @@ This hardcoded list of Todo Items gives us a list that we can work with to displ
         Console.WriteLine("Loading Todos");
         todoItems = TodoBusiness.Todos;
     }
+    
+    // Event handler has to match signature
+    async Task reload(MouseEventArgs ev) => loadTodos();
 }
 ```
 <small>**Listing XX** - Looping through a list of Todo Items</small>
 
 There's a lot happening in this code so lets break down some of the highlights. The core bit of code deals with displaying a list of items and the code uses `@foreach(var todo in todoItems)` to do it. Note that you can use LINQ to easily filter the list or order the list as I've done here for demonstration purposes. Normally I would put the filtering and order logic probably into the 'business' logic. More on that later.
+
+The page contains properties that can be treated like the component's state. If you only have a couple of things you can store the state as properties here, or if you have a more complex it's probably a good idea to create a separate `TodoListModel` class and attach all the display state there.
+
+I'm 'loading' the business objects in the `OnInitAysnc()` method which is fired when the component starts up. Note that the component stays loaded
 
 Inside of the `foreach()` loop the `todo` object is in scope and can be used for other expressions to display things like `@todoItem.Title`. One of the nice things with Razor is that you also get to take advantage of the string formatting built into .NET, so you can format dates nicely like `todoItem.Entered.ToString("MMM dd, yy - HH:mm")` for example. These are things that are often a pain in JavaScript and provided by frameworks, but here it just comes naturally as part of the core .NET language which highlights one of the big plus points for using .NET in the first place. You have access to the core framework.
 
@@ -488,12 +495,225 @@ Even better: You can also add NuGet packages that support .NET Standard 2.0. For
 
 to display something like Today @ 2:30pm.
 
-Notice also that I can use the `todo` instance when handling events, so I can establish the proper context of which item should be removed or updated for example. You can easily pass
+### Formatting
+One advantage of Razor is that it is fairly terse in allowing expressions. Coming from Angular I'm familiar with things like `ngClass` that lets you specify conditional JSON for classes to display. Frameworks like Angular use pseudo code to describe a number of 'command attributes' like `ngClass` to handle operations like this, but with Razor you can actually use real code. Remember that Razor pages are actually turned into compiled .NET class code so you can do something like this:
+
+```html
+<i class="fa @(todo.Completed ?
+    "fa-check green-text larger" : 
+    "fa-bookmark-o")"
+```
+
+to conditionally add CSS classes and styles. Maybe not quite as readable as `ngClass` but much more flexible because you are dealing with real code.
+
+### Browser Event Handling
+Blazor allows you to attach event handlers to browser events that it knows about. Currently a fixed list of events is used, but in the future you will be able to bind to any event including custom events raised from JavaScript or your Blazor components.
+
+Events can be handled in two ways:
+
+* Providing a Function Pointer (delegate)
+* Providing an Action
+
+The former looks like this:
+
+```html
+<button class="btn btn-primary"
+        onclick="@reload">
+    Load ToDos
+</button>
+```                
+
+`reload` in this case is a method in the page that has to match a Mouse Event handler delegate:
+
+```
+async Task reload(MouseEventArgs ev) => loadTodos();
+```
+
+Alternately, you can also use an Action method directly attached to the event handler which allows you to pass any other context objects:
 
 ```html
 <div class="pull-left" 
-     onclick="@(()=> toggleCompleted(todo))">
-```     
+     onclick="@(()=>toggleCompleted(todo))">
+```
+
+Note that you can pass the proper context to the toggleCompleted method which can now be super simple:
+
+```cs
+void toggleCompleted(TodoItem todo)
+{
+    todo.Completed = !todo.Completed;
+}
+```    
+
+Updating the `Completed` property updates the underlying `todoItem` and the event triggers a UI refresh so the page is immediately updated and the Todo item is displayed as a completed item with CSS styling applied for the `completed` CSS class.
+
+Likewise to remove an item is as simple as passing
+
+```html
+<i class="fa fa-remove"
+   onclick="@(() => removeTodo(todo))">
+</i>
+```    
+
+and the corresponding handler method:
+
+```cs
+void removeTodo(TodoItem todo) =>
+    todoItems.Remove(todo);
+``` 
+
+This behavior is very similar to the way frameworks like Angular work but it makes for a very easy way to work with events and pass proper context between components and event handlers.
+
+### Handling User Input
+Let's add the ability to add new Todo items to the list, which is also very easy to do. First lets add another property to our page called `activeTodo` which is the todo displayed in the editor:
+
+```cs
+TodoItem activeTodo = new TodoItem() {
+    Title = "New ToDo", 
+    Description = "Get 'er done!" 
+};
+```
+
+The form in **Listing XX** above the Todo list can then display and add new items in an editable input. 
+
+```html
+<div class="card bg-light">
+<form name="form1" id="form1">
+    <div class="form-group">
+        <div class="input-group">
+            <span class="input-group-prepend">
+                <i class="fa fa-bookmark input-group-text"></i>
+            </span>
+            <input type="text" class="form-control"
+                   id="name" name="name"
+                   bind="@activeTodo.Title"
+                   placeholder="Enter the title for this ToDo"
+                   required />
+        </div>
+    </div>
+
+     <div class="form-group">
+        <textarea class="form-control"
+                  id="description" name="description"
+                  style="height: 100px"
+                  bind="activeTodo.Description"
+                  minlength="10"
+                  placeholder="Enter the description for this placeholder"
+                  required></textarea>
+    </div>
+
+    <button class="btn btn-primary" type="button"
+            onclick="@(() => addTodo(activeTodo) )">
+        <i class="fa fa-plus"></i> Add Todo
+    </button>
+    <button class="btn btn-primary" type="button"
+            onclick="@reload">
+        <i class="fa fa-download"></i>
+        Reload ToDos
+    </button>
+</form>
+</div>
+```    
+
+**Figure XX** shows what this form looks like:
+![](TodoInputForm.png)
+
+<small>**Figure XX** - Entering a new Todo item</small>
+
+The key feature of the input form in **Listing XX** is the `bind=` directive in the input controls, which bind the text in the textbox to a model value. 
+
+```html
+<input id="name" required 
+    bind="@activeTodo.Title"   />
+```
+
+As you enter a new value and move off the field the value updates the underlying `Title` property. Currently Blazor's binding features are limited and bind to specific properties, value and onchange for the `<input>` in this case. Work is underway to provide a more dynamic binding model that will let you bind to any DOM property and event.
+
+### Reloading Todos from an Http Url
+If you look at the `Reload` button on the sample, you'll note that currently reloading doesn't appear to be doing anything. That's because the Todo list is a static list of objects and reloading actually just re-assigns the same list of object. In other words, nothing really happensin the current code.
+
+To make this mildly more interesting lets load the Todo items from a URL via HTTP. To do this I'll change the business object to use the `HttpClient` to retrieve todo items from a static URL on the site.
+
+```cs
+public class TodoBusiness
+{
+    public static List<TodoItem> Todos { get; set; } 
+    private HttpClient _httpClient;
+
+    public TodoBusiness(HttpClient httpClient)
+    {
+        _httpClient = httpClient;
+    }
+
+    public async Task<List<TodoItem>> LoadTodos()
+    {            
+        Todos = await _httpClient.GetJsonAsync<List<TodoItem>>("/sample-data/todos.json");            
+        return Todos;         
+    }
+}
+```
+
+To use this class now in the Todo page component I have to make a few changes to ensure I can get access to the HttpClient instance.
+
+I can use dependency injection to get a reusable instance of the HttpClient object with this directive:
+
+```
+@inject HttpClient Http
+```
+
+HttpClient is one of the default injected components available to inject into any page and component. To use the injected HttpClient I can now pass it into the `loadTodos()`:
+
+```cs
+// Important: List cannot be null!
+List<TodoItem> todoItems = new List<TodoItem>();
+
+protected override async Task OnInitAsync()
+{
+    await loadTodos();
+}
+async Task loadTodos()
+{
+    var busTodos = new TodoBusiness(Http);
+    todoItems = await busTodos.LoadTodos();
+}
+```
+
+With this code in place the Reload button now properly reloads the original set of todos from the server.
+
+### Using Dependency Injection Instead
+A better way to handle the `TodoBusiness` is by adding it to dependency injection during the browser application's startup:
+
+```cs
+static void Main(string[] args)
+{
+    var serviceProvider = new BrowserServiceProvider(services =>
+    {
+        services.AddTransient<TodoBusiness>();                
+    });
+    new BrowserRenderer(serviceProvider).AddComponent<App>("app");
+}
+```
+
+This ensures that `HttpClient` is always passed to the constructor when injected. To inject the business object into the page and use it I can use:
+
+```cs
+@inject TodoBusiness TodoBusiness
+```
+
+and to use it:
+
+```cs
+async Task loadTodos()
+{
+    var busTodos = TodoBusiness;
+    todoItems = await busTodos.LoadTodos();
+}
+```
+
+
+
+
+
 
 > #### @icon-info-circle No Debugging Support
 > Currently there's no support for debugging Blazor code. Since the code runs client side in the browser and you are not running JavaScript you also can't use the browser dev tools to debug your code. Debugging is being worked on and should be available soon. In the meantime you don't have a lot of options for runtime debugging of code. The best way I've found is just using `Console.WriteLine()`, which writes its output to the JavaScript browser console. Unfortunately you are limited to string values with this approach - no way to display full object dumps, but you can use `JsonUtils.Serialize()` to turn objects to string and dump them as JSON.
