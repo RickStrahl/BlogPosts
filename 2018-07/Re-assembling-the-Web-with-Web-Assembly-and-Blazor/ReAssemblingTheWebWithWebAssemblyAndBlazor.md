@@ -1,13 +1,13 @@
 ---
 title: Re-assembling the Web with Web Assembly and Blazor
-weblogName: West Wind Web Log
+weblogName: West Wind Web Log 
 postDate: 2018-07-18T14:27:16.1036517-07:00
 ---
-# Re-assembling the Web with Web Assembly and Blazor
+# Web Assembly and Blazor
 
-The Web has been powered by a single language on the client since the very beginnings of the Web as a platform. JavaScript started as an overly simplistic scripting language in the first Mozilla browsers and very slowly evolved over the years to become what is now the most widely used programming language anywhere. 
+The Web has been powered by a single language on the client since the very beginnings of the Web as a platform. JavaScript started as an overly simplified scripting language in the first Netscape browsers and slowly evolved over the years to become what is now the most widely used programming language anywhere. 
 
-In recent years with the advent of ES2015 and later, and many infrastructure tools like Babel and WebPack using JavaScript has become a considerable more capable language and evolved into a complete platform able to handle even very large code bases. Unfortunately the complexity for the infrastructure too has increased with ever more crazy and byzantine build systems to build even simple applications. With JavaScript it seems the simpler the programming model gets, the more complex the build system and tooling becomes.
+In recent years with the advent of ES2015 and later versions, and many infrastructure tools like Babel and WebPack, using JavaScript has become a much more capable language that has evolved into a complete platform that can handle even very large code bases. Unfortunately the complexity for the infrastructure too has increased with ever more crazy and byzantine build systems to build even simple applications. With JavaScript it seems the simpler the programming model gets, the more complex the build system and tooling becomes.
 
 ## Re-Assembly
 There are a lot of developers that would much rather use something else - anything else - than JavaScript to build Web applications. I myself have made peace with JavaScript years ago, but while I use it daily and feel reasonably proficient with it, I would definitely welcome other options to build Web applications with.
@@ -23,9 +23,9 @@ Web Assembly allows exploring alternatives to JavaScript syntax and different bu
 
 Web Assembly is a parallel technology to JavaScript and exists side by side with the JavaScript runtime in the Web Browser VM. **Figure XX** shows how both JavaScript and Web Assembly are processed. Rather than parsing JavaScript into executble code, Web Assembly Modules (WASM) contain lower level assembly-language like intermediate code that can be produced by compilers of other languages. WASM code doesn't need to be parsed like JavaScript since it is already byte code that has resolved into execution ready byte code. WASM code can be expressed in text format and deals with instructions at the register, stack and memory level. This platform agnostic byte code is then compiled compiled into native code for the appropriate computer platform (x86 or ARM) and executed by on the specific  Browser platform. This can be advantageous for creating very high performance computational code which can be highly optimized for performance and can execute considerably faster than JavaScript code both in terms of loading and runtime execution.
 
-![](WebAssemblyBasics.png)
+![](Figure%201%20-WebAssemblyBasics.png)
 
-<small>**Figure XX** - Web Assembly sits side by side with JavaScript </small>
+<small>**Figure 1** - Web Assembly sits side by side with JavaScript </small>
 
 ### Blazor - One way to .NET on the Web
 But even more interesting than performance is the possibility of using Web Assembly to bootstrap higher level runtimes that can then execute higher level languages like .NET code. This is exactly that Microsoft's **Blazor framework** takes. 
@@ -34,9 +34,9 @@ Blazor uses a **Mono** compiled version of the .NET Runtime compiled to a WASM m
 
 Blazor then sits on top of the core runtime and implements the Razor engine used as an entry point to the .NET Code that can be processed inside of pages. You can do most of the things you normally do in .NET such as importing and referencing additional .NET Standard assemblies and instantiate classes and execute code in them.  
 
-![](BlazorWasmMono.png)
+![](Figure%202%20-%20BlazorWasmMono.png)
 
-<small>**Figure XX** - How Blazor use the Mono Runtime to execute .NET Code. Browser APIs currently have to be accessed through JavaScript interop</small>
+<small>**Figure 2** - How Blazor use the Mono Runtime to execute .NET Code. Browser APIs currently have to be accessed through JavaScript interop</small>
 
 One thing that sticks out in this implementation is that rather than compiling every bit of .NET code your application runs to WASM, only the Mono Runtime is compiled as a WASM module. All the Blazor framework and your application code is loaded as plain old .NET assemblies that are executed through Mono.
 
@@ -780,14 +780,14 @@ There's huge potential to for this technology to have wide ranging effects on th
 
 We'll have to wait and see how that all turns out.
 
-### Summary
+## Summary
 It's really cool to finally see some real noise around Web Assembly that aims at breaking the JavaScript mono-culture in the Browser. Blazor certainly feels very comfortable to .NET developers and it gets a lot of things related to HTML frameworks right. In a lot of ways Blazor feel more natural than any of the other big frameworks. Part of this is the very code centric approach, the ability to use .NET classes **and** also pull in a lot of .NET Standard compliant code on the client side.
 
 On the flip side, this technology is not anywhere near ready. There are big missing features in Web Assembly, which are going to take a while to get addressed and then take more time to actually make it into browsers. The good news is that most browser vendors are eager to make Web Assembly work, so once the specs are worked out and in recommendation stage, browsers are likely to be close behind with implementations.
 
 Blazor too is still discovering what works and what doesn't and frankly Microsoft doesn't have a great track record with client side frameworks. The good news here is that Blazor is different in that it is not based around JavaScript and Microsoft can leverage their skill in building .NET based frameworks and awesome tooling with Blazor.Given the short time since it was initially announced and put out I'd say Blazor has come a long way and it's actually mostly functional. But it's definitely not ready to be used in production any time soon due to performance, missing features and a number of bugs in the runtime. It's just a matter of time before these issues are resolved, but it's a waiting game.
 
-So as exciting as all of this new tech is, don't get too excited because I think it'll be quite a while before there's a stable and fully functional version of Blazor that we can use in production. 
+So as exciting as all of this new tech is, don't get too excited because I think it'll be quite a while before there's a stable and fully functional version of Blazor and Web Assembly that we can use in production. 
 
 It's not quite time to throw out the JavaScript baby with the bathwater yet. But in the meantime we can think about the possibilities that Web Assembly and Blazor can deliver. Get involved, play with the technology, report bugs and help out with discussions about features that you think you need.
 
