@@ -31,7 +31,7 @@ Web Assembly allows exploring alternatives to JavaScript syntax and different bu
 
 Web Assembly is a parallel technology to JavaScript and exists side by side with the JavaScript runtime in the Web Browser's Runtime. It also shares the Browser Sandbox's security context so unlike plug-ins of old, Web Assembly can't access computer hardware or OS features. Web Assembly **is not a new Silverlight** in that respect. Web Assembly relies on the same browser runtime that JavaScript relies on.  
 
-![](Figure%201%20-WebAssemblyBasics_smaller.png)
+![](Figure%201%20-%20WebAssemblyBasics_smaller.png)
 
 <small>**Figure 1** - Web Assembly sits side by side with JavaScript </small>
 

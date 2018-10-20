@@ -177,12 +177,14 @@ The base method responsible for handling the script stripping is this pretty sim
 ```cs
 static string HtmlSanitizeTagBlackList { get; } = "script|iframe|object|embed|form";
 
-static Regex _RegExScript = new Regex(
-    $@"(<({HtmlSanitizeTagBlackList})\b[^<]*(?:(?!<\/({HtmlSanitizeTagBlackList}))<[^<]*)*<\/({HtmlSanitizeTagBlackList})>)",
-    RegexOptions.IgnoreCase | RegexOptions.Multiline);
+static Regex _RegExScript = new Regex($@"(<({HtmlSanitizeTagBlackList})\b[^<]*(?:(?!<\/({HtmlSanitizeTagBlackList}))<[^<]*)*<\/({HtmlSanitizeTagBlackList})>)",
+	RegexOptions.IgnoreCase | RegexOptions.Multiline);
 
+// strip javascript: and unicode representation of javascript:
+// href='javascript:alert(\"gotcha\")'
+// href='&#106;&#97;&#118;&#97;&#115;&#99;&#114;&#105;&#112;&#116;:alert(\"gotcha\");'
 static Regex _RegExJavaScriptHref = new Regex(
-    @"<.*?(href|src|dynsrc|lowsrc)=.{0,10}(javascript:).*?>",
+    @"<.*?(href|src|dynsrc|lowsrc)=.{0,20}((ᴶavascript:)|(&#)).*?>",
     RegexOptions.IgnoreCase | RegexOptions.Multiline);
 
 static Regex _RegExOnEventAttributes = new Regex(
@@ -213,16 +215,19 @@ public static string SanitizeHtml(string html, string htmlTagBlacklist = "script
     else
     {
         html = Regex.Replace(html,
-           $@"(<({htmlTagBlacklist})\b[^<]*(?:(?!<\/({HtmlSanitizeTagBlackList}))<[^<]*)*<\/({htmlTagBlacklist})>)",
-           "", RegexOptions.IgnoreCase | RegexOptions.Multiline);
+                                $@"(<({htmlTagBlacklist})\b[^<]*(?:(?!<\/({HtmlSanitizeTagBlackList}))<[^<]*)*<\/({htmlTagBlacklist})>)",
+                                "", RegexOptions.IgnoreCase | RegexOptions.Multiline);
     }
 
     // Remove javascript: directives
     var matches = _RegExJavaScriptHref.Matches(html);
     foreach (Match match in matches)
     {
-        var txt = StringUtils.ReplaceString(match.Value, "javascript:", "unsupported:", true);
-        html = html.Replace(match.Value, txt);
+        if (match.Groups.Count > 2)
+        {
+            var txt = match.Value.Replace(match.Groups[2].Value, "'#'");
+            html = html.Replace(match.Value, txt);
+        }
     }
 
     // Remove onEvent handlers from elements
@@ -241,37 +246,18 @@ public static string SanitizeHtml(string html, string htmlTagBlacklist = "script
 
     return html;
 }
-
 ```
 
-This is then plugged into the Markdown parser like this:
+### Performance
+So as I mentioned previously I had built an HTML Sanitizer a long while back that used HTML Agility Pack to manually parse the document. Now there's also a maintained version of a [HTML Sanitizer](https://github.com/mganss/HtmlSanitizer) that's much more full featured and will handle many more edge cases. Both of these are more reliable, but it comes at a cost - there's overhead in this processing as you have to load the document into the HTML parser, then walk the entire document and check each element and attribute. This is memory and CPU intensive and definitely has some overhead.
 
-```csharp
-public override string Parse(string markdown, bool sanitizeHtml = true)
-{
-    if (string.IsNullOrEmpty(markdown))
-        return string.Empty;
+It depends entirely on how you use Markdown in your document. If you capture markdown and immediately parse it into HTML and save that with your data probably won't care about performance since it's a one time shot. Even if you have sizable Markdown and you simply display a single page that's probably Ok. But if you have multiple Markdown fragments on a page, or as I do in Markdown Monster refresh Markdown Monster whenever the cursor stops typing, you want the markdown conversion to happen as fast as possible. RegEx processing tends to be a lot quicker as it's relatively straight forward string parsing.
 
-    string html;
-    using (var htmlWriter = new StringWriter())
-    {
-        var renderer = CreateRenderer(htmlWriter);
+So Feedback is welcome in perhaps optimizing this string and RegEx based parsing as a midling solution.
 
-        Markdig.Markdown.Convert(markdown, renderer, Pipeline);
+The code for the [rudimentary HTML Sanitation lives here on GitHub](https://github.com/RickStrahl/Westwind.AspNetCore/blob/master/Westwind.AspNetCore.Markdown/Utilities/StringUtils.cs#L183). I'm fully aware this isn't a complete XSS solution, but it at least addresses the most common and obvious use cases. 
 
-        html = htmlWriter.ToString();
-    }
-
-    html = ParseFontAwesomeIcons(html);
-
-    if (sanitizeHtml)
-        html = StringUtils.SanitizeHtml(html);
-              
-    return html;
-}
-```
-
-Feedback welcome. The code for the [rudimentary HTML Sanitation lives here on GitHub](https://github.com/RickStrahl/Westwind.AspNetCore/blob/master/Westwind.AspNetCore.Markdown/Utilities/StringUtils.cs#L183). I'm fully aware this isn't a complete XSS solution, but it at least addresses the most common use cases. Also if anybody has a experience based recommendation for a good, **fast and actively developed** XSS Sanitation library for .NET please leave a comment. I've been using my own home grown HtmlSanitizer I created a long while back and it's served me well enough to date.
+Also if anybody has a experience based recommendation for a good, **fast and actively developed** XSS Sanitation library for .NET please leave a comment. I've been using my own home grown HtmlSanitizer I created a long while back and it's served me well enough to date.
 
 ## Summary
 Wouldn't it be nice if the Internet was still all roses and unicorns and we wouldn't have to worry about bad actors sniffing out security holes within a few hours of an application going live. Alas, such is the world we live in...
@@ -286,6 +272,7 @@ If you however capture user input and display that user input, make sure you hav
 * [Creating a generic Markdown Page Handler using ASP.NET Core Middleware ](https://weblog.west-wind.com/posts/2018/Apr/18/Creating-a-generic-Markdown-Page-Handler-using-ASPNET-Core-Middleware)
 * [Old post on .NET HTML Sanitation for rich HTML Input](https://weblog.west-wind.com/posts/2012/Jul/19/NET-HTML-Sanitation-for-rich-HTML-Input)
 * [Westwind.AspNetCore.Markdown Project on Github](https://github.com/RickStrahl/Westwind.AspNetCore/tree/master/Westwind.AspNetCore.Markdown)
+* A full featured .NET Html Sanitizer: [Html Sanitizer](https://github.com/mganss/HtmlSanitizer)
 
 <div style="margin-top: 30px;font-size: 0.8em;
             border-top: 1px solid #eee;padding-top: 8px;">

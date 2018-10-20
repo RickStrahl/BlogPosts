@@ -5,6 +5,7 @@ keywords: Markdown, ASP.NET, WebForms, Literal, Editing
 categories: ASP.NET Markdown
 weblogName: West Wind Web Log
 postId: 397177
+postDate: 2018-09-08T16:04:22.8116253-07:00
 ---
 # A Literal Markdown Control for ASP.NET WebForms
 
@@ -20,13 +21,15 @@ IAC, I often write fairly plain text in content pages that doesn't require any f
 
 ##AD##
 
-## Westind.Web.MarkdownControl
+## Westind.Web.Markdown
 This isn't a new idea of course. If you use a CMS you likely already have this built-in and there are ASP.NET MVC and ASP.NET Core Html and Tag Helpers that provide literal translation from Markdown to HTML. But looking around last night I didn't see a WebForms implementation, so I quickly whipped up a simple WebForms server control.
 
 > #### @icon-info-circle What about ASP.NET Core?
-> This post discusses a WebForms based WebControl that provides a Markdown Content control. If you're using ASP.NET Core, that a look at:
+> This post discusses System.Web MVC and WebForms Markdown support. If you're using ASP.NET Core, that a look at:
 >
-> [A Markdown TagHelper and Markdown Parser for ASP.NET Core](https://weblog.west-wind.com/posts/2018/Mar/23/Creating-an-ASPNET-Core-Markdown-TagHelper-and-Parser).
+> * [A Markdown TagHelper and Markdown Parser for ASP.NET Core](https://weblog.west-wind.com/posts/2018/Mar/23/Creating-an-ASPNET-Core-Markdown-TagHelper-and-Parser)
+>
+> * [Creating a generic Markdown Page Handler with ASP.NET Core Middleware](https://weblog.west-wind.com/posts/2018/Apr/18/Creating-a-generic-Markdown-Page-Handler-using-ASPNET-Core-Middleware)
 
 The control lets me write the following inline Markdown:
 
@@ -48,13 +51,17 @@ The control lets me write the following inline Markdown:
 There's also simple static Markdown parsing support (courtesy of the awesome [Markdig Markdown Parser](https://github.com/lunet-io/markdig)):
 
 ```html
-<%= Markdown.Parse(Model.MarkdownNotesText) %>
+<%= Markdown.Parse(Model.MarkdownNotesText, sanitizeHtml: true) %>
+```
+
+```cs
+@Markdown.ParseHtml(Model.MarkdownNotesText, sanitizeHtml: true) %>
 ```
 
 Anyway, you can find the code and a Nuget package here:
 
-* [Westwind.Web.MarkdownControl](https://github.com/RickStrahl/Westwind.Web.MarkdownControl)
-* [Nuget](https://www.nuget.org/packages/Westwind.Web.MarkdownControl)
+* [Westwind.Web.Markdown on GitHub](https://github.com/RickStrahl/Westwind.Web.Markdown)
+* [Westwind.Web.Markdown on Nuget](https://www.nuget.org/packages/Westwind.Web.Markdown)
 
 There's a lot more information on how to use the control and a few of the options available.
 
@@ -189,7 +196,8 @@ The key is the `Render()` method which text the markdown content from the `Text`
 `NormalizeWhitespace` deals with stripping leading white space from the markdown text in a control. What this means that when you embed Markdown like this:
 
 ```html
-<ww:Markdown runat="server" id="md2" NormalizeWhiteSpace="True">
+<ww:Markdown runat="server" id="md2" 
+			 NormalizeWhiteSpace="True">
     # Markdown Monster Change Log 
     [download latest version](https://markdownmonster.west-wind.com/download.aspx) &bull; 
     [install from Chocolatey](https://chocolatey.org/packages/MarkdownMonster) &bull; 
@@ -212,6 +220,37 @@ which guarantees that the Markdown is rendered as is.
 
 `NormalizeWhiteSpace` is `true` by default so typically it does what you'd expect it to do. Use `false` if your leading spaces are wonky (ie. not the same for all lines) and left justify to the left margin.
 
+## Sanitizing HTML
+Markdown is essentially a superset of HTML as you can embed any HTML into Markdown. Markdown itself doesn't have any rules about what HTML can be embedded and it's entirely possible to embed script code inside of markdown.
+
+> #### @icon-warning Markdown and Script Attacks
+> If you accept Markdown as user input, you have to treat Markdown with the same security concerns as you would raw HTML input. 
+
+If you capture user Markdown input you have to ensure you sanitize the rendered HTML and remove any potential code execution.
+
+To help with this, the Markdown control has a `SanitizeHtml` property which is **set to `True` by default** and which performs rudimentary script sanitation. It removes `<script>`, `<iframe>`, `<form>` and a few other elements, removes `javascript:` and `data:` attribute content, and removes `onXXX` event handlers from HTML input.
+
+If you rather render your Markdown *as is* set `SantizeHtml` to `False` which has to be done explicitly to get raw, unsanitized HTML output. 
+
+To see what that looks like you can try the following in a Markdown block. Add this to your page and switch `SanitizeHtml` between `true` and `false`.
+
+```html
+<markdown runat="server" id="mm1" 
+          SanitizeHtml="False">
+	
+	### Links:
+	[Please don't hurt me](javascript:alert('clicked!');)
+	
+	### Script Blocks
+	<script>alert('this will show!');</script>
+	
+	<div onmouseover="alert('That really hurts!')"
+	     style="opacity: 0; padding: 20px;">
+		A hidden menace in Venice
+	</div>
+</markdown>
+```
+
 ##AD## 
 
 ## Markdown Conversion
@@ -227,6 +266,22 @@ or by directly embedding into ASPX pages:
 <%= Markdown.Parse("This is **a very bold Markdown**.") %>
 ```
 It works elsewhere too (like MVC), but you're not likely to add the control to non WebForms projects. But if for some reason you do, there's another version of the `Parse` method as `ParseHtml()` which returns a `HtmlString` instance instead that you can use in `@Markdown.ParseHtml("This is **a very bold Markdown**.")` in WebPages or MVC.
+
+#### sanitizeHtml Parameter
+By default the Parse methods apply HTML sanitation via a `sanitzeHtml` parameter, which defaults to `true`. If you would like to get the raw unsanitized HTML returned or you want to do your own HTML Sanitation post parsing, set `sanitizeHtml: false` in the method call.
+
+For code you know is safe turn sanitation off:
+
+```cs
+string html = Markdown.Parse(staticMarkdown,sanitizeHtml: false);
+```
+
+For user input that you echo back to the screen make sure you sanitize:
+
+```cs
+// true is the default but it's good to be explicit!
+string html = Markdown.Parse(staticMarkdown, sanitizeHtml: true);
+```
 
 ## Parsing Markdown
 All of this functionality is really made possible by the Markdown parser which in this case is the excellent [Markdig](https://github.com/lunet-io/markdighttps://github.com/lunet-io/markdig) library. I tend to wrap whatever MarkdownParser I use in a small factory interface as over the last few years I've switched parsers quite frequently.
@@ -337,6 +392,11 @@ I've put the code on Github and the control into Nuget so if this sounds like a 
 
 ## Resources
 * [A Markdown TagHelper and Markdown Parser for ASP.NET Core](https://weblog.west-wind.com/posts/2018/Mar/23/Creating-an-ASPNET-Core-Markdown-TagHelper-and-Parser)
+* [Creating a generic Markdown Page Handler using ASP.NET Core Middleware](https://weblog.west-wind.com/posts/2018/Apr/18/Creating-a-generic-Markdown-Page-Handler-using-ASPNET-Core-Middleware)
+* [Markdown and Cross-Site Scripting](https://weblog.west-wind.com/posts/2018/Aug/31/Markdown-and-Cross-Site-Scripting)
+* [Westwind.Web.Markdown on GitHub](https://github.com/RickStrahl/Westwind.Web.Markdown)
+* [Westwind.Web.Markdown on Nuget](https://www.nuget.org/packages/Westwind.Web.Markdown)
+
 
 <div style="margin-top: 30px;font-size: 0.8em;
             border-top: 1px solid #eee;padding-top: 8px;">

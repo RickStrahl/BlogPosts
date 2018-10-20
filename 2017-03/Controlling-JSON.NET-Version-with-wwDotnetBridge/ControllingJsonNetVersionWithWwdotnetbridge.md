@@ -1,3 +1,12 @@
+---
+title: Controlling the JSON.NET Version in wwDotnetBridge with Assembly Redirects
+abstract: JSON.NET is the most popular .NET component used in more components than any other and because of that you can end up finding other components that also use JSON.NET and perhaps with a different version. Trying to load a different version of JSON.NET in an application can cause runtime failures for loading the assembly. The workaround is to use .NET Assembly Redirects in the application's .config file. Here's how to do this.
+keywords: JSON.NET,FoxPro,wwdotnetBridge
+categories: FoxPro,wwDotnetBridge
+weblogName: West Wind Web Log
+postId: 927
+postDate: 2018-09-17T11:24:31.0762884-07:00
+---
 # Controlling the JSON.NET Version in wwDotnetBridge with Assembly Redirects
 
 ![Round Hole, Square Peg](SquarePegRoundHole.jpg)
@@ -70,29 +79,3 @@ The first line of defense are assembly redirects that you can specify in your ap
 
 
 
-<!-- Post Configuration -->
-<!--
-```xml
-<blogpost>
-<title>Controlling the JSON.NET Version in wwDotnetBridge with Assembly Redirects</title>
-<abstract>
-JSON.NET is the most popular .NET component used in more components than any other and because of that you can end up finding other components that also use JSON.NET and perhaps with a different version. Trying to load a different version of JSON.NET in an application can cause runtime failures for loading the assembly. The workaround is to use .NET Assembly Redirects in the application's .config file. Here's how to do this.
-</abstract>
-<categories>
-FoxPro,wwDotnetBridge
-</categories>
-<keywords>
-JSON.NET,FoxPro,wwdotnetBridge
-</keywords>
-<isDraft>False</isDraft>
-<featuredImage></featuredImage>
-<weblogs>
-<postid>927</postid>
-<weblog>
-Web Connection Weblog
-</weblog>
-</weblogs>
-</blogpost>
-```
--->
-<!-- End Post Configuration -->
