@@ -178,18 +178,18 @@ The base method responsible for handling the script stripping is this pretty sim
 static string HtmlSanitizeTagBlackList { get; } = "script|iframe|object|embed|form";
 
 static Regex _RegExScript = new Regex($@"(<({HtmlSanitizeTagBlackList})\b[^<]*(?:(?!<\/({HtmlSanitizeTagBlackList}))<[^<]*)*<\/({HtmlSanitizeTagBlackList})>)",
-	RegexOptions.IgnoreCase | RegexOptions.Multiline);
+RegexOptions.IgnoreCase | RegexOptions.Multiline);
 
 // strip javascript: and unicode representation of javascript:
 // href='javascript:alert(\"gotcha\")'
 // href='&#106;&#97;&#118;&#97;&#115;&#99;&#114;&#105;&#112;&#116;:alert(\"gotcha\");'
 static Regex _RegExJavaScriptHref = new Regex(
-    @"<.*?(href|src|dynsrc|lowsrc)=.{0,20}((ᴶavascript:)|(&#)).*?>",
-    RegexOptions.IgnoreCase | RegexOptions.Multiline);
+    @"<[^>]*?\s(href|src|dynsrc|lowsrc)=.{0,20}((javascript:)|(&#)).*?>",
+    RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
 static Regex _RegExOnEventAttributes = new Regex(
-    @"<.*?\s(on.{4,12}=([""].*?[""]|['].*?['])).*?(>|\/>)",
-    RegexOptions.IgnoreCase | RegexOptions.Multiline);
+    @"<[^>]*?\s(on[^\s\\]{0,20}=([""].*?[""]|['].*?['])).*?(>|\/>)",
+    RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
 /// <summary>
 /// Sanitizes HTML to some of the most of 
@@ -225,7 +225,7 @@ public static string SanitizeHtml(string html, string htmlTagBlacklist = "script
     {
         if (match.Groups.Count > 2)
         {
-            var txt = match.Value.Replace(match.Groups[2].Value, "'#'");
+            var txt = match.Value.Replace(match.Groups[2].Value, "unsupported:");
             html = html.Replace(match.Value, txt);
         }
     }

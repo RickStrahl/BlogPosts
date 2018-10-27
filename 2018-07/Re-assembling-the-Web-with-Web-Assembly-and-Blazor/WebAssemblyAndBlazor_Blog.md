@@ -9,7 +9,7 @@ postDate: 2018-07-31T00:51:26.1924026-07:00
 ---
 # Web Assembly and Blazor: Re-assembling the Web
 
-![](WebAssembly.jpg) 
+![](WebAssembly.jpg)
 
 <small>*this post contains contains a subset from the forthcoming [CoDe Magazine](https://code-magazine.com) article in the September/October issue*</small>
 
