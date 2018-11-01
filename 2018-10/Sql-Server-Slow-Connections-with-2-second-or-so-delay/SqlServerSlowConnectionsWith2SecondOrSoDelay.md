@@ -37,8 +37,32 @@ I'm pretty sure that I've used Named Pipes in the past and didn't see this type 
 
 Anybody have any ideas why Named Pipes are so slow for SQL connections? It almost seems like a fixed delay because it's so consistent across several different machines.
 
+After a bit more digging it appears that the problem isn't the Named Pipe Connection itself, but something related to the protocol discovery. In particular I ran into this problem with a FoxPro application which means it's using the SQL Server ODBC driver.
+
+There connecting to SQL server like this with only Named Pipes enabled:
+
+```foxpro
+losql = CREATEOBJECT("wwSql")
+? loSql.Connect("server=.;database=webstore;integrated security=yes")
+```
+
+results in the 2 second+ delay.
+
+Changing the connection string to explicitly specify the protocol however fixes the issue:
+
+```foxpro
+losql = CREATEOBJECT("wwSql")
+? loSql.Connect("server=np:.;database=webstore;integrated security=yes")
+```
+
+which seems to suggest there's some sort of protocol discovery problem where the driver is trying to use TCP/IP first, and failing to get a connection before trying the other protocols.
+
+Interestingly the behavior would vary depending on the version of the SQL Server driver. Version 11 (which is what my ODBC driver is pegged to) exhibits this behavior, while the latest v13 does not.
+
+This isn't a solution, but should be useful as a troubleshooting aid. It's easy to find out if a specific protocol is working as using a protocol that's not installed won't automatically try to go through all the protocols. Perhaps it's a good idea to be explicit about protocols (ie. specify `tcp:.` for the server explicitly always) because then if `tcp/ip` is not enabled you know right away that there's a problem.
+
 ### Summary
-I'm writing this up because I know I'll run into this again next time I install a dev machine or even a new server and hopefully by then I'll remember that I wrote this blog post :-). Maybe it'll help you find the issue this way as well.
+I'm writing all this up because I know I'll run into this again next time I install a dev machine or even a new server and hopefully by then I'll remember that I wrote this blog post :-). Maybe it'll help you too should you run into slow initial SQL connections as well.
 
 <div style="margin-top: 30px;font-size: 0.8em;
             border-top: 1px solid #eee;padding-top: 8px;">
