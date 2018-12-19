@@ -1,11 +1,11 @@
 ---
 title: Creating an ASP.NET Core Markdown TagHelper and Parser
 abstract: A couple of months ago I wrote about creating a WebForms based Markdown control. This time around I'll build an ASP.NET Core MVC TagHelper that performs similar functionality for embedding Markdown text into a content area of a Razor page. The component also includes easy access to a Markdown parser using the blazing fast MarkDig Markdown parser.
-keywords: Markdown, TagHelper, ASP.NET Core
 categories: ASP.NET Core, Markdown
+keywords: Markdown, TagHelper, ASP.NET Core
 weblogName: West Wind Web Log
 postId: 708211
-postDate: 2018-03-23T04:11:43.8926586-07:00
+postDate: 2018-03-23T01:11:43.8926586-10:00
 ---
 # Creating an ASP.NET Core Markdown TagHelper and Parser
 
@@ -17,6 +17,49 @@ Since I wrote that article I've gotten a lot of requests to write about an ASP.N
 
 There are already a number of Markdown TagHelper implementations available, but I'm a big fan of the [MarkDig Markdown Parser](https://github.com/lunet-io/markdig), so I set out to create an **ASP.NET Core Tag Helper** that provides the same functionality as the WebForms control I previously created.
 
+## Get it
+This library provides:
+
+* A Markdown TagHelper 
+* Markdown Parsing function
+* Markdown Page Processing Middleware that allows you to serve Markdown Pages as HTML
+
+In this post I cover the first two, the Markdown Page processor is covered in a [separate post](https://weblog.west-wind.com/posts/2018/Apr/18/Creating-a-generic-Markdown-Page-Handler-using-ASPNET-Core-Middleware).
+
+The packaged **Westwind.AspnetCore.Markdown** component includes simple Markdown Parsing support for code or Razor pages and a the TagHelper for your ASP.NET Core applications.
+
+It's available as a [NuGet Package](https://www.nuget.org/packages/Westwind.AspNetCore.Markdown):
+
+```
+PM> Install-Package Westwind.AspNetCore.Markdown
+```
+
+And you can take a look at the source code on Github:
+
+* [Westwind.AspnetCore.Markdown Github Repository](https://github.com/RickStrahl/Westwind.AspNetCore.Markdown)
+* [Westwind.AspnetCore.Markdown on NuGet](https://www.nuget.org/packages/Westwind.AspNetCore.Markdown/)
+
+*Note: the GitHub repository was recently moved out of the [Westwind.AspnetCore](https://github.com/RickStrahl/Westwind.AspNetCore) into its own dedicated package.* 
+
+## Quick Overview
+The two key features are the Markdown Parser and the Markdown TagHelper.
+
+### Markdown Parsing
+This library uses the popular Markdig Markdown parser along with configuration options to customize how Markdown is rendered.
+
+At the highest level there are is a static Markdown instance that you can use to parse Markdown to an HTML string:
+
+```cs
+var html = Markdown.Parse("This is some **markdown** text and some `code`.")
+```
+
+For use in Razor there's also another version that returns an `HtmlString` so you don't need `@html.Raw()` to display the rendered Markdown:
+
+```html
+<div>@Markdown.ParseHtmlString(model.MarkdownNotes)</div>
+```
+
+### Markdown TagHelper
 Using the TagHelper you can render Markdown like this inside of a Razor Page:
 
 ```html
@@ -51,34 +94,9 @@ You can also bind to Model values using the `markdown` attribute:
 <markdown markdown="Model.MarkdownText" />
 ```
 
-You can also easily parse Markdown both in code and inside of Razor Pages:
-
-```cs
-string html = Markdown.Parse(markdownText)
-```
-
-Inside of Razor code you can do:
-
-```html
-<div>@Markdown.ParseHtmlString(Model.ProductInfoMarkdown)</div>
-```
-
 ##AD##
 
-## Get it
-The packaged component includes the TagHelper and a simple way to parse Markdown in code or inside of a Razor Page.
-
-It's available as a [NuGet Package](https://www.nuget.org/packages/Westwind.AspNetCore.Markdown):
-
-```
-PM> Install-Package Westwind.AspNetCore.Markdown
-```
-
-And you can take a look at the source code on Github:
-
-* [Westwind.AspNetCore.Markdown on GitHub](https://github.com/RickStrahl/Westwind.AspNetCore)
-
-## Why do I need a Markdown Control?
+## Why do I need a Markdown TagHelper/Control?
 Let's take a step back - why would you even need a content control for Markdown Parsing?
 
 Markdown is everywhere these days and I for one have become incredibly dependent on it for a variety of text scenarios. I use it for blogging, for documentation both for code on Git repos and actual extended documentation. I use it for note keeping and collaboration in Gists or Github Repos, as well as a data entry format for many applications that need to display text content a little bit more richly than using plain text. Since I created the Markdown control I've also been using that extensively for quite a bit of my static content and it's made it much easier to manage some of my content this way.
@@ -336,7 +354,7 @@ If `normalize-whitespace="false"` in the document, you can still use the TagHelp
 
 To look at the complete code for this class you can check the code on Github:
 
-* [MarkdownTagHelper.cs](https://github.com/RickStrahl/Westwind.AspNetCore/blob/master/Westwind.AspNetCore.Markdown/MarkdownTagHelper.cs)
+* [MarkdownTagHelper.cs](https://github.com/RickStrahl/Westwind.AspNetCore.Markdown/blob/master/Westwind.AspNetCore.Markdown/MarkdownTagHelper.cs)
 RickStrahl
 
 ### Razor Expressions in Markdown
@@ -643,7 +661,7 @@ Enjoy...
 
 ### Resources
 * [Westwind.AspnetCore.Markdown NuGet Package](https://www.nuget.org/packages/Westwind.AspNetCore.Markdown)
-* [Westwind.AspNetCore.Markdown on GitHub](https://github.com/RickStrahl/Westwind.AspNetCore/tree/master/Westwind.AspNetCore.Markdown)
+* [Westwind.AspNetCore.Markdown on GitHub](https://github.com/RickStrahl/Westwind.AspNetCore.Markdown)
 * [Creating generic Markdown Page Handling Middleware for ASP.NET Core](https://weblog.west-wind.com/posts/2018/Apr/18/Creating-a-generic-Markdown-Page-Handler-in-ASPNET-Core)
 * [A literal Markdown Control for ASP.NET WebForms](https://weblog.west-wind.com/posts/2017/Sep/13/A-Literal-Markdown-Control-for-ASPNET-WebForms)
 

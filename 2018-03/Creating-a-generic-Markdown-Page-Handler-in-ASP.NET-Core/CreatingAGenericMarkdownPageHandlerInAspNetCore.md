@@ -5,11 +5,11 @@ keywords: Markdown, ASP.NET Core
 categories: ASP.NET Core, Markdown
 weblogName: West Wind Web Log
 postId: 744512
-postDate: 2018-04-18T04:47:01.8636657-07:00
+postDate: 2018-04-18T01:47:01.8636657-10:00
 ---
 # Creating a generic Markdown Page Handler using ASP.NET Core Middleware
 
-![Book Scribe] 
+![Book Scribe](Book.jpg) 
 
 I'm in the process of re-organizing a ton of mostly static content on several of my Web sites and in order to make it easier to manage the boat load of ancient content I have sitting around in many places. Writing content - even partial page content - as Markdown is a heck of a lot more comfortable than writing HTML tag soup.
 
@@ -21,6 +21,19 @@ But in a lot of scenarios even these controls add a lot of unnecessary cruft - i
 By using plain Markdown files it's easier to edit the files, and when you host them in a repo like Github as they can just be displayed as rendered Markdown. In short it's a similar use case, but meant for content only displays that's ideal for Documentation sites or even things like a file only Blog.
 
 So in this post I'll describe a generic Middleware implementation that allows you to drop Markdown files into a folder and get them served - either as `.md` extension files, or as extensionless Urls based on the filename without the extension.
+
+
+## Getting Started
+If you want to try out the middleware I describe in this post, you can install the [NuGet package](https://www.nuget.org/packages/Westwind.AspNetCore.Markdown/) from here:
+
+```text
+PM> Install-Package Westwind.AspNetCore.Markdown
+```
+
+or  take a look at the source code on Github:
+
+* [Westwind.AspNetCore.Markdown on GitHub](https://github.com/RickStrahl/Westwind.AspNetCore.Markdown)
+
 
 ### Generic Markdown Processing Middleware
 The idea to process Markdown files directly is nothing new - it's a common feature in standalone documentation and CMS/Blog generators.
@@ -46,17 +59,6 @@ The idea is that I can set up one or more folders (or the entire site) for servi
 
 The middleware is a relatively simple implementation that looks for a configured folder and extensionless urls within (think Docs for documentation or Posts folder for Blog posts)  or `.md` files in the configured folder. When it finds either, the URL is processed by loading the underlying Markdown file, rendering it to HTML and simply embedding it into the specified View template.
 
-
-## Getting Started
-If you want to try out the middleware I describe in this post, you can install the [NuGet package](https://www.nuget.org/packages/Westwind.AspNetCore.Markdown/) from here:
-
-```txt
-PM> Install-Package Westwind.AspNetCore.Markdown
-```
-
-or  take a look at the source code on Github:
-
-* [Westwind.AspNetCore.Markdown on GitHub](https://github.com/RickStrahl/Westwind.AspNetCore/tree/master/Westwind.AspNetCore.Markdown)
 
 ### Setting up the Markdown MiddleWare
 To use this feature you need to do the following:
@@ -134,13 +136,13 @@ With this basic configuration code in place you should now be able to place a ma
 
 I can now go to:
 
-```txt
+```text
 http://localhost:59805/posts/2018/03/23/MarkdownTagHelper.md
 ```
 
 or the extensionless version:
 
-```txt
+```text
 http://localhost:59805/posts/2018/03/23/MarkdownTagHelper
 ```
 
@@ -162,8 +164,6 @@ Ok the above is the basics, lets look at a few more configuration and customizat
 * Customize the Razor template
 * Configure folders that are handled
 * Configure each folder's options
-
-Let's take a look
 
 ### A better Template: Adding Syntax Coloring
 Most likely you'll want to spruce up things a little bit. If you're doing software related stuff like documentation or a blog posts one of the first things you'll want is syntax highlighting. 
@@ -556,7 +556,7 @@ This is nothing overly complex, but I find this drop in Markdown functionality i
 
 ### Related Resources
 
-* [Westwind.AspNetCore.Markdown on GitHub](https://github.com/RickStrahl/Westwind.AspNetCore/tree/master/Westwind.AspNetCore.Markdown)  (part of Westwind.AspNetCore)
+* [Westwind.AspNetCore.Markdown on GitHub](https://github.com/RickStrahl/Westwind.AspNetCore.Markdown)
 * [Westwind.AspNetCore.Markdown NuGet Package](https://www.nuget.org/packages/Westwind.AspNetCore.Markdown)
 * [Creating an ASP.NET Core Markdown TagHelper and Parser ](https://weblog.west-wind.com/posts/2018/Mar/23/Creating-an-ASPNET-Core-Markdown-TagHelper-and-Parser)
 * [A Literal Markdown Control for ASP.NET WebForms](https://weblog.west-wind.com/posts/2017/Sep/13/A-Literal-Markdown-Control-for-ASPNET-WebForms)
