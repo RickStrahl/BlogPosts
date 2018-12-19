@@ -99,6 +99,8 @@ Page paths can be either **relative to the Host Page** or use **Virtual Path Syn
 
 ![](PageRelationships.png)
 
+This is another image ![](PageRelationships.png) that is totally inline.
+
 
 > #### @icon-warning File Rendering loads Resources as *Host Page Relative*
 > Any relative links and resources - images, relative links - **relative to the host page** rather than to the Markdown document. Make sure you take into account paths for any related resources and either ensure they are relative to the host page or use absolute URLs.
