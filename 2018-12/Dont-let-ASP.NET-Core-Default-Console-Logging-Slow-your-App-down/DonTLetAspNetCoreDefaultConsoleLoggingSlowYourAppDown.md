@@ -15,7 +15,7 @@ Earlier today I put my foot in my mouth on Twitter by running a quick and dirty 
 
 Specifically I ran my application directly out of the Release folder **without first publishing** and while that works to run the application, it doesn't copy over the configuration files. Since there was no configuration, ASP.NET Core started the console app without any explicit logging overrides and I got the default Console logging configuration which **produced a crap-ton of Console log messages** which in turn slowed the application under load to a crawl.
 
-How slow? Take a look:
+How slow? Take a look - here in [WebSurge](https://websurge.west-wind.com):
 
 ![](WebSurge_WithDebugging.png)
 
