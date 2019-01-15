@@ -31,7 +31,7 @@ How slow? Take a look - here in [WebSurge](https://websurge.west-wind.com):
 
 Yup, that's nearly a 40x difference in these admittedly small do-nothing requests. Even with the async logging improvements in .NET Core 2.x Console logging is very, very slow when it is set to `Information` or worse `Debug`. The default ASP.NET Core default if there's no configuration at all is `Information`. Not cool! 
 
-Luckily the default templates handle setting the Log level to `Warning` in production, but the raw default is still a headscratcher.
+Luckily the default templates handle setting the Logging Level to `Warning` in production, but the raw default Logging Level of `Information` is still a headscratcher.
 
 > **Moral of the story**: Make sure you know what your Console logger is doing in your application and make sure it's turned down to at least `Warning` or off in production apps.
 
@@ -39,6 +39,13 @@ Luckily the default templates handle setting the Log level to `Warning` in produ
 
 ### Operator Error: Missing Configuration
 My error was that I tried to be quick about my test, simply compiling my tiny project and running it out of the **Release** folder. That works, but it's generally not recommended for an ASP.NET Core application. 
+
+Instead what I got was this:
+
+![](LoggingNotRespected.png)
+<small>**Figure 3** - Running out of the Release folder rather than the Publish folder can cause problems due to missing configuration</small>
+
+Notice that the folder is `Release/netcore22` which is the plain Release folder, **not the published app** folder!
 
 ASP.NET Core applications **should be published**  with `dotnet publish` which creates a self contained folder structure that includes all the dependencies and support files and folders that are needed for the application to run. In Web applications that tends to be the `wwwroot` folder, the runtime dependency graph and configuration files.
 
@@ -157,8 +164,35 @@ You can take a look at what the default builder does by source stepping (or deco
 ```
 ##AD##
 
+
+### Using the Logger in your Code
+Once configuration has been configured you can use the logger via Dependency injection by injecting `ILogger<T>` into your code.
+
+```csharp
+[ApiController]
+public class ValuesController : ControllerBase
+{
+    public ILogger<ValuesController> Logger { get; }
+
+    public ValuesController(ILogger<ValuesController> logger)
+    {
+        Logger = logger;
+    }
+
+    // GET api/values
+    [HttpGet]
+    public string  Get()
+    {
+        Logger.LogInformation("Hello World In Values Controller");            
+        return "Hello World " + DateTime.Now;
+    }
+}    
+```
+
+The `T` in `ILogger<T>` provides a logging context that is shown on log messages so you can decide on whether to use a local or more global scope. `ILogger` has a number of methods to log the various logging levels  like `LogInformation()` above or `LogError()`, `LogCritical()` and so on.
+
 ### Overriding the Default Logging Configuration
-If that default setup doesn't suit you you can clear everything out and configure your own logging stack from scratch by doing something like the following in your  `Startup.ConfigureServices()` method:
+If the default logging setup provided by the `WebHostBuilder` doesn't suit you you can clear everything out and configure your own logging stack from scratch by doing something like the following in your  `Startup.ConfigureServices()` method:
 
 ```csharp
 public void ConfigureServices(IServiceCollection services)
@@ -187,6 +221,16 @@ There are no `config.RemoveProviderXXX()` functions - once created the logging c
 You can control the logging levels via configuration, but you can't add or remove providers that way, so if you need custom providers or want to remove provider like say the Console provider in production you have to do it in code.
 
 ## Summary
-What I've covered here is probably an odd edge case that you may never see, but it's one that can bite you when you're not paying attention. It's a good reminder that Console logging can have a big performance hit for little benefit. There are more efficient ways to log and other than for on site debugging there's not much use for console logging in the first place at least running in production.
+What I've covered here is probably an odd edge case that you may never see, but it's one that can bite you when you're not paying attention. Heck logging in general can add significant overhead. It's a good reminder that Console logging can have a big performance hit for little benefit. There are more efficient ways to log and other than for on site debugging there's not much use for console logging in the first place at least running in production.
+
 
 Ah, the little consolations in life... they always come back to bite 'ya!
+
+<div style="margin-top: 30px;font-size: 0.8em;
+            border-top: 1px solid #eee;padding-top: 8px;">
+    <img src="https://markdownmonster.west-wind.com/favicon.png"
+         style="height: 20px;float: left; margin-right: 10px;"/>
+    this post created and published with 
+    <a href="https://markdownmonster.west-wind.com" 
+       target="top">Markdown Monster</a> 
+</div>

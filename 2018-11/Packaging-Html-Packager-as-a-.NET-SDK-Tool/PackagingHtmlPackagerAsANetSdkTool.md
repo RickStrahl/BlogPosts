@@ -9,7 +9,9 @@ postDate: 2018-11-05T14:38:23.4002666-10:00
 ---
 # Creating a .NET Global Tool from an existing Console Application
 
-![](https://weblog.west-wind.com/images/2018/Packaging-Html-Packager-as-a-.NET-SDK-Tool/Global.jpg)
+![](Global.jpg)
+
+<small style="color:firebrick">*updated Jan. 14th, 2019*</small>
 
 In [my last post](https://weblog.west-wind.com/posts/2018/Nov/01/Creating-an-HTML-Packager) I discussed a small utility library I originally created for integration into [Markdown Monster](https://markdownmonster.west-wind.com). It packages a Web HTML Url into a self contained HTML document or package that can be rendered on its own offline without an Internet connection.
 
@@ -58,8 +60,8 @@ Behind it all, global tools are nothing more than standard **.NET Core Console a
 
 Publishing of a global tool is done via NuGet using the standard NuGet publishing URLs which adds it to the published to registry as a global tool. Global tools are using the same package store as .NET libraries, but global tools are a different type of library which is displayed and handled differently than a standard NuGet package.
 
-> #### @icon-info-circle Publishing both a Library and Global Tool - Separate Projects
-> If you need to publish a library that is both a code library as well as a global tool, you'll have to split up the two into two separate projects. Tools and libraries are displayed and handled differently on NuGet and each requires their own publish ids.
+> #### @icon-info-circle Publishing both a Library and Global Tool require separate Projects
+> If you need to publish a library that is **both a code library as well as a global tool**, you'll have to split up the two into **two separate projects**. Tools and libraries are displayed and handled differently on NuGet and by the NuGet client, so each requires its own publish id.
 
 ##AD##
 
@@ -155,6 +157,32 @@ The Global Tool specific tags for a project are shown below. In my case the tool
     
 The `ToolCommandName` is what users can type on the Command Line to access your tool once it is registered. The `PackAsTool` is what denotes that this is a .NET tool. 
 
+### Testing your Tool and local Package Install
+Before publishing your tool you probably want to test it, running it as a .NET global tool locally before publishing. To do this you can add a local package source where Nuget is looking for the package, which allows you to install from a local folder:
+
+From my console project folder I can do:
+
+```ps
+dotnet tool install -g dotnet-htmlpackager --add-source=./nupkg
+```
+
+where `./nupkg` is the relative folder where the NuGet package has been generated.
+
+Once installed you can now run your tool with:
+
+```
+htmlpackager
+```
+
+In order to update your package you can run the `dotnet tool update` command. 
+The syntax to update the package from a new version on the local source is:
+
+```ps
+dotnet tool update -g dotnet-htmlpackager --add-source=./nupkg
+```
+
+What's nice is that this will update even the current version if the version number has not been changed and will even roll back to an older version, if that version is the latest version available which makes it easier to work with the package at development time. Nice!
+
 ### Publish to NuGet
 Once you've built and tested your .NET Core Console app, you should test your package locally with:
 
@@ -162,11 +190,7 @@ Once you've built and tested your .NET Core Console app, you should test your pa
 HtmlPackager https://markdownmonster.west-wind.com 
              -o c:\temp\mm_home.html 
              -x -v -d
-             --add-source=./nupkg
 ```
-
-The `--add-source` argument lets you specify an alternate NuGet package source which can be a local folder. In this case it's the build output in my tool project's `./nupkg` folder which I specified in the `PackageOutputPath`.
-
 Using the local package lets you easily test your Console app as a tool.
 
 Next you need to publish your tool to NuGet.
