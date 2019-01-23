@@ -11,15 +11,13 @@ postDate: 2019-01-14T10:52:20.7128655-10:00
 
 ![](CommandLinePreview.png)
 
-
-<img src="https://raw.githubusercontent.com/RickStrahl/VisualStudioSnippetConverter/master/SnippetConverterIcon.png" style="float:left;height: 170px; margin-right: 14px;" />
-Visual Studio has very nice Code Snippet facility built into it and over the years I've been using it to create a ton of useful expansion snippets that make my day to day development easier. I have quite a few C# code snippets, but even more I use the HTML snippets for things like my Bootstrap customized snippets, snippets for complex HTML controls and the like. There are few others for JavaScript, XAML and even some Powershell ones. Overall I have nearly 150 code snippets.
+Visual Studio has very nice Code Snippet facility built into it and over the years I've been using it to create a ton of useful expansion snippets that make my day to day development easier. I have quite a few C# code snippets, but even more I use the HTML snippets for things like my Bootstrap customized snippets, snippets for complex HTML controls and the like. There are few others for JavaScript, XAML and even some Powershell ones. 
 
 Over the last couple of years I have been more and more using other tools in combination with Visual Studio. Two tools in particular: [Visual Studio Code](https://github.com/RickStrahl/wwMongoDb/stargazers) and [JetBrains Rider](https://www.jetbrains.com/rider/). 
 
-Over the years I've accumulated nearly hundred 150 code-snippets in Visual Studio and when I'm working in other environments and I really do miss them especially the HTML ones for long blocks that are painful to look up on doc sites and then customize. With snippets this stuff auto-fills or fills with a few keystrokes which saves me lots of time every day.
+Over the many years of using Visual Studio,  I've accumulated 130+ code snippets and when I'm working in other environments I really miss them, especially the HTML ones for long blocks that are painful to look up on doc sites and then customize. With snippets this stuff auto-fills and with a few keystrokes customizes my specific use case which saves me tons of time every day.
 
-In fact, I missed this stuff so much that at times I'd just fire up Visual Studio with an HTML editor open to just expand HTML snippets I need, and then paste them into VS Code or Rider. Tedious but still faster than manually typing out some of these longer blocks of text with the appropriate insertions added. It sure would be a lot nicer to do this directly in each respective environment.
+In fact, I missed this stuff so much that sometimes I'd just fire up Visual Studio with an HTML editor open, just to expand HTML snippets I need, and then paste them back into VS Code or Rider. Tedious, but still faster than manually copying code from a Doc site and then manually customizing these longer blocks of text with the appropriate insertions added. It sure would be a lot nicer to do this directly in each respective environment.
 
 So over the last couple of weekends I threw together a small utility that allows me to move my Visual Studio snippets to Visual Studio Code snippets and - with limited features - to JetBrains Rider.
 
@@ -27,22 +25,24 @@ If you just want to jump in, you can find the code on GitHub:
 
 * [VisualStudioSnippetConverter on GitHub](https://github.com/RickStrahl/VisualStudioSnippetConverter)
 
-A word of warning - this is a hacky project, and there's no guarantee that it'll work with all types of snippets that are supported. However, for my snippets all of them ported over nicely to VS Code and I can re-run the export multiple times and easily create new snippet files for the exports to compare/update as needed.
+A word of warning - this is a hacky project, and there's no guarantee that it'll work with all types of snippets that are supported. However, for my snippets all 137 of them ported over nicely to VS Code, and as far as I can tell they all work. I can also re-run the export multiple times and easily create new snippet files for the exports to compare/update as needed.
 
 For Rider the story is more complicated as Rider has a crazy mechanism for storing templates in an internal, single configuration file. It also uses a couple of completely different storage engines for the .NET related snippets (C#,VB,F#, Razor, ASPNET) and the Web based ones (html,css,js etc.). This tool currently only supports the .NET related snippets and a one-time export since the crazy GUID based key system in Rider doesn't allow for finding existing snippets without the GUID. More on that later.
 
 ## The Snippet Converter
-You can download and run it as .NET Global SDK Tool ([.NET SDK 2.1 ](https://dotnet.microsoft.com/download) or later) which is installable via Nuget:
+
+<img src="https://raw.githubusercontent.com/RickStrahl/VisualStudioSnippetConverter/master/SnippetConverterIcon.png" style="height: 170px" />
+
+You can download and run the Visual Studio Snippet Converter as **.NET Global SDK Tool** ([.NET SDK 2.1 ](https://dotnet.microsoft.com/download) or later) which is installable [via Nuget](https://www.nuget.org/packages/dotnet-snippetconverter/):
 
 ```ps
 dotnet tool install --global dotnet-snippetconverter
 ```
 
-If you don't want to install and just run the tool you can clone or download the Github repo you can:
+If you don't want to install and just run the tool you can clone or download the Github repo and then:
 
 ```ps
 cd .\SnippetConverter\
-# assumes .NET 2.1+ is installed
 dotnet run
 ```
 
@@ -53,6 +53,8 @@ snippetconverter ~2017 -r -d
 ```
 
 will convert all Visual Studio 2017 snippets to VS Code into a single  `visualstudio-exported.code-snippets` snippets file. 
+
+Alternately you can specify your output snippet file as I'm doing in this screenshot:
 
 ![](RunningSnippetConverter.png)
 
@@ -115,7 +117,7 @@ This should give you an idea of what you can do. For more info read on...
 But first a little background.
 
 ## Visual Studio Code Snippets?
-If you're not familiar or not using Code Snippets, you're not alone. They're pretty much a hidden feature in Visual Studio, which is a shame because they are a very useful productivity tool. Unfortunately Visual Studio doesn't have any useful, built-in UI to create these snippets, and so this feature is largely under-utilized by most developers. There's only the crappy **Tool -> Code Snippet Manager**, which isn't a manager of anything but nothing but a viewer that lets you see what snippets are active and available. There's no built-in way to create or edit snippets or even jump to and open a snippet. You're on your own.
+If you're not familiar or not using Code Snippets, you're not alone. They're pretty much a hidden feature in Visual Studio, which is a shame because they are a very useful productivity tool. Unfortunately Visual Studio doesn't have any useful, built-in UI to create these snippets, and so this feature is largely under-utilized by most developers. There's only the crappy **Tool -> Code Snippet Manager**, which isn't a manager of anything but a viewer that lets you see what snippets are active and available. There's no built-in way to create or edit snippets or even jump to and open a snippet. You're on your own.
 
 However, Code Snippets are just simple XML files in a known folder location in your Documents folder. They are very easy to create and update and all things considered editing the raw XML file in syntax colored editor like VS Code might just be the easiest UI to create them anyway. There are a few low quality Visual Studio addins that provide UI but they tend to be more cumbersome than the raw snippet files.
 
@@ -196,20 +198,22 @@ The most useful and larger snippets I use are mostly for HTML insertions, especi
 ### Prefixes and Snippet Packs
 There are also a number of snippet packs available in the Visual Studio Marketplace that you can install that provide a whole block of usually pre-fixed snippets that you can use. For example the Bootstrap Snippet pack adds a bunch of `bs-` snippets.
 
-Using a prefix is a good idea as it makes it easy to find your own snippets in a see of Intellisense suggestions. I use `ww-` for most of my snippets. Unfortunately when I created many of my snippets originally I didn't follow this advice. But now when I export them I can explicitly specify a prefix when exporting if it doesn't exist already on the snippet name.
+![](SnippetPacks.png)
+
+Even with your own snippets it's a good idea to create a prefix for your snippets so that you can find them more easily in a sea of IntelliSense suggestions. I use `ww-` for most of my snippets. Unfortunately when I created many of my snippets originally I didn't follow this advice. But now when I export them I can explicitly specify a prefix when exporting if it doesn't exist already on the snippet name.
 
 ## Building a Converter
-So over the last couple of weekends I threw together a small utility that allows me to move my Visual Studio snippets to Visual Studio Code snippets and - with limited features - to JetBrains Rider. 
+Since I get so much use out of my Visual Studio Snippets, I decided to throw together a small tool that lets me to move my Visual Studio snippets to Visual Studio Code snippets and - with limited features - to JetBrains Rider. 
 
-I figure there might be a few others out there that would find this useful so I published this as a **.NET Global Tool** console application that you can quickly install:
+I figure there might be a few others out there that would also find this useful so I published it as a **.NET Global Tool** console application that you can quickly install:
 
 ```ps
 dotnet tool install dotnet-snippetconverter
 ```
 
-You'll need the [.NET 2.1 SDK or later](https://dotnet.microsoft.com/download) to run this.
+You'll need the [.NET Core 2.1 SDK or later](https://dotnet.microsoft.com/download) to run this.
 
-> The following commands all export from Visual Studio to VS Code I'll talk about Rider separately later
+> The following sample commands all export from Visual Studio to VS Code I'll talk about Rider separately later
 
 Once installed you can quickly convert all your Visual Studio snippets to VS Code with the following command.
 
@@ -217,7 +221,9 @@ Once installed you can quickly convert all your Visual Studio snippets to VS Cod
 snippetconverter ~ -r -d
 ```
 
-This will convert all snippets from the latest installed Visual Studio version (2017,2019 etc.) and create a single VS Code `visualstudio-exported.code-snippets` in your VS Code User Snippets folder. You can also specify a specific VS version:
+This will convert **all snippets** from the latest installed Visual Studio version (2017,2019 etc.) and create a single VS Code `visualstudio-exported.code-snippets` in your VS Code User Snippets folder which lives in `%appdata%\Code\User\snippets`. 
+
+You can also specify a specific VS version to export from:
 
 ```ps
 snippetconverter ~2017 -r -d
@@ -230,7 +236,9 @@ snippetconverter "~2017\Visual C#\My Code Snippets" -r -d
                  -o "~\ww-csharp.code-snippets"
 ```
 
-This specifies a specific output file for the snippet file. The `~` both in the input and output folder options are optional, but they reference base locations for snippets in Visual Studio (`%Documents%\Visual Studio <year>`) and VS Code (`%appdata%\Code\User\Snippets\`) to not have to provide full path names. But if you prefer you can also use fully qualified paths.
+This specifies a specific output file for the snippet file. 
+
+The `~` both in the input and output folder options are optional and are placeholders for physical snippet paths. They reference base locations for snippets in Visual Studio (`%Documents%\Visual Studio <year>\Code Snippets`) and VS Code (`%appdata%\Code\User\Snippets\`) so you don't have to specify the full path every time. But if you prefer you can also use fully qualified paths.
 
 Finally you can also move a single file:
 
@@ -240,6 +248,17 @@ snippetconverter "~2017\Visual C#\My Code Snippets\proIPC.snippet" -d
 ```
 
 The tool will update snippets if they already exist in VS Code so you can re-run it to update your VS Code snippets from time to time.
+
+
+Once you've run the tool on your snippets you can immediately access them in the VS Code editor by its prefix/shortcut:
+
+![](VsCodeImportedSnippet.png)
+
+and allows the same type of placeholder expansions as in Visual Studio:
+
+![](VsCodeImportedSnippetInEditor.png)
+
+Sweet!
 
 ### Syncing Snippets
 Moving snippets is one way **from Visual Studio** and **to VS Code** (for now). This means if you want to keep snippets in sync for both Visual Studio and VS Code it's best to create snippets in Visual Studio and then move them to VS Code via this tool.
@@ -310,7 +329,7 @@ You can find the Visual Studio Code Snippet Template docs here:
 But for actually manually creating a template, the JSON `body` property is a pain to create because the string is expected to be an array of strings (yuk) which is a bear to type. The good news is it's easy to generate a template when exporting from a Visual Studio snippet...
 
 ## Rider Formatting - Ugh
-The SnippetConverter also works with Rider to some degree, but the functionality is much more limited. This is due to the fact that Rider uses a crazy format for storing its templates - or really all of its configuration using a GUID key/value based XML file. If you ever need an example of how not to use XML this would probably be it.
+The SnippetConverter also works with Rider to some degree, but the functionality is much more limited. This is due to the fact that Rider uses a crazy format for storing its templates - or really all of its configuration using a GUID key/value based XML file.
 
 ```dos
 %USERPROFILE%\.Rider2018.2\config\resharper-host\GlobalSettingsStorage.DotSettings
@@ -393,6 +412,8 @@ private $type$ _$name$;
 Ugh...
 
 Using this crazy format you can't even tell where one set of settings starts or ends. Each key has a multi-value, plus GUID key which makes it next to impossible to try to match up an existing snippet to see if it exists already.
+
+As far as I can tell there is no documentation on this format or any of the keys, nor how things are supposed to be stored. It's quite possible there are other options for storage, but it looks like Rider isn't set up to allow anything but manipulation through Rider for snippets. If you know of better developer docs on this please leave a comment.
 
 For this reason Rider imports are one-time - they will double up if you export the same snippets twice.
 
