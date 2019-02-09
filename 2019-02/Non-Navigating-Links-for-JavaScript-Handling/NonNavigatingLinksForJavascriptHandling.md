@@ -62,6 +62,7 @@ Ok, so what options are there? There quite a few actually, some better than othe
 1. `<a href="javascript:void(0)">`
 1. `<a href="javascript:{}">`
 1. `<a href="#0">`
+1. Use a styled `<button>`
 
 Until recently I've been using #5, but just recently discovered that #6 is actually possible and which to me is preferrable.
 
