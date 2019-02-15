@@ -1,22 +1,26 @@
 ---
 title: Ad Blockers, Brave Browser and BrainTree Credit Card Processing SDKs
 abstract: Ran into an issue with my CC processing forms using Brave today. Brave is a Chromium based browser, but it includes built-in, on-by-default content blocking which apparently causes my order forms to not work as scripts and related page cookies aren't being loaded. Here's what happened and some thoughts on how to work around this.
-categories: Web,Credit Card Processing
 keywords: Content Blocking, JavaScript,SDK,Braintree,Brave,Ad Blockers
+categories: Web,Credit Card Processing
 weblogName: West Wind Web Log
 postId: 1146129
 postDate: 2019-02-08T23:33:02.2863964-10:00
+customFields:
+  mt_githuburl:
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2019-02/Ad-Blockers-and-BrainTree-Credit-Card-Processing-SDKs/AdBlockersAndBraintreeCreditCardProcessingSdks.md
 ---
 # Ad Blockers, Brave and BrainTree Credit Card Processing Client SDKs
 
-I just ran into an interesting issue with my Web Store. On my site I use a custom Web Store and the payment integration is going through [BrainTree's](https://www.braintreepayments.com/) CC Processing APIs. Braintree has both server side and client side SDKs and the site uses the JavaScript SDK to remotely render the payment form into the order form. 
+I just ran into an interesting issue with my Web Store. On my site I use a custom Web Store and the payment integration is going through [BrainTree's](https://www.braintreepayments.com/) CC Processing APIs. Braintree has both server side and client side SDKs and the site uses the JavaScript SDK to remotely render the partial payment form into the overall order form. 
 
 These days it's a pretty common scenario to use a JavaScript SDK that essentially removes the payment detail handling on the server so that the server never actually touches the credit card data. The SDK and the remote hosted form keeps the credit card data on BrainTree's server which reduces the risk of credit cards getting hacked during the payment process. Or, if something does go wrong the responsibility lies with the processor since they are the ones handling the Credit Card transaction data.
 
 ## Good News, Bad News
-The good news is works very well. Order processing is very quick through this remote interface and with BrainTree at least as a bonus you can process PayPal requests in the very same way without having to set up a separate PayPal order flow. Nice.
+The good news is works very well. Order processing is very quick through this remote interface and with BrainTree at least as a bonus you can process PayPal requests just as you do Credit Cards using the exact same process with a different 'card type' - no need to use a separate PayPal order flow. Nice.
 
-But - and there's always a but - today I noticed a fairly major problem: For the last few months I've been using the [Brave Browser](https://brave.com/) for most of my Web browsing. Brave is a Chromium based browser that provides most of the features of Chrome without Google tracking you each step of your browsing adventures. Brave also provides built-in ad-blocking by default so overall the browsing experience out of box is much better than you get in stock [Google Chrome](https://www.google.com/chrome/), because a lot of the crap ad content that makes up a good part of the Web these days is not being loaded.
+But - and there's always a but - today I noticed a fairly major problem: For the last few months I've been using the [Brave Browser](https://brave.com/) for most of my Web browsing. Brave is a Chromium based browser that provides most of the features of Chrome without Google tracking you each step of your browsing adventures. Brave also provides **built-in ad-blocking** by default so overall the browsing experience out of box is much better than you get in stock [Google Chrome](https://www.google.com/chrome/), because a lot of the crap ad content that makes up a good part of the Web these days is not being loaded.
 
 When visiting one of the payment pages in my store with Brave, I noticed that the payment page wasn't working. Basically the remote payment form wasn't showing up.
 
