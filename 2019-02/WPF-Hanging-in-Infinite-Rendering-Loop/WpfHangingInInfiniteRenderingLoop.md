@@ -1,7 +1,7 @@
 ---
 title: WPF Hanging in Infinite Rendering Loop
 abstract: Ran into a nasty WPF bug this week with Markdown Monster that caused MM to hang during startup in certain scenarios. Several users reported issues that I could not duplicate until I started playing around with my screen resolution and scaling. An obscure but insidious WPF bug can cause an application to go into an infinite loop which effectively locks up the application's UI and the app overall. Here's more info on what the problem is and how to work around it.
-keywords: WPF,Hang,Infinite,Rendering,StarDefinitionsCanExceedAvailableSpace
+keywords: WPF,Hang,Infinite,Rendering,StarDefinitionsCanExceedAvailableSpace,Grid Layout
 categories: WPF
 weblogName: West Wind Web Log
 postId: 1154648
@@ -45,9 +45,9 @@ Finally I landed an obscure Github Issue that references a `StarDefinitionsCanEx
 
 In my case I ended up rolling back to 4.6.1 anyway though. As mentioned the 4.7.1 move didn't get me what I wanted (less DLL dependencies from .NET Standard references) and for deployment on Chocolatey running anything past 4.6.2 complicates the automated installer testing they do to verify packages as it requires a .NET Runtime update to their clean virtual machine.
 
-For now problem solved - after a harrowing week that probably turned away tons of people from Markdown Monster cause it crashed :unamused:
+For now problem solved - after a harrowing week that probably turned away a few people from Markdown Monster because it crashed :unamused:
 
-If you're interested you can follow the whole Markdown Monster paper trail on this issue in this GitHub issue:
+If you're interested you can follow the whole Markdown Monster paper trail in this GitHub issue:
 
 [HiDPI Display w/Scaling Can Cause App Freeze on Launch](https://github.com/RickStrahl/MarkdownMonster/issues/485)
 
@@ -58,9 +58,11 @@ Here's some more info on the resolution.
 ## WPF Grid Sizing Bug in .NET 4.7.x
 Long story short, I managed to duplicate the bug by having a high scale mode and all users that reported the issue also were using high scale modes.
 
-But, it turns out the scale mode wasn't the actual cause of the failure, but rather a symptom which was exacerbated by scaling the display. 
+But, it turns out the scale mode wasn't the actual cause of the failure, but rather a symptom which was exacerbated by scaling the display.
 
-The problem is a bug in .NET 4.7.1 that is specific to applications **that are targeted at .NET 4.7.x** and hit a specific sizing issues. It's a **Grid sizing bug** caused by infinite loop entered due to a very minute rounding error. This bug occurs only if your application targets .NET 4.7.x - if you target 4.6.x or now 4.8.x (it's fixed there) the problem does not occur. So you can **target 4.6.x and run on 4.7.x** and there is no problem. But if you **target 4.7.x and run on 4.7.x** that's when there's a potential problem.
+The issue is related to a known problem in .NET 4.7 related to **Grid Star Sizing**. It's specific to applications **that are targeted at .NET 4.7.x** and hit a specific sizing issue when using Grids with `*` sizing. Which for most applications is probably **everywhere**. I know in my apps almost every screen uses some form of grid and grid column or row sizing that uses `*` for auto-widening columns.
+
+The **Grid sizing bug** caused by infinite loop entered due to a very minute rounding error in the new calculation for grid sizing introduced in 4.7.x. This bug occurs only if your application targets .NET 4.7.x - if you target 4.6.x (which uses an older algorithm) or now pre-release 4.8.x (it's fixed there) the problem does not occur. So you can **target 4.6.x and run on 4.7.x** and there is no problem. But if you **target 4.7.x and run on 4.7.x** that's when there's a potential problem.
 
 The final outcome and summary of the problem is best summarized by Sam Bent from Microsoft in a [separate Github issue](https://github.com/Microsoft/dotnet/issues/604#issuecomment-463341296):
 
