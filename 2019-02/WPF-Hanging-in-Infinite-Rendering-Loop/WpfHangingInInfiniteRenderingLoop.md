@@ -6,6 +6,10 @@ categories: WPF
 weblogName: West Wind Web Log
 postId: 1154648
 postDate: 2019-02-14T23:54:50.8893893-10:00
+customFields:
+  mt_githuburl:
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2019-02/WPF-Hanging-in-Infinite-Rendering-Loop/WpfHangingInInfiniteRenderingLoop.md
 ---
 # WPF Hanging in Infinite Rendering Loop
 
