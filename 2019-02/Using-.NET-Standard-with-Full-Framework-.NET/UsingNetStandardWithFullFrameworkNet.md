@@ -6,7 +6,6 @@ categories: .NET,.NET Standard
 weblogName: West Wind Web Log
 postId: 1157964
 postDate: 2019-02-19T02:03:39.0770996-10:00
-postStatus: draft
 customFields:
   mt_githuburl:
     key: mt_githuburl
@@ -18,19 +17,23 @@ customFields:
 
 .NET Standard has been around long enough now that most people are reasonably familiar with this somewhat 'unnatural' concept.  The idea of targeting or consuming a library that is not really a library but a specification which in turn affects the build process and runtime binding takes a bit getting used to.
 
-Things have gotten a little clearer recently with [better documentation](https://docs.microsoft.com/en-us/dotnet/standard/net-standard) from Microsoft and clearer designations on what versions of the various .NET runtimes support what version of .NET Standard. With more implementations out in the wild now too, it's easier to see and realize the benefits of .NET Standard whereas in the early much of .NET Standard seemed sort of academic.
+Things have gotten a little clearer recently with [better documentation](https://docs.microsoft.com/en-us/dotnet/standard/net-standard) from Microsoft and clearer designations on what versions of the various .NET runtimes support what version of .NET Standard. With more implementations out in the wild now too, it's easier to see and realize the benefits of .NET Standard whereas in the early days of .NET Core and .NET Standard much of .NET Standard seemed sort of academic.
 
 But there's still a lot of confusion for people who are not keeping up with all the latest .NET tech. It's not a concept that comes naturally unless you've been following the evolution of .NET and it's **torturous versioning paths**. Rather,  seeing it in action is the best way to make sense of it - at least that's how it worked for me.
 
 I've [talked about .NET Standard in previous posts](https://weblog.west-wind.com/posts/2016/Nov/23/NET-Standard-20-Making-Sense-of-NET-Again) (and [here](https://weblog.west-wind.com/posts/2017/Jun/22/MultiTargeting-and-Porting-a-NET-Library-to-NET-Core-20)) so I won't rehash it here. This post is about a more specific scenario which is using .NET Standard libraries in full .NET Framework, which has its own set of peculiarities.
 
 But first a short explanation of .NET Standard.
+
+##AD##
  
 ## What is .NET Standard?
-Here's my 1 liner of what .NET Standard is:
+Here's my short definition of what .NET Standard is:
 
 > #### @icon-info-circle .NET Standard is a Specification not an Implementation
 > .NET Standard is a specification that describes specific feature implementations that a .NET Runtime like .NET Core, .NET Framework, Mono, Xamarin or Unity has to implement - at minimum - to support that version of the Standard.
+>  
+> For library authors targeting .NET Standard provides the same feature set across all supported platforms - if it compiles to .NET Standard it'll very likely run on those frameworks. For consumers it's an easy way to tell which platforms a .NET Standard component can work on.
 
 The current most widely applied version of .NET Standard is **.NET Standard 2.0** but there are 1.0, 1.1, 1.6 and the latest 2.0. Each version includes progressively more features.
 
@@ -72,6 +75,8 @@ Each successive version of full framework .NET has slightly better support for .
 So, for best .NET Standard support in full framework .NET, ideally you should target 4.7.2 (or 4.8+ once that comes out). Unfortunately that's probably not realistic for public distribution applications as there are still plenty of people on older versions of .NET.
 
 For Markdown Monster which even though it's pretty tech focused, about 25% of users are not on .NET 4.7.2 and a good chunk of that is still on .NET 4.6.2/1. It'll be a while before I can target 4.7.2 and not turn away a significant chunk of users without them having to update their .NET Runtime.
+
+##AD##
  
 ## Concise Example: Using LibGit2Sharp in Markdown Monster
 So what does all that mean for an application? Let me give you a practical example. In Markdown Monster which is a WPF desktop application which targets .NET 4.6.2, I'm using [LibGit2Sharp](https://github.com/libgit2/libgit2sharp) to provide a host of Git integration features in the file and folder browser as well as the ability to commit current and pending documents in the document's repository.
@@ -122,6 +127,8 @@ An even cleaner solution is the route that LibGit2Sharp took **eventually** by b
 This multi-targeted package when added to a full .NET Framework project will use the NET46 assemblies and **not clutter up your project** with all those extra dependencies even on my original .NET 4.6.2.
 
 **We have a Winner!**
+
+##AD## 
 
 I think that was a smart move on LibGit2Sharp's part. It's in vogue to .NET Standard All the Things, but practicality and more than likely the sheer numbers of user base often speak louder than the latest fad. I  **was not planning on upgrading** LibGit2Sharp to the .NET Standard only version, **because of the DLL dependencies** - that's enough of a blocker for me. Although I tried out running on .NET 4.7.2 which didn't add the extra assembly load, that doesn't really help me because 4.7.2 still excludes too many people from my user base without a forced .NET Framework upgrade which otherwise offers minimal benefits especially to end users.
 
