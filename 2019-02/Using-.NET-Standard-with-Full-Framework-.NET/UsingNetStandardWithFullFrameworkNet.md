@@ -129,21 +129,8 @@ If you are a library author, multi-targeting in using the SDK Style project form
 
 > For the time being I think any popular 3rd party library that is expected to work on full .NET Framework, **should continue to ship a full framework target** in addition to .NET Standard. 
 
-Regardless I suspect we're likely to see more and more libraries that end up targeting **only .NET Standard** because, because... Hopefully the runtime numbers keep creeping up that it'll become viable to run on newer versions of the framework that have better support soon.
-
-## Some Related Thoughts on .NET Core 3.0
-Here is some off topic thoughts that came to mind in regards to .NET Core 3.0's desktop support, which is supposed to fix some of these runtime dependency issues. 
-
-But realistically this really won't change this sort of problem. The .NET 3.0 solution to versioning issues as described would be - ship a self-contained version that includes all the runtime files. While that sounds real nice on paper, I'm not sure I would enjoy adding 100mb of runtime files to my distribution size to have a self-contained application. 
-
-Yet I think this is exactly what will end up happening with 3.0 because there's going to be a proliferation of runtime versions that are incompatible with each other and the only reliable way to make sure your app runs on a machine likely will be to ensure that the runtime ships with your application.
-
-For a vendor - what do you do? Offer two downloads? One that requires a pre-requisite runtime (please check and make sure you have .NET Core 3.0.12122.2222.2333 installed) or a full package (150mb instead of 15mb please)? That sounds ugly as hell.
-
-As much pain as a system wide .NET Framework provides and having to wait for the user base to catch up with .NET versions, it does at least provide a solid baseline you can count on. I hope that with 3.0 we can somehow find that sort of baseline without massive side by side installs of each every application and utility or 100 micro versioned runtime installs in some central folder.
-
-Some food for thought. Now back to our regular scheduled programming.
-
+Regardless I suspect we're likely to see more and more libraries that end up targeting **only .NET Standard**. Hopefully the runtime version counts will keep creeping up to meet the versions that support .NET Standard completely. Maybe when .NET 4.8 ships the 1 step back will be 4.7.2 at that time. 
+  
 ## Summary
 .NET Standard with full framework is still confusing because it's not all that obvious what dependencies will be pulled in when bound to a specific version of the full .NET Framework. I hope this post clarifies some of that.
 
