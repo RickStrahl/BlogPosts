@@ -56,18 +56,18 @@ If you're building libraries, you'll want to target the lowest version of .NET S
 ## .NET Standard and Full Framework .NET
 One of the supported Runtimes for .NET Standard 2.0 is the full .NET Framework.
 
-For full framework the .NET Standard story unfortunately is a bit confusing because although all versions of .NET 4.6.1 and later are .NET Standard 2.0 compliant, **some versions are more compatible than others**. 
+For full framework the .NET Standard story unfortunately is a bit confusing because although all versions of .NET 4.6.1 and later are .NET Standard 2.0 compliant which means you can consume .NET Standard 2.0 in 4.6.1 and later. However, **some versions of full framework are more compatible than others**. 
 
-.NET 4.6.1, 4.6.2, .NET 4.7 and 4.7.1 all have **partial** .NET Standard support in the natively shipped runtimes, but they still are .NET Standard compliant by adding additional runtime dependencies into your output folder to provide the missing functionality. NuGet along with the runtime targeting handles automatically adding those dependencies to your projects to provide the needed runtime support for those extra features. A lot of those assemblies override behavior from the base framework and .NET uses runtime redirects to route api calls to the appropriate assemblies rather than than mscorlib.dll or other system assemblies.
+.NET 4.6.1, 4.6.2, .NET 4.7 and 4.7.1 all have **partial** .NET Standard 2.0 support in the natively shipped runtimes, but they still are .NET Standard 2.0 compliant by adding additional runtime dependencies into your output folder to provide the missing functionality. NuGet along with the runtime targeting handles automatically adding those dependencies to your projects to provide the needed runtime support for those extra features. A lot of those assemblies override behavior from the base framework and .NET uses runtime redirects to route api calls to the appropriate assemblies rather than than mscorlib.dll or other system assemblies.
 
-**.NET 4.7.2** is the first version of the full .NET Framework that is **fully .NET Standard compliant** without any additional dependencies.
+**.NET 4.7.2** is the first version of the full .NET Framework that is **fully .NET Standard 2.0 compliant** without any additional dependencies.
 
 ### First Version to support .NET Standard 2.0 is 4.6.1
-The first version of .NET Framework that is .NET Standard 2.0 compliant is **.NET 4.6.1**. 4.6.1 through 4.7.1 are all partially compliant with the shipped Runtime, but can work with additional dependencies added to the project when a .NET Standard 2.0 component is added.
+The first version of .NET Framework that is .NET Standard 2.0 compliant is **.NET 4.6.1**. 4.6.1 through 4.7.1 are all partially compliant with the shipped Runtime, but work by adding additional dependencies to your project when a .NET Standard 2.0 component is added.
 
-When you add a .NET Standard 2.0 targeted package to say a .NET 4.6.2 project, a number of additional assembly dependencies and assembly redirects to provide updated runtime components are installed to provide the missing runtime features. This adds a bunch of assemblies to your application's `bin` folder that have to be distributed with your application and a bunch of assembly redirects to your `app.config` file.
+When you add a .NET Standard 2.0 targeted package to say a .NET 4.6.2 project, a number of additional assembly dependencies and assembly redirects provide updated runtime components that are installed to provide the missing runtime features. This adds a non-trivial amount of assemblies to your application's `bin` folder that have to be distributed with your application and a bunch of assembly redirects to your `app.config` file.
 
-This is pretty messy and clutters up your output folder and app.config, but it does work and lets you use .NET Standard 2.0 components from these older runtime versions.
+This is pretty messy and clutters up your output folder and `app.config`, but it does work and lets you use .NET Standard 2.0 components from these older runtime versions.
 
 ### The first version that fully .NET Standard 2.0 Compliant is 4.7.2
 Each successive version of full framework .NET has slightly better support for .NET Standard 2.0 up to 4.7.2 which now has full support for it and is the first version that can use .NET Standard 2.0 packages without bringing in extra dependencies.
@@ -79,20 +79,20 @@ For Markdown Monster which even though it's pretty tech focused, about 25% of us
 ##AD##
  
 ## Concise Example: Using LibGit2Sharp in Markdown Monster
-So what does all that mean for an application? Let me give you a practical example. In Markdown Monster which is a WPF desktop application which targets .NET 4.6.2, I'm using [LibGit2Sharp](https://github.com/libgit2/libgit2sharp) to provide a host of Git integration features in the file and folder browser as well as the ability to commit current and pending documents in the document's repository.
+So what does all that mean for an application? Let me give you a practical example. In Markdown Monster which is a WPF desktop application that targets .NET 4.6.2, I'm using [LibGit2Sharp](https://github.com/libgit2/libgit2sharp) to provide a host of Git integration features in the file and folder browser as well as the ability to commit current and pending documents in the document's repository.
 
-A little while back LibGit2Sharp switched their library over to support **only** .NET Standard and they dropped support for other .NET Framework versions for a brief moment of time - of course the moment I decide to jump in and bite the bullet to think about upgrading. Since then a new version was released that added back full framework support which actually belabors a point I'll make later on :-)
+A little while back LibGit2Sharp switched their library over to support **only** .NET Standard 2.0 and they dropped support for other .NET Framework versions for a brief moment of time. Of course it's that moment that I decide to jump in and bite the bullet to think about upgrading. Since then LibGit2Sharp released a new version that added back full framework support which actually belabors a point I'll make later on (oh the suspense :-)).
 
-At the time when I went through this excercise, the choices I had was stick to an older version of LibGit2Sharp or keep moving forward with .NET Standard version. 
+At the time when I went through this exercise, the choices I had was stick to an older version of LibGit2Sharp or keep moving forward with .NET Standard version. 
 
 In version 0.25 you'd see this:
 
 ![](LibGitSharpNetStandardOnly.png)
 
-Only .NET Standard was supported.
+Only .NET Standard 2.0 support!
 
 ### Stuck in 4.6.2
-Markdown Monster has been running with a target framework of 4.6.2 in order to support older runtime installs on Windows. Supporting 4.6.x still brings in quite a few people who haven't updated to Windows 10 mostly, and even for my developer centric audience that's a not-insignificant number of users.
+Markdown Monster has been running with a target framework of 4.6.2 in order to support older runtime installs on Windows. Supporting 4.6.x still brings in quite a few people who haven't updated to Windows 10 mostly, and even for my developer centric audience that's a not-insignificant number of users. I use 4.6.2 specifically because it introduced some important high DPI improvements for WPF that Markdown Monster relies on (for its built-in screen capture feature).
 
 At the time I decided to give updating LibGit2Sharp with the .NET Standard based  0.25.4 version a try in my 4.6.2 project and I got the following assembly hell:
 
@@ -126,13 +126,17 @@ An even cleaner solution is the route that LibGit2Sharp took **eventually** by b
 
 This multi-targeted package when added to a full .NET Framework project will use the NET46 assemblies and **not clutter up your project** with all those extra dependencies even on my original .NET 4.6.2.
 
+And I'm back to being able to keep up with the latest versions of LibGit2Sharp in Markdown Monster.
+
 **We have a Winner!**
 
 ##AD## 
 
-I think that was a smart move on LibGit2Sharp's part. It's in vogue to .NET Standard All the Things, but practicality and more than likely the sheer numbers of user base often speak louder than the latest fad. I  **was not planning on upgrading** LibGit2Sharp to the .NET Standard only version, **because of the DLL dependencies** - that's enough of a blocker for me. Although I tried out running on .NET 4.7.2 which didn't add the extra assembly load, that doesn't really help me because 4.7.2 still excludes too many people from my user base without a forced .NET Framework upgrade which otherwise offers minimal benefits especially to end users.
+I think that this was a smart move on LibGit2Sharp's part. It's in vogue to .NET Standard All the Things, but practicality and more than likely the sheer numbers of user base often speak louder than the latest fad. I  **was not planning on upgrading** LibGit2Sharp to the .NET Standard only version, **because of the DLL dependencies** - that's enough of a blocker for me. Although I tried out running on .NET 4.7.2 which didn't add the extra assembly load, that doesn't really help me because 4.7.2 still excludes too many people from my user base without a forced .NET Framework upgrade which otherwise offers minimal benefits especially to end users.
 
-If you are a library author, multi-targeting in using the SDK Style project format is [fairly easy to set up](https://weblog.west-wind.com/posts/2017/Jun/22/MultiTargeting-and-Porting-a-NET-Library-to-NET-Core-20) and assuming your library doesn't depend on some of the newest features that are in .NET Standard that didn't exist previously, there are usually no code changes required to compile both for .NET Standard or Full Framework. 
+### Library Authors: Don't target only .NET Standard if you work on Full Framework!
+
+If you are a library author, multi-targeting in the newer .NET SDK Style project format is [fairly easy to set up](https://weblog.west-wind.com/posts/2017/Jun/22/MultiTargeting-and-Porting-a-NET-Library-to-NET-Core-20) and assuming your library doesn't depend on some of the newest features that are in .NET Standard that didn't exist previously, there are usually no code changes required to compile both for .NET Standard or Full Framework. 
 
 > For the time being I think any popular 3rd party library that is expected to work on full .NET Framework, **should continue to ship a full framework target** in addition to .NET Standard. 
 
@@ -144,7 +148,7 @@ Regardless I suspect we're likely to see more and more libraries that end up tar
 To summarize here are the key points
 
 * **.NET 4.6.1-.NET 4.7.1: Not nyet!**  
-4.6.1 through 4.7.1 add a boatload of additional runtime assemblies and assembly redirects to your project to work with .NET Standard 2.0. Avoid, unless you really need to use a .NET Standard component. Look for older versions that do support full framework. Pester third parties to still provide .NET Framework targets which is not a difficult to do with SDK style projects.
+4.6.1 through 4.7.1 add a boatload of additional runtime assemblies and assembly redirects to your project to work with .NET Standard 2.0. Avoid, unless you really need to use a .NET Standard component. Look for older versions that do support full framework. Pester third parties to still provide .NET Framework targets which is not a difficult thing to do with SDK style projects.
 
 * **.NET 4.7.2: Works as advertised**  
 .NET 4.7.2 is the first version of .NET Framework that fully supports .NET Standard 2.0 and there are no additional assemblies dumped into your output folder. This is what you would expect to happen.
