@@ -76,6 +76,14 @@ So, for best .NET Standard support in full framework .NET, ideally you should ta
 
 For Markdown Monster which even though it's pretty tech focused, about 25% of users are not on .NET 4.7.2 and a good chunk of that is still on .NET 4.6.2/1. It'll be a while before I can target 4.7.2 and not turn away a significant chunk of users without them having to update their .NET Runtime.
 
+
+### Paket considers pre-4.7.2 Versions of .NET Incompatible with .NET Standard
+As a side note a number of people pointed out to me that Paket - which is an alternate package manager for NuGet packages - considers versions of .NET 4.7.1 and older **incompatible** with .NET Standard so you can't actually install .NET Standard packages for those versions by default.
+
+Makes sense - Microsoft has acknowledged that using .NET Standard on anything prior to 4.7.2 is *not optimal*, but alas it does work with some of the messy hackery described above. 
+
+At the end of the day though it's **highly recommended** that you **don't use** .NET Standard with 4.7.1 or earlier.
+
 ##AD##
  
 ## Concise Example: Using LibGit2Sharp in Markdown Monster
@@ -156,10 +164,16 @@ To summarize here are the key points
 * **Multi-Targeting for libraries is still recommended**  
 Because of the limited 'full .NET Standard support' in older version of the .NET Framework, it's still recommended for third party providers to ship .NET Framework targets with their NuGet packages in addition to .NET Standard.
 
-Multi-targeting with the new SDK projects is easy and once configured doesn't require any additional work in most cases. Using this approach full framework target can avoid the DLL deployment nightmare on 4.6.1-4.7.1.
+  Multi-targeting with the new SDK projects is easy and once configured doesn't require any additional work in most cases. Using this approach full framework target can avoid the DLL deployment nightmare on 4.6.1-4.7.1.
 
 * **If possible use .NET 4.7.2 or later**  
 If you want full .NET Standard support, consider using .NET 4.7.2 or later. Not always an option, but if you can, this is the cleanest way to .NET Standard 2.0 o full framework today. We just need to wait until 4.7.2 or more likely 4.8 gets into the Windows update pipeline to flush out the old versions.
+
+Going forward it's pretty clear that Microsoft is gearing up for .NET Core even for the desktop. With .NET Core 3.0 and desktop framework support everything is likely to go to .NET Standard at some point. 
+
+But for now, and probably the foreseeable short term, we'll have to live with this mish mash of support, and I hope this article has shed some light on what you can expect when you use .NET Standard on the full framework.
+
+
 
 <div style="margin-top: 30px;font-size: 0.8em;
             border-top: 1px solid #eee;padding-top: 8px;">
