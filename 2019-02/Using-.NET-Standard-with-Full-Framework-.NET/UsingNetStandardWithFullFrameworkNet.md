@@ -80,9 +80,9 @@ For Markdown Monster which even though it's pretty tech focused, about 25% of us
 ### Paket considers pre-4.7.2 Versions of .NET Incompatible with .NET Standard
 As a side note a number of people pointed out to me that Paket - which is an alternate package manager for NuGet packages - considers versions of .NET 4.7.1 and older **incompatible** with .NET Standard so you can't actually install .NET Standard packages for those versions by default.
 
-Makes sense - Microsoft has acknowledged that using .NET Standard on anything prior to 4.7.2 is *not optimal*, but alas it does work with some of the messy hackery described above. 
+Makes sense - Microsoft has acknowledged that using .NET Standard on anything prior to 4.7.1 is not a good idea and I would add using 4.7.1 is *not optimal* either, but alas it does work with some of the messy hackery described above.
 
-At the end of the day though it's **highly recommended** that you **don't use** .NET Standard with 4.7.1 or earlier.
+At the end of the day though it's **highly recommended** that you **don't use** .NET Standard with 4.7.1 or earlier. Use 4.7.2 if you want to use .NET Standard.
 
 ##AD##
  
