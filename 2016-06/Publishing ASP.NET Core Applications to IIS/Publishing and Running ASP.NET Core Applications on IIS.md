@@ -5,11 +5,10 @@ categories: ASP.NET Core,ASP.NET
 keywords: ASP.NET Core,IIS,Hosting,Kestrel,Host Headers,Port Forwarding
 weblogName: West Wind Web Log
 postId: 1607308
+postDate: 2019-03-16T11:20:34.5807464-10:00
 ---
 
 # Publishing and Running ASP.NET Core Applications with IIS
-
-<small style="color:firebrick;font-style: italic">Updated March 20th, 2019 with information about InProcess hosting.</small>
 
 When you build ASP.NET Core applications and plan on running them on IIS, you'll find that .NET Core applications in IIS work radically different than previous versions of ASP.NET. 
 
@@ -33,6 +32,8 @@ In a classic ASP.NET application everything is hosted inside of an IIS Worker Pr
 
 ### ASP.NET Core with IIS
 Things are quite different with ASP.NET Core which doesn't run in-process to the IIS worker process, but rather runs as a separate, out of process Console application that runs its own Web server using the **Kestrel** component. Kestrel is a .NET Web Server implementation that has been heavily optimized for throughput performance. It's fast and functional in getting network requests into your application, but it's 'just' a raw Web server. It does not include Web management services as a full featured server like IIS does. 
+
+> As of ASP.NET Core 2.2 IIS Hosting does support a new InProcess hosting mechanism. A [seperate post describes the details of In Process/Out of Process hosting](https://weblog.west-wind.com/posts/2019/Mar/16/ASPNET-Core-Hosting-on-IIS-with-ASPNET-Core-22).
 
 If you run on Windows you will likely want to run Kestrel behind IIS to gain infrastructure features like port 80/443 forwarding via Host Headers, process lifetime management and certificate management to name a few.
 
