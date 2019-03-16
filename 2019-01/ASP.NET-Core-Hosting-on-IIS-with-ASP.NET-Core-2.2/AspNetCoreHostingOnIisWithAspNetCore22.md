@@ -1,14 +1,20 @@
 ---
-title: ASP.NET Core Hosting on IIS with ASP.NET Core 2.2
+title: ASP.NET Core InProcess Hosting on IIS with ASP.NET Core 2.2
 abstract: In version 2.2 ASP.NET Core adds support for direct in-process hosting which improves throughput considerably using an easy mechanism that allows switching between in-process and out-of-process hosting. In this post I describe how to use in process hosting and how it works.
 keywords: ASP.NET Core, IIS, Hosting, InProcess, AspNetCoreModule, Kestrel
 categories: ASP.NET Core, IIS
 weblogName: West Wind Web Log
 postId: 1188401
-postDate: 2019-01-18T23:10:34.3710764-10:00
-postStatus: draft
+postDate: 2019-03-16T23:10:34.3710764-10:00
+customFields:
+  mt_githuburl:
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2019-01/ASP.NET-Core-Hosting-on-IIS-with-ASP.NET-Core-2.2/Publishing%20and%20Running%20ASP.NET%20Core%20Applications%20on%20IIS.md
+  mt_date:
+    key: mt_date
+    value: 2019-03-16 10:00
 ---
-# ASP.NET Core In Process Hosting on IIS with ASP.NET Core 2.2
+# ASP.NET Core InProcess Hosting on IIS with ASP.NET Core 2.2
 
 ![](Hosting.jpg)
 
@@ -305,6 +311,12 @@ in your project and remove it or set it to `OutOfProcess` to use the old mode. T
 This is a great improvement that gets you a decent performance bump for literally setting a switch. 
 
 Switch it on and go burn some rubber...
+
+## Resources
+
+* [Sample Repo](https://github.com/RickStrahl/AspetCoreIISInprocessHostingSample)
+* [Docs: Host ASP.NET Core on Windows with IIS](https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/iis/?view=aspnetcore-2.2)
+* [Docs: Web Server Implementations in ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/servers/?view=aspnetcore-2.2&tabs=windows)
 
 <div style="margin-top: 30px;font-size: 0.8em;
             border-top: 1px solid #eee;padding-top: 8px;">
