@@ -1,10 +1,11 @@
 ---
 title: Publishing and Running ASP.NET Core Applications with IIS
 abstract: If you plan on hosting ASP.NET Core applications on IIS, you'll find that the process to get your application to run is quite different than it was with classic ASP.NET. Because ASP.NET Core applications are essentially standalone Console applications that run outside of IIS, some special tooling and new publishing tools are required to get your apps up and running on Windows Server. In this post I'll give an overview of the architecture and show you how to deploy your ASP.NET Core applications using IIS on Windows Server.
-categories: ASP.NET Core,ASP.NET
 keywords: ASP.NET Core,IIS,Hosting,Kestrel,Host Headers,Port Forwarding
+categories: ASP.NET Core,ASP.NET
 weblogName: West Wind Web Log
 postId: 1607308
+permalink: https://weblog.west-wind.com/posts/2016/Jun/06/Publishing-and-Running-ASPNET-Core-Applications-with-IIS
 postDate: 2019-03-16T11:20:34.5807464-10:00
 ---
 
@@ -88,6 +89,23 @@ Here's what the web.config looks like:
 ```
 
 You can see that module references **dotnetexe** and the compiled entry point DLL that holds your **Main** method in your .NET Core application.
+
+You can also provide an optional section for Environment Variables if you were explicitly configuring various configuration startup environment settings.
+
+```xml
+<aspNetCore processPath="dotnet"
+                arguments=".\AlbumViewerNetCore.dll" 
+                stdoutLogEnabled="false" 
+                stdoutLogFile=".\logs\stdout" 
+                forwardWindowsAuthToken="false">
+    <environmentVariables>
+        <environmentVariable name="ASPNETCORE_ENVIRONMENT" value="Production" />
+        
+    </environmentVariables>
+</aspNetCore>    
+```
+
+Note that you should use these settings sparingly and rather rely on the configuration settings object which gives you more control. Limit environment variable settings for specific startup options you need to configure the global environment. Otherwise stick to configuration file settings - or on Azure use the application settings to merge values into your config.
 
 ### Do you need IIS?
 We've already discussed that when running ASP.NET Core on Windows, it's recommended you use IIS as a front end proxy. While it's possible to directly access Kestrel via an IP Address and available port, there are number of reasons why you don't want to expose your application directly this way in production environments.
@@ -229,6 +247,7 @@ Rock on...
 ### More
 I created another couple of posts that follow up this one with a few more specific use cases: Process Identity, Performance and using IIS to serve static content:
 
+* [ASP.NET Core InProcess Hosting on IIS](https://weblog.west-wind.com/posts/2019/Mar/16/ASPNET-Core-Hosting-on-IIS-with-ASPNET-Core-22)
 * [More on ASP.NET Core Running under IIS](https://weblog.west-wind.com/posts/2017/Mar/16/More-on-ASPNET-Core-Running-under-IIS)
 * [IIS and ASP.NET Core Rewrite Rules for Static Files and HTML 5 Routes ](https://weblog.west-wind.com/posts/2017/Apr/27/IIS-and-ASPNET-Core-Rewrite-Rules-for-AspNetCoreModule)
 

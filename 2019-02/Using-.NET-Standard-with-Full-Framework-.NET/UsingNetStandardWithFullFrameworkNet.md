@@ -74,13 +74,17 @@ Each successive version of full framework .NET has slightly better support for .
 
 So, for best .NET Standard support in full framework .NET, ideally you should target 4.7.2 (or 4.8+ once that comes out). Unfortunately that's probably not realistic for public distribution applications as there are still plenty of people on older versions of .NET.
 
+### Sorry
+Although it's not the official word from Microsoft a few authoritative voices from within the mothership confirm the sentiment that no other version but 4.7.2 should officially be considered .NET Standard compliant:
+
+![](ImmoTweet.png)
+
 For Markdown Monster which even though it's pretty tech focused, about 25% of users are not on .NET 4.7.2 and a good chunk of that is still on .NET 4.6.2/1. It'll be a while before I can target 4.7.2 and not turn away a significant chunk of users without them having to update their .NET Runtime.
 
-
 ### Paket considers pre-4.7.2 Versions of .NET Incompatible with .NET Standard
-As a side note a number of people pointed out to me that Paket - which is an alternate package manager for NuGet packages - considers versions of .NET 4.7.1 and older **incompatible** with .NET Standard so you can't actually install .NET Standard packages for those versions by default.
+As a side note a number of people pointed out to me that [Paket](https://fsprojects.github.io/Paket/) - which is an alternate package manager for NuGet packages - considers versions of .NET 4.7.1 and older **incompatible** with .NET Standard so **you can't actually install .NET Standard packages for those versions** by default.
 
-Makes sense - Microsoft has acknowledged that using .NET Standard on anything prior to 4.7.1 is not a good idea and I would add using 4.7.1 is *not optimal* either, but alas it does work with some of the messy hackery described above.
+Makes sense - Microsoft has acknowledged that using .NET Standard on anything prior to 4.7.1 is not a good idea and I would add using 4.7.1 is *not optimal* either and Paket is just taking that sentiment to its logical conclusion: It's not a good idea to use .NET Standard in versions prior than 4.7.2 of full Framework.
 
 At the end of the day though it's **highly recommended** that you **don't use** .NET Standard with 4.7.1 or earlier. Use 4.7.2 if you want to use .NET Standard.
 

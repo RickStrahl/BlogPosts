@@ -1,11 +1,12 @@
 ---
-title: ASP.NET Core InProcess Hosting on IIS with ASP.NET Core 2.2
+title: ASP.NET Core In Process Hosting on IIS with ASP.NET Core 2.2
 abstract: In version 2.2 ASP.NET Core adds support for direct in-process hosting which improves throughput considerably using an easy mechanism that allows switching between in-process and out-of-process hosting. In this post I describe how to use in process hosting and how it works.
-categories: ASP.NET Core, IIS
 keywords: ASP.NET Core, IIS, Hosting, InProcess, AspNetCoreModule, Kestrel
+categories: ASP.NET Core, IIS
 weblogName: West Wind Web Log
 postId: 1188401
-postDate: 2019-03-16T23:10:34.3710764-10:00
+permalink: https://weblog.west-wind.com/posts/2019/Mar/16/ASPNET-Core-Hosting-on-IIS-with-ASPNET-Core-22
+postDate: 2019-03-17T02:10:34.3710764-07:00
 customFields:
   mt_githuburl:
     key: mt_githuburl
@@ -34,7 +35,7 @@ With ASP.NET Core 2.2 there's now an **In Process hosting model on IIS** which h
 
 **In Process Hosting (v2.2 and later)**
 
-![IIS In Process Hosting](InProcessHostingDiagram.png)
+![](InProcessHostingDiagram.png)
 
 <small>**Figure 2** - With In Process hosting your application runs nside of the IIS application pool and uses IIS's intrinsic processing pipeline.</small>
 
@@ -151,21 +152,20 @@ Once on the ASP.NET Core side the request is picked up by Kestrel, which then pa
 ![](KestrelRequestHandler.png)
 
 
-<small>**Figure 4* - Once requests are forwarded via HTTP, they are picked up by the Kestrel Web Server</small>
+<small>**Figure 4** - Once requests are forwarded via HTTP, they are picked up by the Kestrel Web Server</small>
 
 ### In Process Hosting
-In ASP.NET Core 2.2 and later, an in process processing model has been added that provides a more direct connection between IIS and your application. Like the out of process model the **AspNetCoreModule** intercepts requests and routes them directly into the ASP.NET Core application:
 
 ![](InProcessHostingDiagram.png)
 
-<small>**Figure 4** - IIS In Process Hosting routes requests directly into the application pipeline via the IISHttpServer implementation.</small>
+<small>**Figure 5** - IIS In Process Hosting routes requests directly into the application pipeline via the IISHttpServer implementation.</small>
 
 In-process hosting does not use the **Kestrel Web Server** and instead uses an **IISHttpServer** implementation. This implementation receives incoming requests from the standard IIS `http.sys` driver and the built-in IIS native pipeline. Requests are routed to the Web site's port and host name through IIS and the request is then routed to `IISHttpServer` into ASP.NET Core. 
 
 
 ![](IISHttpHandlerInCallstack.png)
 
-<small>**Figure 5** - In Process hosting uses the `IISHttpServer` component to handle the Web Server interface</small>
+<small>**Figure 5.1** - In Process hosting uses the `IISHttpServer` component to handle the Web Server interface</small>
 
 `IISHttpServer` then packages up request data for passing on to the ASP.NET Core pipeline to provide the HttpContext required to process the current request through the ASP.NET Core pipeline. Input is retrieved through native interfaces that talk to the IIS intrinisic objects and output is routed into the IIS output stream.
 
@@ -215,7 +215,7 @@ Before I show a few simplistic requests here, keep in mind that these tests are 
 Still it's always a good idea to eek out extra performance and the improved throughput means less latency in requests, slightly faster response times and less overhead on the server potential more load that can be processed.
 
 ### How I set up the Test
-For this test I used a standard .NET Core API project and then created a small custom class that has a few basically do nothing HelloWorld style methods in it:
+For this test I used a [standard ASP.NET Core API project](https://github.com/RickStrahl/AspetCoreIISInprocessHostingSample) and then created a small custom class that has a few basically do nothing HelloWorld style methods in it:
 
 ```cs
 public class TestController : Controller
