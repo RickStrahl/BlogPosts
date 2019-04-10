@@ -1,8 +1,8 @@
 ---
-title: Creating a custom HttpInterceptor to handle 'withCredentials'
+title: Creating a custom HttpInterceptor to handle 'withCredentials' in Angular 6+
 abstract: Client HTTP requests often need to set a few common settings and you don't want to set them on every request. To make this process easier Angular provides an HttpInterceptor class that you can subclass and add custom behavior to for each HTTP request that is sent through the HttpClient. Here's a quick review on how to do this.
-categories: Angular
 keywords: Angular, HttpInterceptor, WithCredentials, Cookies
+categories: Angular
 weblogName: West Wind Web Log
 postId: 1215446
 permalink: https://weblog.west-wind.com/posts/2019/Apr/07/Creating-a-custom-HttpInterceptor-to-handle-withCredentials
@@ -16,9 +16,9 @@ customFields:
 
 ![](intercept.jpg)
 
-Been back at doing some Angular stuff after a long hiatus and I'm writing up a few issues that I ran into while updating some older projects over the last couple of days, and writing down the resolutions for my own future reference in a few short posts. 
+Been back at doing some Angular stuff after a long hiatus and I'm writing up a few issues that I ran into while updating some older projects over the last couple of days. I'm writing down the resolutions for my own future reference in a few short posts. 
 
-For this post, I needed to **create and hook up a custom HttpInterceptor in Angular 6**. There's lots of information from previous versions of Angular, but with the new HTTP subsystem in Angular 6, things changed once again so things work a little bit differently.
+For this post, I needed to **create and hook up a custom HttpInterceptor in Angular 6**. There's lots of information from previous versions of Angular, but with the new HTTP subsystem in Angular 6, things changed once again so things work a little bit differently and that was one of the things that broke authentication in my application.
 
 ##AD##
 
@@ -26,7 +26,7 @@ For this post, I needed to **create and hook up a custom HttpInterceptor in Angu
 In my use case I have a simple SPA application that relies **on server side Cookie authentication**. Basically the application calls a server side login screen which authenticates the user and sets a standard HTTP cookie. That cookie is passed down to the client and should be pushed back up to the server with each request.
 
 ### WithCredentials - No Cookies for You!
-This used to just work, but with added security functionality in newer browsers plus various frameworks clamping down on their security settings, XHR requests in Angular by default **do not pass cookie information with each request**. What this means is by default Angular doesn't pass Cookies captured on previous requests back to the server.
+This used to just work, but with added security functionality in newer browsers plus various frameworks clamping down on their security settings, XHR requests in Angular by default **do not pass cookie information with each request**. What this means is by default Angular doesn't pass Cookies captured on previous requests back to the server which effectively logs out the user.
 
 In order for that to work the HttpClient has to set the `withCredentials` option.
 
@@ -106,9 +106,9 @@ providers: [
 ```
 
 ### Summary
-Customizing every HTTP request is almost a requirement for every client side application, especially if it deals with any kind of authentication. Nobody wants to send the same headers or config info on every request, and if later on it turns out there are additional items that need to be sent you get to scour your app and try to find each place the HttpClient is used. 
+Customizing every HTTP request is almost a requirement for every client side application that deals with any kind of authentication. Nobody wants to send the same headers or config info on every request, and if later on it turns out there are additional items that need to be sent you get to scour your app and try to find each place the `HttpClient` is used which is not cool. 
  
-Creating one or more interceptors is useful for handling creating standardized requests.
+Creating one or more interceptors is useful for handling and creating standardized requests that fire on every request. In this example I added additional headers to every request, but you can potentially look at each url and decide what needs to be handled. The control is there as one or multiple central interception points to HTTP requests.
 
 In the end this is relatively easy to hook up, but man is this some ugly, ugly code and good luck trying to remember the class salad - or even finding it. That's why I'm writing this up if for nothing else than my own sanity so i can find it next time. Maybe it's useful to some of you as well.
 
