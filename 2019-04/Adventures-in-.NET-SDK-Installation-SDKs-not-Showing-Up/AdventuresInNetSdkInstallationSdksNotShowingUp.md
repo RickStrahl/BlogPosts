@@ -47,13 +47,14 @@ But why all the pain with the 3.0 SDK.
 ### 32 Bit vs 64 Bit
 Thanks to my Twitter outburst it only took a few minutes for Kevin Jones ([@vcsjones](https://twitter.com/vcsjones)) and Ben Adams ([@ben_a_adams](https://twitter.com/ben_a_adams)) to spot my **myopia**:
 
-[![](32BitTwitterHelp.png)](https://twitter.com/vcsjones/status/1119439213580173312)
+[![](32BitTwitterHelp.jpg)](https://twitter.com/vcsjones/status/1119439213580173312)
 
 The 3.0 SDK installed is the 32 bit version and due to the way the SDK pathing worked out due to install order, the 32 bit SDK is found first.
 
 So what happened here is that I had **accidentally** installed the **32 bit version** of the .NET Core 3.0 SDK.  If you look at the screen shot above more closely you can see that the installed version is installed `Program Files (x86)` which is the giveaway for the 32 bit version:
 
 ![](32bitVersionofSdk.png)
+
 
 The problem here is that if you have both 32 bit and 64 bit versions of the SDK installed, the first one found wins. And only one version of the SDK (32 bit or 64 bit) can be active at any one time. 
 
