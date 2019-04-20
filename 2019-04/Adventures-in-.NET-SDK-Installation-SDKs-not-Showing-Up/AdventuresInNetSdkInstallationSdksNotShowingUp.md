@@ -1,7 +1,10 @@
 ---
 title: 'Adventures in .NET SDK Installation: SDKs not Showing Up'
 weblogName: West Wind Web Log
+postId: 1232649
+permalink: https://weblog.west-wind.com/posts/2019/Apr/20/Adventures-in-NET-SDK-Installation-SDKs-not-Showing-Up
 postDate: 2019-04-20T09:45:24.4539558-10:00
+postStatus: draft
 ---
 # Adventures in .NET SDK Installation: SDKs not Showing Up
 
@@ -23,16 +26,16 @@ All the 2.x SDKs were missing. Yet notice that the 2.x SDKs are actually install
 
 I tried all sorts of stuff to try and get this to work that didn't work:
 
-* **Repair Installed the 2.2 SDKs**
+* **Repair Installed the 2.2 SDKs**  
 Just to be sure I went and repaired two of the SDK installs to see if that would bring them back in the `dotnet --info` list - but no joy.
 
-* **Added explicit `global.json`**
+* **Added explicit `global.json`**  
 I created a `global.json` with a very specific SDK version that I know was installed. Building the project now tells me that the specific version of the SDK is not installed. No joy.
 
 I've been having a bunch of version mishaps lately with .NET Core so in my frustration I yelled loudly on Twitter :innocent: I'll come to regret that later...
 
 ### Success #1: Uninstall the .NET Core 3.0 SDK
-So the first and obvious solution after all the above failed was to uninstall the .NET Core 3.0 SDK and sure enough removing the SDK fixed the 2.2 SDKs and I had my proper display back.
+So the first and obvious solution after all the above failed was to uninstall the .NET Core 3.0 SDK and sure enough removing the SDK fixed the 2.2 SDKs and I had my proper SDK list back.
 
 ![](OldSdksWorkingAgain.png)
 
@@ -75,6 +78,10 @@ For example, I'm planning at some point to move Markdown Monster to .NET Core 3.
 
 So there are still some edge cases for 32 bit development and that's what those SDK exist for I suspect.
 
+> But... even if you are building 32 bit apps, according to [Rich Lander](https://twitter.com/runfaster2000) again, the **64 bit SDK can build for 32 bit runtimes** so even if you are building a 32 bit application you probably don't need a 32 bit SDK.
+
+All 64 bit, all day!
+
 ### Make it harder to install 32 bit
 So my fat fingered error was caused by being sloppy when picking the installer on the Web Page:
 
@@ -84,9 +91,7 @@ It's probably a good idea to make the 64 bit download more prominent to avoid an
 
 Even better maybe the 32 bit download on a 64 bit system should prompt and ask *Are you sure you want to install the 32 bit SDK*?
 
-According to Rich Lander again, the 64 bit SDK can build for 32 bit runtimes so even if you are building a 32 bit application you probably don't need a 32 bit SDK.
 
-All 64 bit, all day!
 
 ### Visual Studio doesn't Care?
 Incidentally I found that while I was struggling on the command line with the `dotnet` command line tooling, Visual Studio was just fine compiling my 2.2 projects and running it. The problem I had was specifically with the command line version from my 'normal' Windows environment.
