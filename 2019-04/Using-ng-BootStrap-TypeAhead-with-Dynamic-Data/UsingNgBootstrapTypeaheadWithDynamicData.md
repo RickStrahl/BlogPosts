@@ -7,6 +7,10 @@ weblogName: West Wind Web Log
 postId: 1218382
 permalink: https://weblog.west-wind.com/posts/2019/Apr/08/Using-the-ngBootStrap-TypeAhead-Control-with-Dynamic-Data
 postDate: 2019-04-08T10:26:27.1734284-10:00
+customFields:
+  mt_githuburl:
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2019-04/Using-ng-BootStrap-TypeAhead-with-Dynamic-Data/UsingNgBootstrapTypeaheadWithDynamicData.md
 ---
 # Using the ng-BootStrap TypeAhead Control with Dynamic Data 
 

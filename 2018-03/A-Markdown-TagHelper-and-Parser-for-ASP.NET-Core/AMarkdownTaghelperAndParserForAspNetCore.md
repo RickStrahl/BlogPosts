@@ -1,10 +1,11 @@
 ---
 title: Creating an ASP.NET Core Markdown TagHelper and Parser
 abstract: A couple of months ago I wrote about creating a WebForms based Markdown control. This time around I'll build an ASP.NET Core MVC TagHelper that performs similar functionality for embedding Markdown text into a content area of a Razor page. The component also includes easy access to a Markdown parser using the blazing fast MarkDig Markdown parser.
-categories: ASP.NET Core, Markdown
 keywords: Markdown, TagHelper, ASP.NET Core
+categories: ASP.NET Core, Markdown
 weblogName: West Wind Web Log
 postId: 708211
+permalink: https://weblog.west-wind.com/posts/2018/Mar/23/Creating-an-ASPNET-Core-Markdown-TagHelper-and-Parser
 postDate: 2018-03-23T01:11:43.8926586-10:00
 ---
 # Creating an ASP.NET Core Markdown TagHelper and Parser
@@ -13,7 +14,7 @@ postDate: 2018-03-23T01:11:43.8926586-10:00
 
 A few months ago I wrote about creating a [literal Markdown Control for WebForms](https://weblog.west-wind.com/posts/2017/Sep/13/A-Literal-Markdown-Control-for-ASPNET-WebForms), where I described a simple content control that takes the content from within a tag and parses the embedded Markdown and then produces HTML output in its stead. I created a WebForms control mainly for selfish reasons, because I have tons of semi-static content on my content sites that still live in classic ASP.NET ASPX pages.
 
-Since I wrote that article I've gotten a lot of requests to write about an ASP.NET Core version for something similar and - back to my own selfishness - I'm also starting to deploy a few content heavy sites that have mostly static html content that would be well served by Markdown using ASP.NET Core and Razor Pages. So it's time to build an ASP.NET Core version by creating a `<markdown>` TagHelper which I cover in this post. Along the same lines, I also created a [generic markdown page processing Middleware component](https://github.com/RickStrahl/Westwind.AspNetCore/tree/master/Westwind.AspNetCore.Markdown#markdown-page-processor-middleware) that can be used to generically serve arbitrary Markdown documents in any ASP.NET Core site which I cover in a [separate post](https://weblog.west-wind.com/posts/2018/Apr/18/Creating-a-generic-Markdown-Page-Handler-in-ASPNET-Core) next week.
+Since I wrote that article I've gotten a lot of requests to write about an ASP.NET Core version for something similar and - back to my own selfishness - I'm also starting to deploy a few content heavy sites that have mostly static html content that would be well served by Markdown using ASP.NET Core and Razor Pages. So it's time to build an ASP.NET Core version by creating a `<markdown>` TagHelper which I cover in this post. Along the same lines, I also created a [generic markdown page processing Middleware component](https://weblog.west-wind.com/posts/2018/Apr/18/Creating-a-generic-Markdown-Page-Handler-using-ASPNET-Core-Middleware) that can be used to generically serve arbitrary Markdown documents in any ASP.NET Core site which I cover in a [separate post](https://weblog.west-wind.com/posts/2018/Apr/18/Creating-a-generic-Markdown-Page-Handler-using-ASPNET-Core-Middleware) next week.
 
 There are already a number of Markdown TagHelper implementations available, but I'm a big fan of the [MarkDig Markdown Parser](https://github.com/lunet-io/markdig), so I set out to create an **ASP.NET Core Tag Helper** that provides the same functionality as the WebForms control I previously created.
 
@@ -662,7 +663,8 @@ Enjoy...
 ### Resources
 * [Westwind.AspnetCore.Markdown NuGet Package](https://www.nuget.org/packages/Westwind.AspNetCore.Markdown)
 * [Westwind.AspNetCore.Markdown on GitHub](https://github.com/RickStrahl/Westwind.AspNetCore.Markdown)
-* [Creating generic Markdown Page Handling Middleware for ASP.NET Core](https://weblog.west-wind.com/posts/2018/Apr/18/Creating-a-generic-Markdown-Page-Handler-in-ASPNET-Core)
+* [Creating generic Markdown Page Handling Middleware for ASP.NET Core](https://weblog.west-wind.com/posts/2018/Apr/18/Creating-a-generic-Markdown-Page-Handler-using-ASPNET-Core-Middleware)
+* [File and URL Markdown Processing with Westwind.AspNetCore.Markdown](https://weblog.west-wind.com/posts/2018/Dec/20/Updating-WestwindAspnetCoreMarkdown-with-Markdown-from-Files-and-URLs)
 * [A literal Markdown Control for ASP.NET WebForms](https://weblog.west-wind.com/posts/2017/Sep/13/A-Literal-Markdown-Control-for-ASPNET-WebForms)
 
 

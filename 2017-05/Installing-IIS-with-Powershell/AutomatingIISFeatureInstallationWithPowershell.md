@@ -5,6 +5,7 @@ keywords: IIS,Powershell,Automation,Enable-WindowsOptionalFeature,Enable-Windows
 categories: IIS,Windows
 weblogName: West Wind Web Log
 postId: 249066
+permalink: https://weblog.west-wind.com/posts/2017/May/25/Automating-IIS-Feature-Installation-with-Powershell
 postDate: 2018-09-26T10:22:48.5100629-10:00
 ---
 # Automating IIS Feature Installation with Powershell
@@ -22,11 +23,14 @@ Apparently many people are unaware that in recent versions of Windows - **using 
 
 ##AD##
 
-You can use the [Enable-WindowsOptionalFeature](https://technet.microsoft.com/en-us/library/mt575535(v=wps.620).aspx) command to install IIS Features as well as any other Windows Features. This command works both on desktop and server versions (server versions also have `Enable-WindowsFeature` which has the same effect) and makes it pretty easy to automate an IIS install by whittling away a few commands in a POSH script file.
+You can use the [Enable-WindowsOptionalFeature](https://technet.microsoft.com/en-us/library/mt575535(v=wps.620).aspx) command to install IIS Features as well as any other Windows Features. This command works both on desktop and server versions (server versions also have `Enable-WindowsFeature` which has the same effect) and makes it pretty easy to automate an IIS install by whittling away a few commands in a Powershell script file.
 
 Here's what I typically use to configure my base version of IIS:
 
 ```powershell
+# This script installs IIS and the features required to
+# run Web Connection.
+#
 # * Make sure you run this script from a Powershel Admin Prompt!
 # * Make sure Powershell Execution Policy is bypassed to run these scripts:
 # * YOU MAY HAVE TO RUN THIS COMMAND PRIOR TO RUNNING THIS SCRIPT!
@@ -68,25 +72,30 @@ Enable-WindowsOptionalFeature -Online -FeatureName IIS-ApplicationInit
 Enable-WindowsOptionalFeature -Online -FeatureName IIS-ISAPIExtensions
 Enable-WindowsOptionalFeature -Online -FeatureName IIS-ISAPIFilter
 Enable-WindowsOptionalFeature -Online -FeatureName IIS-HttpCompressionStatic
+
 Enable-WindowsOptionalFeature -Online -FeatureName IIS-ASPNET45
 
 # If you need classic ASP (not recommended)
-# Enable-WindowsOptionalFeature -Online -FeatureName IIS-ASP
+#Enable-WindowsOptionalFeature -Online -FeatureName IIS-ASP
 
 
-#REM The following optional components require 
-#REM Chocolatey OR Web Platform Installer to install
+# The following optional components require 
+# Chocolatey OR Web Platform Installer to install
 
-#REM Install UrlRewrite Module for Extensionless Urls (optional)
-#REM & "C:\Program Files\Microsoft\Web Platform Installer\WebpiCmd-x64.exe" /install /Products:UrlRewrite2 /AcceptEULA /SuppressPostFinish
-choco install urlrewrite -y
 
-#REM Install WebDeploy for Deploying to IIS (optional)
-#REM & "C:\Program Files\Microsoft\Web Platform Installer\WebpiCmd-x64.exe" /install /Products:WDeployNoSMO /AcceptEULA /SuppressPostFinish
-choco install webdeploy -y
+# Install UrlRewrite Module for Extensionless Urls (optional)
+###  & "C:\Program Files\Microsoft\Web Platform Installer\WebpiCmd-x64.exe" /install /Products:UrlRewrite2 /AcceptEULA /SuppressPostFinish
+#choco install urlrewrite -y
+    
+# Install WebDeploy for Deploying to IIS (optional)
+### & "C:\Program Files\Microsoft\Web Platform Installer\WebpiCmd-x64.exe" /install /Products:WDeployNoSMO /AcceptEULA /SuppressPostFinish
+# choco install webdeploy -y
+
+# Disable Loopback Check on a Server - to get around no local Logins on Windows Server
+# New-ItemProperty HKLM:\System\CurrentControlSet\Control\Lsa -Name "DisableLoopbackCheck" -Value "1" -PropertyType dword
 ```
 
-Put the above into a POSH script file (`SetupIIS.ps1`) and then:
+Put the above into a Powershell script file (`SetupIIS.ps1`) and then:
 
 * Open a PowerShell command prompt using `Run as Administrator`
 * Run the script
