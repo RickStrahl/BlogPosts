@@ -24,25 +24,28 @@ showed this:
 
 All the 2.x SDKs were missing. Yet notice that the 2.x SDKs are actually installed on the machine, as you can clearly see in the Programs and Features display.
 
-I tried all sorts of stuff to try and get this to work that didn't work:
+I tried a few things to try and get this to work **without success**:
 
 * **Repair Installed the 2.2 SDKs**  
 Just to be sure I went and repaired two of the SDK installs to see if that would bring them back in the `dotnet --info` list - but no joy.
 
 * **Added explicit `global.json`**  
-I created a `global.json` with a very specific SDK version that I know was installed. Building the project now tells me that the specific version of the SDK is not installed. No joy.
+I created a `global.json` with a very **specific SDK version** that I know was installed. Building the project now tells me that **the specific version of the SDK is not installed**. Hrrrmph - no joy.
 
-I've been having a bunch of version mishaps lately with .NET Core so in my frustration I yelled loudly on Twitter :innocent: I'll come to regret that later...
+I've been having a bunch of version mishaps lately with .NET Core, so in my frustration I yelled loudly on Twitter :innocent:
+
+![](TwitterFrustration.png)
+
+I'll come to regret that later... but only a little :-)
 
 ### Success #1: Uninstall the .NET Core 3.0 SDK
-So the first and obvious solution after all the above failed was to uninstall the .NET Core 3.0 SDK and sure enough removing the SDK fixed the 2.2 SDKs and I had my proper SDK list back.
+So the first and obvious solution after all the above failed was to uninstall the .NET Core 3.0 SDK and sure enough removing the SDK fixed the problem, and the 2.2 SDKs SDK list back was back!
 
 ![](OldSdksWorkingAgain.png)
 
 Yay. 
 
-But why all the pain with the 3.0 SDK.
-
+But why all the pain with the 3.0 SDK?
 
 ### 32 Bit vs 64 Bit
 Thanks to my Twitter outburst it only took a few minutes for Kevin Jones ([@vcsjones](https://twitter.com/vcsjones)) and Ben Adams ([@ben_a_adams](https://twitter.com/ben_a_adams)) to spot my **myopia**:
@@ -60,11 +63,17 @@ The problem here is that if you have both 32 bit and 64 bit versions of the SDK 
 
 ![](OneOneVersion3264.png)
 
+
+
 ### Fix the Problem
 So to fix this problem I can now do :
 
 * Uninstall the .NET Core 3.0 32 Bit SDK
 * Reinstall the 64 bit Version
+
+which nets me the install I want to have from the get-go:
+
+![](Net30InstalledProperlyWith22CommandLine.png)
 
 or if you really need to have both SDKs installed fix the path so that the one you need in your current session is first in the path sequence.
 
@@ -105,3 +114,12 @@ So in theory I could have gone and published my project to a folder to get the o
 At the end of the day this was a user error on my part. The bottom line is **make sure you install the right version of the .NET Core SDK and runtimes**. 
 
 In almost all cases the right version of the SDK to download and  is the 64 bit version unless you are running on 32 bit Windows version (hopefully not).
+
+<div style="margin-top: 30px;font-size: 0.8em;
+            border-top: 1px solid #eee;padding-top: 8px;">
+    <img src="https://markdownmonster.west-wind.com/favicon.png"
+         style="height: 20px;float: left; margin-right: 10px;"/>
+    this post created and published with 
+    <a href="https://markdownmonster.west-wind.com" 
+       target="top">Markdown Monster</a> 
+</div>
