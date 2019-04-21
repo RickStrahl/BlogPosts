@@ -1,16 +1,19 @@
 ---
-title: 'Adventures in .NET SDK Installation: SDKs not Showing Up'
+title: 'Adventures in .NET Core SDK Installation: Missing SDKs and 32 bit vs 64 bit'
+abstract: Ran into a problem yesterday with a new installation of the .NET Core 3.0 Preview 4 installation. Installed the new preview and found that all of my .NET Core 2.x SDKs were no longer showing. A lot of back and forth later I found that I accidentally installed the wrong bitness SDK - 32 bit vs 64 bit. Here's a quick overview of how and why and why you probably NEVER want to install the 32 bit SDK.
+keywords: .NET Core SDK, 32 bit, 64 bit, SDK, Download
+categories: .NET Core
 weblogName: West Wind Web Log
 postId: 1232649
 permalink: https://weblog.west-wind.com/posts/2019/Apr/20/Adventures-in-NET-SDK-Installation-SDKs-not-Showing-Up
 postDate: 2019-04-20T09:45:24.4539558-10:00
 postStatus: draft
 ---
-# Adventures in .NET SDK Installation: SDKs not Showing Up
+# Adventures in .NET Core SDK Installation: Missing SDKs and 32 bit vs 64 bit
 
 Yesterday I ran into yet another .NET Core versioning problem, this time related around the .NET Core SDK installation. A couple of days ago the [.NET Core 3.0 Preview 4 SDK](https://dotnet.microsoft.com/download/dotnet-core/3.0) was released and I installed it as I was doing some experiments around Blazor and Razor Components again. I installed the SDK and did my 3.0 things and forgot about it.
 
-Today I went back to one of my .NET Core 2.2 applications and tried to run them and found that when running from the command line I was getting strange errors saying that the required 2.2 SDK wasn't installed.
+Today I went back to one of my .NET Core 2.2 applications and found that when trying to run from the command line I was getting strange errors saying that the required 2.2 SDK wasn't installed.
 
 To my surprise doing a:
 
@@ -62,8 +65,6 @@ So what happened here is that I had **accidentally** installed the **32 bit vers
 The problem here is that if you have both 32 bit and 64 bit versions of the SDK installed, the first one found wins. And only one version of the SDK (32 bit or 64 bit) can be active at any one time. 
 
 ![](OneOneVersion3264.png)
-
-
 
 ### Fix the Problem
 So to fix this problem I can now do :
