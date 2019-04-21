@@ -37,7 +37,7 @@ I created a `global.json` with a very **specific SDK version** that I know was i
 
 I've been having a bunch of version mishaps lately with .NET Core, so in my frustration I yelled loudly on Twitter :innocent:
 
-![](TwitterFrustration.png)
+![](TwitterFrustration.jpg)
 
 I'll come to regret that later... but only a little :-)
 
@@ -66,7 +66,7 @@ The problem here is that if you have both 32 bit and 64 bit versions of the SDK 
 
 ![](OneOneVersion3264.png)
 
-### Fix the Problem
+### Success #2: Fix the Problem
 So to fix this problem I can now do :
 
 * Uninstall the .NET Core 3.0 32 Bit SDK
@@ -104,7 +104,7 @@ Even better maybe the 32 bit download on a 64 bit system should prompt and ask *
 
 
 
-### Visual Studio doesn't Care?
+### Visual Studio doesn't Care
 Incidentally I found that while I was struggling on the command line with the `dotnet` command line tooling, Visual Studio was just fine compiling my 2.2 projects and running it. The problem I had was specifically with the command line version from my 'normal' Windows environment.
 
 It works for Visual Studio because VS sets up a custom environment with a custom path that includes the right SDK locations based on the runtime target you specify in your application, so compilation inside Visual Studio works.
