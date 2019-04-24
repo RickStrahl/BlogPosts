@@ -1,15 +1,19 @@
 ---
 title: 'Adventures in .NET Core SDK Installation: Missing SDKs and 32 bit vs 64 bit'
 abstract: Ran into a problem yesterday with a new installation of the .NET Core 3.0 Preview 4 installation. Installed the new preview and found that all of my .NET Core 2.x SDKs were no longer showing. A lot of back and forth later I found that I accidentally installed the wrong bitness SDK - 32 bit vs 64 bit. Here's a quick overview of how and why and why you probably NEVER want to install the 32 bit SDK.
-keywords: .NET Core SDK, 32 bit, 64 bit, SDK, Download
 categories: .NET Core
+keywords: .NET Core SDK, 32 bit, 64 bit, SDK, Download
 weblogName: West Wind Web Log
 postId: 1232649
 permalink: https://weblog.west-wind.com/posts/2019/Apr/20/Adventures-in-NET-SDK-Installation-SDKs-not-Showing-Up
 postDate: 2019-04-20T09:45:24.4539558-10:00
-postStatus: draft
+customFields:
+  mt_githuburl:
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2019-04/Adventures-in-.NET-SDK-Installation-SDKs-not-Showing-Up/AdventuresInNetSdkInstallationSdksNotShowingUp.md
 ---
 # Adventures in .NET Core SDK Installation: Missing SDKs and 32 bit vs 64 bit
+
 
 Yesterday I ran into yet another .NET Core versioning problem, this time related around the .NET Core SDK installation. A couple of days ago the [.NET Core 3.0 Preview 4 SDK](https://dotnet.microsoft.com/download/dotnet-core/3.0) was released and I installed it as I was doing some experiments around Blazor and Razor Components again. I installed the SDK and did my 3.0 things and forgot about it.
 
@@ -76,9 +80,7 @@ which nets me the install I want to have from the get-go:
 
 ![](Net30InstalledProperlyWith22CommandLine.png)
 
-or if you really need to have both SDKs installed fix the path so that the one you need in your current session is first in the path sequence.
-
-* Fix 64 bit SDK locations to be first in Windows Path
+or if you really need to have both SDKs installed fix the path so that the one you need - the 64 bit one most likely - is first in the path sequence.
 
 ### Do you need 32 Bit SDKs?
 There should be very little need for 32 bit versions of the SDK on Windows. Most moderns Windows machines are running 64 bit so if you are building a new application it would make sense to build your apps using 64 bit.
@@ -102,6 +104,10 @@ It's probably a good idea to make the 64 bit download more prominent to avoid an
 
 Even better maybe the 32 bit download on a 64 bit system should prompt and ask *Are you sure you want to install the 32 bit SDK*?
 
+### Watch out for the IIS Server Hosting Pack!
+I ran into another problem with x86 and x64 a day later when I installed an update to the IIS Server Hosting pack on a server. The hosting pack installs both 32 bit and 64 bit versions and for reasons unknown I found that when I installed the latest version, `dotnet --info` only reports the 32 bit versions when running. Same issue as above, somehow the 32 bit path preceeded the 64 bit path causing only the 32 bit runtimes to show up.
+
+I actually found that some of my applications were running in 32 bit mode, which I guess is not a huge problem, but somewhat unexpected. For the quick fix - I ended up uninstalling the 32 bit runtimes that the Hosting Pack(s) past and future installed.
 
 
 ### Visual Studio doesn't Care
