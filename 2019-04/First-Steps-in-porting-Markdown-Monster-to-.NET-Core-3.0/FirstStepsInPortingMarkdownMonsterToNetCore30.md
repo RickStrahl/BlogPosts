@@ -1,5 +1,5 @@
 ---
-title: First Steps in porting Markdown Monster to .NET Core 3.0
+title: First Steps in porting Markdown Monster WPF App to .NET Core 3.0
 abstract: I spent a good part of the day today getting Markdown Monster to run on .NET Core 3.0 and in this post I packaged up my notes into a lengthy post with how went through this process. It wasn't exactly quick to make this happen but MM has a few peculiarities that made this process a little bit more trying than it could have been. I'll summarize some thoughts at the end on both the process and the relevance of this process.
 keywords: .NET Core 3.0, WPF, Windows
 categories: '.NET Core,WPF, Windows, '
@@ -7,8 +7,12 @@ weblogName: West Wind Web Log
 postId: 1238111
 permalink: https://weblog.west-wind.com/posts/2019/Apr/24/First-Steps-in-porting-Markdown-Monster-to-NET-Core-30
 postDate: 2019-04-24T11:29:26.0545383-10:00
+customFields:
+  mt_githuburl:
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2019-04/First-Steps-in-porting-Markdown-Monster-to-.NET-Core-3.0/FirstStepsInPortingMarkdownMonsterToNetCore30.md
 ---
-# First Steps in porting Markdown Monster to .NET Core 3.0
+# First Steps in porting Markdown Monster WPF App to .NET Core 3.0
 
 ![](Banner.jpg)
 
@@ -22,12 +26,15 @@ For example:
 * How to Xaml files get built
 * How do resources (Assets) get embedded into the project
 
-I'll look at all of these things. Heads up: This is a long rambling post as I just wrote down a bunch of stuff as I was going through it. I edited out some extraneous stuff, but it's mostly just off the cuff, but if you're thinking about porting an application I think most of the things I describe here are things you are likely to run into yourself even if this application is a bit more esoteric as it includes some interop features.
+I'll look at all of these things. Heads up: This is a long rambling post as I just wrote down a bunch of stuff as I was going through it. I edited out some extraneous stuff, but it's mostly just off the cuff, but if you're thinking about porting an application I think most of the things I describe here are things you are likely to run into yourself even if this application is a bit more esoteric as it includes some interop features due to the Web Browser control used the core UI.
 
-## Porting
-So the first thing I did is convert the project file to the new **.NET SDK Project Format** file by switching the old .NET project to a .NET SDK project. If you recall, .NET SDK projects are much simpler than the old .NET projects because you generally don't have to list every file that the project needs to build. Instead the project knows about common file types and automatically builds what it knows how to build. You only explicit add files that require *special instructions* like static files or folders to copy, or files to exclude from building or copying.
+> Examples are based **.NET Core 3.0 Preview 4** which is the latest Preview at the time of writing. 
 
-> Examples are based .NET Core 3.0 Preview 4 which is the latest Preview at the time of writing. 
+## Porting the Project
+Markdown Monster is comprised of one main WPF EXE project which contains the bulk of code, plus several Addin projects that handle things like Weblog Publishing, Screen Captures and the Snippet Editor. To start I unloaded the Addin projects to focus only on the main project first.
+
+So the first thing I did is convert the MM exe project file to the new **.NET SDK Project Format** file by switching the old .NET project to a .NET SDK project. If you recall, .NET SDK projects are much simpler than the old .NET projects because you generally don't have to list every file that the project needs to build. Instead the project knows about common file types and automatically builds what it knows how to build. You only explicit add files that require *special instructions* like static files or folders to copy, or files to exclude from building or copying.
+
 
 What's nice about that is that you can easily create a new project by basically deleting the old one and adding just a few simple things into the file.
 
@@ -176,7 +183,7 @@ Any attempt to use `dynamic` just fails! I remember I talked about this [in a pr
 
 Well apparently this is not the case at least not in Preview 4.
 
-So Markdown Monster has a ton of interop that it does with the Markdown Editor which is an HTML component inside of a WebBrowser control. The WPF application calls into the custom behaviors that I've set up in JavaScript to interact with the editor. Any directives through the UI are routed through a central editor calss and all of those interop calls use `dynamic`. These are lightweight method calls - calling JavaScript functions from C# code. 
+So Markdown Monster has a ton of interop that it does with the Markdown Editor which is an HTML component inside of a WebBrowser control. The WPF application calls into the custom behaviors that I've set up in JavaScript to interact with the editor. Any directives through the UI are routed through a central editor class and all of those interop calls use `dynamic`. These are lightweight method calls - calling JavaScript functions from C# code. 
 
 This has been working great in full framework but all of that's broken now in .NET Core 3.0.
 
@@ -347,18 +354,23 @@ So most likely shared runtime it is. But for those of you that follow [my Twitte
 Some guidance is needed on this point I think because this is likely to become a real nightmare. The good news is that .NET Core runtimes are backwards compatible so newer versions minor updates work if an exact match can be found. Of course then we are essentially back to potentially breaking runtimes with code that worked on one version but not on a newer one, which was one of the main selling points of .NET Core in the first place. Oh well... can't win 'em all. 
 
 ## What do you get?
-Right now I'm not so sure that .NET Core 3.0 makes a ton of sense. At this point performance seems drastically worse compared to running the full framework version. Startup time of Markdown Monster is 5-10 seconds with this version (in Release mode) compared to a little over 2 seconds with the full framework version.
+Right now I'm not so sure that .NET Core 3.0 makes a ton of sense. At this point performance seems drastically worse compared to running the full framework version. Startup time of Markdown Monster is 7-10 seconds with this version (in Release mode) compared to a little over 2 seconds with the full framework version.
 
 I can't compare much beyond that because a lot of features in MM currently don't work due to the Interop features. Regular WPF stuff - animations window opening etc. all feels about the same but UI stuff is usually subjective anyway so it's hard to say.
 
-I think ultimately the benefits of .NET Core over the full framework will be runtime fixes and framework improvements, but right now there's very little of that. One improvement I was able to integrate immediately is the new Folder dialog for the WinForms `FolderBrowserDialog` which allowed me to remove the (largish) Windows Common Controls library I'd been using for that. It's actually crazy that that was never added to full framework.
+I think ultimately the benefits of .NET Core over the full framework will be runtime fixes and framework improvements, but right now there's very little of that. However, one nice improvement I was able to integrate immediately is the new Folder dialog for the WinForms `FolderBrowserDialog` which allowed me to remove the (largish) [Microsoft.WindowsAPICodePack-Shell](https://github.com/aybe/Windows-API-Code-Pack-1.1) library I'd been using for that. It's actually crazy that this feature was never added to full framework proper as the stock `FolderOpenBrowserDialog` is an **abomination of user hostility**.
 
-Currently there also doesn't appear to be any real difference in the way you build a WinForms or WPF application. Sure it runs on .NET code but the apps still start the same as before and the code you write is not drastically different - unlike ASP.NET which actually had a lot of huge benefits by re-writing the core framework.
+Currently there also doesn't appear to be any real difference in the way you build a WinForms or WPF application. Sure it runs on .NET code but the apps still start the same as before and the code you write is not drastically different - unlike ASP.NET which actually had a lot of huge benefits by re-writing the core framework. But there are none of the benefits like the Startup pipeline and dependency injection etc. that you typically associate with .NET Core applications. I suspect that will come later, and it probably won't apply to legacy applications, but it's one of those facets that are currently hidden away.
 
-So I'm on the fence. For now I think we can treat .NET Core 3.0 as a novelty. But farther down the line we hopefully see some improvements and fixes of old problems and bottlenecks in these old stodgey desktop frameworks.
+So I'm on the fence. For now I think we can treat .NET Core 3.0 as a novelty. But farther down the line we hopefully see some improvements and fixes of old problems and bottlenecks in these old stodgey desktop frameworks as the open source development model fixes old bugs and perhaps even drives some new features.
 
-It'll be interesting to see how these changes will affect Windows desktop development which has been stagnant for so long. We shall see...
+It'll be interesting to see how these changes will affect Windows desktop development which has been stagnant for so long. One can hope...
 
+
+## Resources
+* [Markdown Monster](https://markdownmonster.west-wind.com)
+* [Markdown Monster GitHub Repo](https://github.com/RickStrahl/MarkdownMonster) (.NET 3.0 Branch:  NET_Core_30_First_Shot)
+* [Com Object Access in .NET Core](https://weblog.west-wind.com/posts/2019/Jan/22/COM-Object-Access-and-dynamic-in-NET-Core-2x)
 
 <div style="margin-top: 30px;font-size: 0.8em;
             border-top: 1px solid #eee;padding-top: 8px;">
