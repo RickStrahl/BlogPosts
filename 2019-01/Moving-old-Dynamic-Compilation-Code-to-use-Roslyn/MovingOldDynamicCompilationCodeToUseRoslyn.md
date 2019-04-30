@@ -5,7 +5,8 @@ postDate: 2019-01-30T12:09:09.1306902-10:00
 ---
 # Moving old Dynamic Compilation Code to use Roslyn
 
-You probably know that compiling code in .NET has changed a bit since the early days of .NET with the advent of the Roslyn compiler. If you've been using the old `CSharpCodeProvider` in the past you probably also know that it uses the old compiler platform which means you don't get to take advantage of new CSharp (and VBNet) language features that have been introduced since Roslyn was introduced - all new language features are implemented only in Roslyn.
+You probably know that compiling code in .NET
+has changed a bit since the early days of .NET with the advent of the Roslyn compiler. If you've been using the old `CSharpCodeProvider` in the past you probably also know that it uses the old compiler platform which means you don't get to take advantage of new CSharp (and VBNet) language features that have been introduced since Roslyn was introduced - all new language features are implemented only in Roslyn.
 
 I used dynamic compilation for a number of features in applications - usually for some sort of scripting automation or for embedding scripts into editors. Quite frequently I've gotten notes from people asking *Why isn't the C# syntax supporting newer language features?* Well the answer is the old compilers don't support it.
 

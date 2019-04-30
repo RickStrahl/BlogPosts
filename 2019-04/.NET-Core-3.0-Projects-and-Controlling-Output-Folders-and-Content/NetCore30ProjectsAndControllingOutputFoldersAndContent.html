@@ -1,0 +1,189 @@
+﻿<!DOCTYPE html>
+<!-- saved from url=(0016)http://localhost -->
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <base href="file:///C:\Users\rstrahl\DropBox\Markdown Monster Weblog Posts\2019-04\.NET-Core-3.0-Projects-and-Controlling-Output-Folders-and-Content\" />
+  <meta charset="utf-8" />
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <link href="file:///C:\projects2010\MarkdownMonster\MarkdownMonster\bin\Release\net462\PreviewThemes\Dharkan\..\scripts\bootstrap\css\bootstrap.min.css" rel="stylesheet" />
+  <link href="file:///C:\projects2010\MarkdownMonster\MarkdownMonster\bin\Release\net462\PreviewThemes\Dharkan\..\scripts\fontawesome\css\font-awesome.min.css" rel="stylesheet" />
+
+  <link href="file:///C:\projects2010\MarkdownMonster\MarkdownMonster\bin\Release\net462\PreviewThemes\Dharkan\Theme.css" rel="stylesheet" />
+
+  <script src="file:///C:\projects2010\MarkdownMonster\MarkdownMonster\bin\Release\net462\PreviewThemes\Dharkan\..\scripts\jquery.min.js"></script>
+  <link href="file:///C:\projects2010\MarkdownMonster\MarkdownMonster\bin\Release\net462\PreviewThemes\Dharkan\..\scripts\highlightjs\styles\twilight.css" rel="stylesheet" />
+  <script src="file:///C:\projects2010\MarkdownMonster\MarkdownMonster\bin\Release\net462\PreviewThemes\Dharkan\..\scripts\highlightjs\highlight.pack.js"></script>
+  <script src="file:///C:\projects2010\MarkdownMonster\MarkdownMonster\bin\Release\net462\PreviewThemes\Dharkan\..\scripts\preview.js" id="PreviewScript"></script>
+  
+</head>
+<body>
+<div id="MainContent">
+    <!-- Markdown Monster Content -->
+    <h1 id="net-core-30-projects-and-controlling-output-folders-and-content">.NET Core 3.0 Projects and Controlling Output Folders and Content</h1>
+<p>In my last post I talked about <a href="https://weblog.west-wind.com/posts/2019/Apr/24/First-Steps-in-porting-Markdown-Monster-to-NET-Core-30">porting my Markdown Monster WPF application to .NET Core 3.0</a> and one of the problems I ran into was how to deal with properly handling compilation of Addins. In Markdown Monster Addins compile <strong>into a non-standard folder</strong> in the main EXE's output folder, so when building the project I want my Addin to be pushed right into the proper folder hierarchy inside of the parent project so that I can run <strong>and debug</strong> my addins along with the rest of the application.</p>
+<p>This used to be pretty easy in classic .NET projects:</p>
+<ul>
+<li>Add NuGet or Project References</li>
+<li>Mark each assembly reference's <strong>Copy Local</strong> settings</li>
+<li>Include new dependencies with Copy Local <code>True</code></li>
+<li>Exclude existing dependencies with Copy Local <code>False</code></li>
+</ul>
+<p>In the new .NET SDK projects this is more complicated as there's no simple way to exclude dependencies quite so easily. Not only that but it's also not quite so easy to set a final output folder that produces raw, as-is output into the target folder.</p>
+<p>Let's take a look.</p>
+<h2 id="where-does-output-go">Where does output go?</h2>
+<p>By default .NET SDK projects push compiled output into:</p>
+<pre><code class="language-ps">&lt;projectRoot&gt;bin\Release\netcore3.0
+</code></pre>
+<p>The reason for this more complex path that includes a target framework is that SDK projects can potentially have multiple targets defined in the <code>&lt;TargetFramework&gt;</code> element so you can do:</p>
+<pre><code class="language-xml">&lt;TargetFrameworks&gt;net462;netcore3.0&lt;/TargetFrameworks&gt;
+</code></pre>
+<p>The separate folder structure allow for both targets to get their own respective output folders when you build the project.</p>
+<p><img src="SeparateTargetFolders.png" alt="" /></p>
+<p>For my addins this is <strong>not what I want</strong> - I want to send output to a very specific folder in the 'parent' Exe project in the <code>Addins\AddinName</code> folder:</p>
+<p><img src="AddinOutput.png" alt="" /></p>
+<p>Not only that but I also need to write out only the actual assembly for the output <strong>plus any new dependencies</strong> that aren't already referenced in the main project - rather than all or no dependencies which are the 'default' options.</p>
+<h2 id="sending-output-to-a-custom-folder-with-dependencies">Sending output to a Custom Folder with Dependencies</h2>
+<p>So to send output to a non-default folder you can use <code>&lt;OutDir&gt;</code> and to force dependencies to be included in the output rather than the default behavior that just includes the project's assembly you can use <code>&lt;CopyLocalLockFileAssemblies&gt;</code>.</p>
+<p>Here's what that looks like in my project:</p>
+<pre><code class="language-xml">&lt;PropertyGroup&gt;
+    &lt;CopyLocalLockFileAssemblies&gt;true&lt;/CopyLocalLockFileAssemblies&gt;
+    &lt;OutDir&gt;$(SolutionDir)MarkdownMonster\bin\$(Configuration)\$(TargetFramework)\Addins\Weblog&lt;/OutDir&gt;
+&lt;/PropertyGroup&gt;
+</code></pre>
+<p>The <code>&lt;OutDir&gt;</code> element points at the Exe's project output folder and  copies files directly into the specified folder without a target folder.</p>
+<blockquote>
+<p>If you want to generate output to a new folder <strong>and get a target framework root folder</strong>  there's the <code>&lt;OutputPath&gt;</code> directive.</p>
+</blockquote>
+<blockquote>
+<p><code>&lt;CopyLocalLockFileAssemblies&gt;</code> is a very blunt tool. It copies <strong>everything</strong> related to a dependency so it can produce a boatload of assemblies and content files that you likely don't want, so you likely will need to filter the resulting output.</p>
+</blockquote>
+<p>The <code>&lt;CopyLocalLockFileAssemblies&gt;</code> ensures that <strong>all</strong> dependencies are copied, not just the one assembly generated for this project. So we need to filter the files somehow. More on that below.</p>
+<p>With <code>&lt;OutDir&gt;</code> the output goes into the main project output folder depending on the current target framework (potentially multiples) and the Configuration which is <code>Debug</code> or <code>Release</code> most likely.</p>
+<p>Ok - output's now going where it needs to go.</p>
+<h2 id="controlling-output-assemblies">Controlling Output Assemblies</h2>
+<p>The next problem is that when I now build  the project the project output includes <strong>all</strong> dependencies. That includes all NuGet package assemblies, all dependent assemblies, and also the dependencies for my Main EXE's reference:</p>
+<p><img src="TooManyAssemblies.png" alt="" /></p>
+<p>Holy crap that's a lot of assemblies and all buy 3 of them are in this case duplicated.</p>
+<p>So the next step is to NuGet packages and Assembly References from bringing in all of their dependencies.</p>
+<p>For NuGet Packages the element to use is <code>&lt;IncludeAssets&gt;</code> and set the value <code>compile</code>:</p>
+<pre><code class="language-xml">&lt;ItemGroup&gt;
+    &lt;!-- Assemblies already referenced by mainline --&gt;
+    &lt;PackageReference Include=&quot;MahApps.Metro&quot; version=&quot;1.6.5&quot;&gt;
+      &lt;IncludeAssets&gt;compile&lt;/IncludeAssets&gt;
+    &lt;/PackageReference&gt;
+    &lt;PackageReference Include=&quot;Dragablz&quot; version=&quot;0.0.3.203&quot;&gt;
+      &lt;IncludeAssets&gt;compile&lt;/IncludeAssets&gt;
+    &lt;/PackageReference&gt;    
+    ...
+    
+    &lt;!-- my dependencies that aren't used by main project 
+         so I'm not using `&lt;IncludeAssets&gt;`                 --&gt;
+    &lt;PackageReference Include=&quot;xmlrpcnet&quot; version=&quot;3.0.0.266&quot; /&gt;
+    &lt;PackageReference Include=&quot;YamlDotNet&quot; version=&quot;6.0.0&quot; /&gt;
+&lt;/ItemGroup&gt;
+</code></pre>
+<p>The point of this to 'exclude' any of the dependencies that are already loaded by the main executable and so don't need to be redistributed again. The <code>&lt;IncludeAssets&gt;compile&lt;/IncludeAssets&gt;</code>. The only packages that I actually <strong>want</strong> to be included in the output folder are those new assemblies that are not already loaded by the main Exe.</p>
+<h2 id="project-or-assembly-references-also-copy-files">Project or Assembly References also Copy Files</h2>
+<p>I'm still not done - I also have an assembly reference that points back at the main EXE project. My first try used a project reference, but this would pull in <strong>the entire project including all related assets</strong>. Ouch.</p>
+<p>So this didn't work:</p>
+<pre><code class="language-xml">&lt;ItemGroup&gt;
+    &lt;ProjectReference Include=&quot;$(SolutionDir)MarkdownMonster\MarkdownMonster.csproj&quot; &gt;
+     &lt;IncludeAssets&gt;compile&lt;/IncludeAssets&gt;
+    &lt;/ProjectReference&gt;
+&lt;/ItemGroup&gt;  
+</code></pre>
+<p>I couldn't find a setting for <code>&lt;IncludeAssets&gt;</code> or <code>&lt;ExcludeAssets&gt;</code> that works for the Project Reference. No matter what I did the depedencies were copied in.</p>
+<p>So - instead of a project reference I can also use an <strong>Assembly Reference</strong>  instead pointing at the compiled EXE. Then I can mark it as <code>Private</code> which won't copy all of the project's content into the output folder:</p>
+<pre><code class="language-xml">&lt;ItemGroup&gt;
+    &lt;Reference Include=&quot;..\..\MarkdownMonster\bin\$(Configuration)\$(TargetFramework)\MarkdownMonster.exe&quot;&gt;
+      &lt;Private&gt;false&lt;/Private&gt;
+    &lt;/Reference&gt;
+  &lt;/ItemGroup&gt;
+</code></pre>
+<p>Success. The end result of both the package references and project reference now is:</p>
+<p><img src="SuccessOnlyNeededDlls.png" alt="" /></p>
+<p>Just to summarize here's the complete project file for the <code>WeblogAddin</code> project:</p>
+<pre><code class="language-xml">&lt;Project Sdk=&quot;Microsoft.NET.Sdk.WindowsDesktop&quot;&gt;
+
+  &lt;PropertyGroup&gt;
+    &lt;TargetFramework&gt;netcoreapp3.0&lt;/TargetFramework&gt;
+    &lt;AssemblyName&gt;WeblogAddin&lt;/AssemblyName&gt;
+    &lt;UseWPF&gt;true&lt;/UseWPF&gt;
+    &lt;GenerateAssemblyInfo&gt;false&lt;/GenerateAssemblyInfo&gt;
+
+    &lt;CopyLocalLockFileAssemblies&gt;true&lt;/CopyLocalLockFileAssemblies&gt;
+    &lt;OutDir&gt;$(SolutionDir)MarkdownMonster\bin\$(Configuration)\$(TargetFramework)\Addins\Weblog&lt;/OutDir&gt;
+
+    &lt;Authors&gt;Rick Strahl, West Wind Technologies&lt;/Authors&gt;
+  &lt;/PropertyGroup&gt;
+
+  &lt;ItemGroup&gt;
+    &lt;!-- Assemblies already referenced by mainline --&gt;
+    &lt;PackageReference Include=&quot;MahApps.Metro&quot; version=&quot;1.6.5&quot;&gt;
+      &lt;IncludeAssets&gt;compile&lt;/IncludeAssets&gt;
+    &lt;/PackageReference&gt;
+    &lt;PackageReference Include=&quot;Dragablz&quot; version=&quot;0.0.3.203&quot;&gt;
+      &lt;IncludeAssets&gt;compile&lt;/IncludeAssets&gt;
+    &lt;/PackageReference&gt;
+    &lt;PackageReference Include=&quot;Microsoft.Xaml.Behaviors.Wpf&quot; version=&quot;1.0.1&quot;&gt;
+      &lt;IncludeAssets&gt;compile&lt;/IncludeAssets&gt;
+    &lt;/PackageReference&gt;
+    &lt;PackageReference Include=&quot;FontAwesome.WPF&quot; Version=&quot;4.7.0.9&quot;&gt;
+      &lt;IncludeAssets&gt;compile&lt;/IncludeAssets&gt;
+    &lt;/PackageReference&gt;
+    &lt;PackageReference Include=&quot;HtmlAgilityPack&quot; version=&quot;1.11.3&quot;&gt;
+      &lt;IncludeAssets&gt;compile&lt;/IncludeAssets&gt;
+    &lt;/PackageReference&gt;
+    &lt;PackageReference Include=&quot;Newtonsoft.Json&quot; version=&quot;12.0.1&quot;&gt;
+      &lt;IncludeAssets&gt;compile&lt;/IncludeAssets&gt;
+    &lt;/PackageReference&gt;
+    &lt;PackageReference Include=&quot;Westwind.Utilities&quot; version=&quot;3.0.26&quot;&gt;
+      &lt;IncludeAssets&gt;compile&lt;/IncludeAssets&gt;
+    &lt;/PackageReference&gt;
+
+    &lt;!-- my dependencies that aren't used by main project 
+         so I'm not using `&lt;IncludeAssets&gt;`                 --&gt;
+    &lt;PackageReference Include=&quot;xmlrpcnet&quot; version=&quot;3.0.0.266&quot; /&gt;
+    &lt;PackageReference Include=&quot;YamlDotNet&quot; version=&quot;6.0.0&quot; /&gt;
+  &lt;/ItemGroup&gt;
+
+  &lt;ItemGroup&gt;
+    &lt;!--&lt;ProjectReference Include=&quot;$(SolutionDir)MarkdownMonster\MarkdownMonster.csproj&quot; &gt;
+     &lt;IncludeAssets&gt;compile&lt;/IncludeAssets&gt;
+    &lt;/ProjectReference&gt;--&gt;
+    &lt;Reference Include=&quot;$(SolutionDir)MarkdownMonster\bin\$(Configuration)\$(TargetFramework)\MarkdownMonster.exe&quot;&gt;
+      &lt;Private&gt;false&lt;/Private&gt;
+    &lt;/Reference&gt;
+  &lt;/ItemGroup&gt;  
+
+  &lt;ItemGroup&gt;
+    &lt;Resource Include=&quot;icon.png&quot; /&gt;
+    &lt;Resource Include=&quot;icon_22.png&quot; /&gt;
+    &lt;Resource Include=&quot;MarkdownMonster_Icon_128.png&quot; /&gt;
+  &lt;/ItemGroup&gt;  
+
+&lt;/Project&gt;
+</code></pre>
+<h2 id="harder-than-it-should-be">Harder than it should be</h2>
+<p>What I'm describing here is a bit of an edge case, but it sure feels like these are a lot of hoops to jump through for behavior that used to work in classic projects by simply specifying an alternate output folder. I also find it very odd that all dependencies are pulled in from an assembly reference (my main Markdown Monster project DLL which references <em>The World</em>).</p>
+<blockquote>
+<p>To be clear having all assemblies in the output folder doesn't break the application so the default settings <strong>work just fine</strong>. But by default you do end up with a bunch of duplicated assemblies that likely don't want and have to explicitly exclude using the steps provided in this post.</p>
+</blockquote>
+<p>In the end it all works and that that's the important thing, but it's a bit convoluted to make this work and wasn't easy to discover. A few pointers from Twitter is what got me over the hump.</p>
+<p>Having to specify <code>CopyLocalLockFileAssemblies&gt;true&lt;/CopyLocalLockFileAssemblies&gt;</code> also feels a bit unexpected and how it deals with a referenced assembly and pulling in all of its dependencies plus all content assets is just plain bizarre. Luckily there are overrides, but none of this is very discoverable and certainly not obvious.</p>
+<p>That's what this post is for - so me (and perhaps you) can come back to this and remember how the heck to get the right incantation to get just the right files copied into the output folder.</p>
+<div style="margin-top: 30px;font-size: 0.8em;
+            border-top: 1px solid #eee;padding-top: 8px;">
+    <img src="https://markdownmonster.west-wind.com/favicon.png"
+         style="height: 20px;float: left; margin-right: 10px;"/>
+    this post created and published with 
+    <a href="https://markdownmonster.west-wind.com" 
+       target="top">Markdown Monster</a> 
+</div>
+
+    <!-- End Markdown Monster Content -->
+</div>
+</body>
+</html>

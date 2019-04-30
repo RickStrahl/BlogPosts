@@ -1,8 +1,8 @@
 ---
 title: First Steps in porting Markdown Monster WPF App to .NET Core 3.0
 abstract: I spent a good part of the day today getting Markdown Monster to run on .NET Core 3.0 and in this post I packaged up my notes into a lengthy post with how went through this process. It wasn't exactly quick to make this happen but MM has a few peculiarities that made this process a little bit more trying than it could have been. I'll summarize some thoughts at the end on both the process and the relevance of this process.
-categories: '.NET Core,WPF, Windows, '
 keywords: .NET Core 3.0, WPF, Windows
+categories: '.NET Core,WPF, Windows, '
 weblogName: West Wind Web Log
 postId: 1238111
 permalink: https://weblog.west-wind.com/posts/2019/Apr/24/First-Steps-in-porting-Markdown-Monster-to-NET-Core-30
@@ -15,7 +15,6 @@ customFields:
 # First Steps in porting Markdown Monster WPF App to .NET Core 3.0
 
 ![](Banner.jpg)
-
 
 Today I took the day to explore what it would take to port Markdown Monster to .NET Core. Most of the examples I've seen so far for ports or running applications on .NET Core are pretty trivial - you can see how the process works, but just looking at those examples I had a million questions of how certain things will be handled. So I decided to take a look.
 
@@ -119,6 +118,19 @@ So there's a lot of small cleanup tasks for various files and types that are mos
 
 This is to be expected with any sort of version update and while there were about 30 or so instances of errors or relocated references this only took 15 minutes to clean up.
 
+## Adding your Entry Point
+If you are using an entry point other than `app.xaml` as I am you'll have to add that explicitly. You can add it to the in the main project group like this:
+
+```xml
+<StartupObject>StartUp</StartupObject>
+```
+
+or use Visual Studio's project dialog to pick the startup class:
+
+![](SetStartupProject.png)
+
+At this point the project compiles! Yay!
+
 ## Managing Resources and Copied Files
 So at this point I was able to compile my project (with a number of warnings for packages that aren't 3.0 'compatible'):
 
@@ -150,6 +162,8 @@ That gets me a little further but I'm still missing some additional resources:
 
 In this case I'm missing some support files that Markdown Monster copies into the output folder. Specifically it's the Web Content files used to render the editor and preview HTML.
 
+
+## Copied Resources
 To add those I need to explicitly add those folders to be copied:
 
 ```xml
@@ -245,10 +259,8 @@ This allows me to open the project in Visual Studio. Next I need to add all my e
   <ItemGroup>
     <PackageReference Include="MahApps.Metro" version="1.6.5" />
     <PackageReference Include="Dragablz" version="0.0.3.203" />
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" version="1.0.1" />
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="2.0.1" />
     <PackageReference Include="FontAwesome.WPF" Version="*" />
-
     <PackageReference Include="HtmlAgilityPack" version="1.11.3" />
     <PackageReference Include="Westwind.Utilities" version="3.0.25" />
     
@@ -284,20 +296,21 @@ To make this work I need to add two directives `<CopyLocalLockFileAssemblies>` a
     <UseWPF>true</UseWPF>
 
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <OutDir>$(SolutionDir)MarkdownMonster\bin\$(Configuration)\$(TargetFramework)\Addins\WebLog</OutDir>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutDir>..\..\MarkdownMonster\bin\Debug\netcoreapp3.0\Addins\WebLog</OutDir>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <OutDir>..\..\MarkdownMonster\bin\Release\netcoreapp3.0\Addins\WebLog</OutDir>
   </PropertyGroup>
  ```
  
 `<CopyLocalLockFileAssemblies>` is used to specify that the output folder should contain not just the target assembly but all of its dependencies. This turns out to be a bit messy, duplicating the entire dependency tree, but this was the only way I could get this to work without using an explicit post build task (which I'd rather avoid). Instead I plan on cleaning up the add-in as part of the final build script that builds final distribution package.
 
-`<OutDir>` allows you to specify an output folder where you want the **final assembly output to go**. I know that sounds silly, but standard output creates the whole `netcoreapp3.0` hierarchy which wouldn't work in this case. `<OutDir>` forces the output into the exact folder you specify.
+`<OutDir>` allows you to specify an output folder where you want the **final assembly output to go**. I know that sounds silly, but standard output creates the whole `netcoreapp3.0` hierarchy which wouldn't work in this case. `<OutDir>` forces the output into the exact folder you specify without any prefixes. 
+
+I'm using various Build constants to force to a folder like this:
+
+```text
+<projRoot>\MarkdownMonster\bin\Release\netcoreapp3.0\Addins\Weblog
+```
 
 When I build now I end up with an output folder that looks like this:
 
@@ -316,6 +329,44 @@ With all this done the addin now shows up on the tool bar and runs:
 ![](AddinWorking.png)
 
 Cool. It works, but again a lot of pain trying to get this to work right.
+
+### Excluding Packages and Assembly References
+So after a bit more trial and error I found a solution to cleaning up the output folder by explicitly exluding the packages and project references that you I don't want in the output. I have to explicitly specify how to use each package and the external reference:
+
+```xml
+<ItemGroup>
+    <PackageReference Include="MahApps.Metro" version="1.6.5">
+      <IncludeAssets>compile</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Dragablz" version="0.0.3.203">
+      <IncludeAssets>compile</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="FontAwesome.WPF" Version="4.7.0.9">
+      <IncludeAssets>compile</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="HtmlAgilityPack" version="1.11.3">
+      <IncludeAssets>compile</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Westwind.Utilities" version="3.0.26">
+      <IncludeAssets>compile</IncludeAssets>
+    </PackageReference>
+
+    <PackageReference Include="xmlrpcnet" version="3.0.0.266" />
+    <PackageReference Include="YamlDotNet" version="6.0.0" />
+</ItemGroup>
+
+<ItemGroup>
+    <Reference Include="$(SolutionDir)MarkdownMonster\bin\$(Configuration)\$(TargetFramework)\MarkdownMonster.exe">
+        <Private>false</Private>
+    </Reference> 
+</ItemGroup>
+```
+
+With these settings I'm telling the project to only use the above NuGet packages for compilation, not for distribuion and to make the project reference private. Note that I'm using the raw EXE rather than a project reference here which is less than ideal because it can cause compile ordering errors, but I couldn't find a way to get a `<ProjectReference>` to not include its output in the output folder. The above works, and it provides a nice clean addin folder.
+
+![](CleanAddinFolder.png)
+
+Note the terrible naming. I would have assume `<Private>` to be `true` to not export, but it means the opposite here. `Compile` means compilation only which sort of makes sense, although there are options for `none` which would have made a lot more sense.
 
 ### Done Updating for now
 For now though - I think I'm done upgrading because it's clear that the next step will be a lot of cleanup work - specifically related to the `dynamic` COM Interop changes. Not sure I'm ready to get into that with .NET Core 3.0 being still a ways away from release.
