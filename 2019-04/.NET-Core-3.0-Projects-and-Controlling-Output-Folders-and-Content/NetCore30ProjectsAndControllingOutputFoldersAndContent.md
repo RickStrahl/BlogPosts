@@ -7,6 +7,10 @@ weblogName: West Wind Web Log
 postId: 1244833
 permalink: https://weblog.west-wind.com/posts/2019/Apr/30/NET-Core-30-SDK-Projects-Controlling-Output-Folders-and-Content
 postDate: 2019-04-30T13:43:36.5583246-10:00
+customFields:
+  mt_githuburl:
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2019-04/.NET-Core-3.0-Projects-and-Controlling-Output-Folders-and-Content/NetCore30ProjectsAndControllingOutputFoldersAndContent.md
 ---
 # .NET Core 3.0 SDK Projects: Controlling Output Folders and Content
 
@@ -21,7 +25,7 @@ This used to be pretty easy in classic .NET projects:
 * Include new dependencies with Copy Local `True`
 * Exclude existing dependencies with Copy Local `False`
 
-In the new .NET SDK projects this is more complicated as there's no simple way to exclude dependencies quite so easily. Not only that but it's also not quite so easy to set a final output folder that produces raw, as-is output into the target folder.
+In the new .NET SDK projects this is more complicated as there's no simple way to exclude dependencies quite so easily. Either everything but the primary assembly is excluded which is the default, or you can set a switch to copy dependencies which copies **every possible dependency** into the output folder.
 
 Let's take a look.
 
@@ -30,7 +34,7 @@ Let's take a look.
 ## Where does output go?
 By default .NET SDK projects push compiled output into:
 
-```ps
+```text
 <projectRoot>bin\Release\netcore3.0
 ```
 
@@ -107,6 +111,8 @@ For NuGet Packages the element to use is `<IncludeAssets>` and set the value `co
 ```
 
 The point of this to 'exclude' any of the dependencies that are already loaded by the main executable and so don't need to be redistributed again. The `<IncludeAssets>compile</IncludeAssets>`. The only packages that I actually **want** to be included in the output folder are those new assemblies that are not already loaded by the main Exe. 
+
+There's more info on the various `<IncludeAssets>` and related elements values that you can provide [in the NuGet documentation](https://docs.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files#controlling-dependency-assets).
 
 ## Project or Assembly References also Copy Files
 I'm still not done - I also have an assembly reference that points back at the main EXE project. My first try used a project reference, but this would pull in **the entire project including all related assets**. Ouch.
@@ -205,15 +211,18 @@ Just to summarize here's the complete project file for the `WeblogAddin` project
 ##AD## 
 
 ## Harder than it should be
-What I'm describing here is a bit of an edge case, but it sure feels like these are a lot of hoops to jump through for behavior that used to work in classic projects by simply specifying an alternate output folder. I also find it very odd that all dependencies are pulled in from an assembly reference (my main Markdown Monster project DLL which references *The World*). 
+What I'm describing here is a bit of an edge case because of the way the addins are wired up in my application, but it sure feels like these are a lot of hoops to jump through for behavior that used to work in classic projects by simply specifying an alternate output folder. I also find it very odd that all dependencies are pulled in from an assembly reference (my main Markdown Monster project DLL which references *The World*). 
 
 > To be clear having all assemblies in the output folder doesn't break the application so the default settings **work just fine**. But by default you do end up with a bunch of duplicated assemblies that likely don't want and have to explicitly exclude using the steps provided in this post.
 
 In the end it all works and that that's the important thing, but it's a bit convoluted to make this work and wasn't easy to discover. A few pointers from Twitter is what got me over the hump.
 
-Having to specify `CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>` also feels a bit unexpected and how it deals with a referenced assembly and pulling in all of its dependencies plus all content assets is just plain bizarre. Luckily there are overrides, but none of this is very discoverable and certainly not obvious.
+And that's what this post is for - so I (and perhaps you) can come back to this and remember how the heck to get the right incantation to get just the right files copied into the output folder.
 
-That's what this post is for - so me (and perhaps you) can come back to this and remember how the heck to get the right incantation to get just the right files copied into the output folder.
+## Related Resources
+
+* [First Steps in porting Markdown Monster WPF App to .NET Core 3.0](https://weblog.west-wind.com/posts/2019/Apr/24/First-Steps-in-porting-Markdown-Monster-to-NET-Core-30)
+* [Project Dependency NuGet Settings](https://docs.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files#controlling-dependency-assets)
 
 <div style="margin-top: 30px;font-size: 0.8em;
             border-top: 1px solid #eee;padding-top: 8px;">
