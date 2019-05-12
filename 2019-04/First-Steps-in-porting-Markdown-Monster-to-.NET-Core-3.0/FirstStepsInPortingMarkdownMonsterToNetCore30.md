@@ -1,8 +1,8 @@
 ---
 title: First Steps in porting Markdown Monster WPF App to .NET Core 3.0
 abstract: I spent a good part of the day today getting Markdown Monster to run on .NET Core 3.0 and in this post I packaged up my notes into a lengthy post with how went through this process. It wasn't exactly quick to make this happen but MM has a few peculiarities that made this process a little bit more trying than it could have been. I'll summarize some thoughts at the end on both the process and the relevance of this process.
-keywords: .NET Core 3.0, WPF, Windows
 categories: '.NET Core,WPF, Windows, '
+keywords: .NET Core 3.0, WPF, Windows
 weblogName: West Wind Web Log
 postId: 1238111
 permalink: https://weblog.west-wind.com/posts/2019/Apr/24/First-Steps-in-porting-Markdown-Monster-to-NET-Core-30
@@ -439,3 +439,4 @@ If you want to see the converted, dual-targeted project you can [check it out on
     <a href="https://markdownmonster.west-wind.com" 
        target="top">Markdown Monster</a> 
 </div>
+

@@ -223,6 +223,9 @@ And that's what this post is for - so I (and perhaps you) can come back to this 
 
 * [First Steps in porting Markdown Monster WPF App to .NET Core 3.0](https://weblog.west-wind.com/posts/2019/Apr/24/First-Steps-in-porting-Markdown-Monster-to-NET-Core-30)
 * [Project Dependency NuGet Settings](https://docs.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files#controlling-dependency-assets)
+* [Markdown Monster](https://markdownmonster.west-wind.com)
+* [Markdown Monster Project on GitHub](https://github.com/RickStrahl/MarkdownMonster)
+
 
 <div style="margin-top: 30px;font-size: 0.8em;
             border-top: 1px solid #eee;padding-top: 8px;">
