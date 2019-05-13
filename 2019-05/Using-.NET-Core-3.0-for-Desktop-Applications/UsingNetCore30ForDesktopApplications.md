@@ -45,7 +45,7 @@ But the desktop frameworks themselves haven't changed. There are a few small cha
 ### Performance Potential
 Microsoft mentions performance as a big reason to go to .NET Framework and while that may not yet be the case I think that there a number of options on the horizon that make this more interesting. 
 
-**Tiered Compilation** is a new feature in .NET Core that uses quick JIT compilation on startup of an application for a quicker and lighter startup footprint, with more optimized compilation performed in the background once the application is warmed up. This can help with startup speed. I turned on Tiered Compilation via project flag and saw slight improvements in startup time - nothing Earth shattering but shaving off a half second of 2.5 second load time is not bad. It's also likely that this new technology will be further tuned to produce even better startup compilation times.
+**Tiered Compilation** In addition, .NET Core has many performance improvements that have greatly benefited the Web stack, but it required specific optimization to use these improvements. Things like `Span<T>`, `Memory<T>` and `ArraySegment<T>` are low level, system enhancements that can yield impressive memory and performance improvements. These new  features are slowly finding their way into the Core CLR where they bring improvements to all applications. Specific frameworks can also benefit as ASP.NET Core has, but it requires some investment into those frameworks to take advantage of these features. Whether Microsoft or the open source community maintaining WinForms and WPF will do any of that is anyone's guess.
 
 In addition .NET Core has many performance improvements that have greatly benefited the Web stack, but it required specific optimization to use these improvements. Things like Spans
 
@@ -110,28 +110,39 @@ Let's do it step by step. The first step is to create a new project and the firs
 
 Notice the various special project type entries the Sdk value, **OutputType** and **UseWPF** are all specific to in this case a WPF project. For WinForms change `<UseWPF>` to `<UseWinForms>`.
 
-At this point I can actually open my project in Visual Studio as a new SDK style project.
+At this point I can actually open my project in my Visual Studio as a new SDK style project.
 
+Note that in the Markdown Monster example I have **one main EXE project** and a number of support Addin projects which depend on the master project. This is backwards from most projects which have a main project with support projects that are loaded by the main project. In that case you probably want to start upgrading the required support projects fist. If your support projects don't include desktop functionality you should target **.NET Standard 2.0 or 2.1** or **.NET Core App** and use a standard library project which  as a desktop target as you won't need all the Windows desktop dependencies and you might want to reuse the project for non-Desktop  applications.
+
+For example for .NET Standard:
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Version>3.0.26</Version>
+</Project>    
+```
 ### Fix Assembly Attributes
-Next you will need to do either delete your **Properties.cs** file that holds various assembly directives **or** add a `<GenerateAssemblyInfo>false</GenerateAssemblyInfo>` into the `<PropertyGroup>`. Assembly attributes are now maintained in the project file itself using standard NuGet schema values. If you don't delete the old one or add the directive the compiler will complain about duplicate assembly directives.
+To upgrade the main project I first need to delete my existing **Properties.cs** file that holds assembly directives **or** add a `<GenerateAssemblyInfo>false</GenerateAssemblyInfo>` into the `<PropertyGroup>`. Assembly attributes are now maintained in the project file itself using standard NuGet schema values and if you don't delete or use the attribute they are duplicated which causes a compilation error.
 
 ### Add NuGet Packages
 The next step is to add all the NuGet packages that were in **packages.config** into the project itself:
 
 ```xml
-  <ItemGroup>
-    <PackageReference Include="Dragablz" Version="0.0.3.203" />
-    <PackageReference Include="FontAwesome.WPF" Version="4.7.0.9" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.3" />
-    <PackageReference Include="LibGit2Sharp" Version="0.26.0" />
-    <PackageReference Include="LumenWorksCsvReader" Version="4.0.0" />
-    <PackageReference Include="MahApps.Metro" Version="1.6.5" />
-    <PackageReference Include="Markdig" Version="0.16.0" />
-    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.9.1" />
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="2.0.1" />
-    <PackageReference Include="NHunspell" Version="1.2.5554.16953" />
-    <PackageReference Include="Westwind.Utilities" Version="3.0.25" />
-  </ItemGroup>
+<ItemGroup>
+  <PackageReference Include="Dragablz" Version="0.0.3.203" />
+  <PackageReference Include="FontAwesome.WPF" Version="4.7.0.9" />
+  <PackageReference Include="HtmlAgilityPack" Version="1.11.3" />
+  <PackageReference Include="LibGit2Sharp" Version="0.26.0" />
+  <PackageReference Include="LumenWorksCsvReader" Version="4.0.0" />
+  <PackageReference Include="MahApps.Metro" Version="1.6.5" />
+  <PackageReference Include="Markdig" Version="0.16.0" />
+  <PackageReference Include="Microsoft.ApplicationInsights" Version="2.9.1" />
+  <PackageReference Include="Microsoft.Windows.Compatibility" Version="2.0.1" />
+  <PackageReference Include="NHunspell" Version="1.2.5554.16953" />
+  <PackageReference Include="Westwind.Utilities" Version="3.0.25" />
+</ItemGroup>
 ```
 
 You only have to specify top level NuGet packages. There's no need to add dependencies as they will be pulled automatically which cuts down on the number of packages compared to what's in **package.config**.
@@ -286,34 +297,68 @@ In the following days I ended up refactoring all COM interaction into a separate
 <small>**Figure 6** - At last: The application is fully running under .NET Core </small>
 
 ### Adding Addins
-With the main application running my next step was to add my Addin projects. 
+With the main application running my next step was to add my Addin projects. This was both easier and more complicated at the same time. Easier because it was easy to get the project to compile and work under .NET Core 3.0. The steps are nearly identical to the main project as these projects also have UI components they are using the same Desktop project type and settings.
 
+Because the addins are much smaller and have fewer dependencies it was easier to get them going - it literally took a few minutes to get the first one to compile. I was able to copy the existing project structure from the main project, rename for my assembly, add a project reference to the main Markdown Monster project, change the package references and things just worked on the first attempt with addins loading right up. Nice!
+
+But... there were still complications mainly because of the quirky way that addins work in Markdown Monster. Addins are loaded into a special folder called `Addins` in the main project's output folder. Addins also have dependencies that already exist in the main application and I don't want those dependencies output into the output folder.
+
+You can check out the full WebLogAddin project file at http://bit.ly/2E5Cn3V.
+
+Here are a few things of note. In order to make the project output into the Addins folder I had to use `<OutDir>` directive to force to the project output folder like this (all one line):
+
+```xml
+<OutDir>
+$(SolutionDir)MarkdownMonster\bin\
+$(Configuration)\$(TargetFramework)\
+win-x86\Addins\Weblog
+</OutDir>
+```
+
+Additionally each of the NuGet packages that are duplicated in the main project are marked as `<IncludeAssets>compile</IncludeAssets>` flag. This tells the project to compile the files but not copy them to the output folder. I use this on all duplicated NuGet packages, but leave it off on the new ones that are not used by the main project and so are required. 
+
+The other issue which is still unresolved is how to deal with the project reference to the main Markdown Monster project. Unfortunately I couldn't find a way to not have the project reference dump the actual output plus its dependencies into the output folder. Although options exist on the project reference element, they appear to not be respected. This is likely a bug but I haven't heard back from my bug report yet.
+
+As a workaround I used an assembly reference instead and on that I could set the 
+
+```xml
+<ItemGroup>
+   <Reference Include="$(SolutionDir)
+MarkdownMonster\bin\$(Configuration)\  
+$(TargetFramework)\win-x86
+\MarkdownMonster.dll">
+      <Private>false</Private>
+    </Reference> 
+</ItemGroup>
+```  
+
+This is ugly and has side effects in that sometimes the Solution doesn't compile due to project order, but it's the only way I could get the proper output into my Addin output folder.
 
 ## Now What?
-At this point I have a running .NET Core 3.0 application which is cool. But there's really nothing to get very excited about. The application looks the same, it doesn't run any faster, the code really isn't very different. Other than using the new runtime and using the latest tools and the potential to use new language and runtime features nothing has been gained.
+So at this point I have a running .NET Core 3.0 application that has all of the features of the classic .NET application which is cool. But there's really nothing to get very excited about. The application looks the same, it doesn't run any faster, and even the code really isn't very different. Other than using a new project type and running on a new runtime nothing has really changed. 
 
-Well almost. There have already been a few changes in the code of Desktop platforms that is useful. For example, the Windows Folder Forms Browser dialog in full framework is a painful dialog to use as you can't paste a path, and it uses some arcane controls to navigate the browser. One of the first changes in the open source Winforms implementation was to provide a new folder dialog using the same old syntax but the much richer and  modern Explorer style dialog shown in **Figure 7**.
+Well almost. There have already been a few changes in the code of Desktop platforms that are useful. For example, the Windows Folder Forms Browser dialog in full framework is a painful dialog to navigate as you can't paste a path, and it uses some arcane controls to navigate the browser. One of the first changes in the open source Winforms implementation was to provide a new folder dialog using the same old syntax but the much richer and  modern Explorer style dialog shown in **Figure 7**.
 
 ![](Figure7-NewFolderBrowserDialog.png)
 
  <small>**Figure 7** - One of the first improvements in Desktop platforms is the Explorer based Folder Browser</small>
 
-This is a trivial change, but this community submitted change to WinForms made it into the new release and is now available for all to use. Best of all no code changes are required. I think we'll see a lot more of these small but very useful changes in the base frameworks that Microsoft never bothered to update are likely to be fixed by community input.
+This is a trivial change, but this community submitted change to WinForms made it into the new release and is now available in .NET Core 3.0's desktop support. Best of all no code changes are required. I think we'll see a lot more of these small but very useful changes in the base frameworks in the future based on community updates - that is one of the big benefits of open sourcing libraries even as complex as WinForms or WPF.
 
 ## Distribution
-Now that I have a running application the next big question is: How do I distribute it? You basically have two options:
+Now that I have a running application the next big question is: How do I distribute it? I  basically have two options:
 
 * Use a Shared Preinstalled Desktop Runtime 
 * Build a Self-Contained installation
 
 ### Shared Runtimes
-Shared runtimes means that you need to actually install two separate runtimes, which is the .NET Core Runtime, plus the Desktop Runtime Pack. This is similar to the way ASP.NET Core installs which requires the .NET Core Runtime, plus the ASP.NET Core Runtime Package. 
+Using a shared runtime means that I actually need to install two separate runtimes: The .NET Core Runtime, plus the Desktop Runtime Pack. This is similar to the way ASP.NET Core installs which also requires the .NET Core Runtime, plus the ASP.NET Core Runtime Package. 
 
-It may seem tedious to require these separate packages, but Microsoft wants to keep the base .NET Core package as small as possible with other frameworks provided as separate add-on packages to provide framework functionality. Microsoft then ships feature packs that combine the runtime plus framework. Today Microsoft does this with the ASP.NET Core Windows Hosting bundle, and something similar will be available for desktop apps to combine the base runtime and desktop frameworks.
+It may seem tedious to require these separate packages, but Microsoft wants to keep the base .NET Core package as small as possible with other frameworks provided as separate add-on packages to provide framework functionality. Microsoft then ships feature packs that combine the runtime plus framework. Today Microsoft does this with the Windows Hosting Pack which basically packages .NET Core, ASP.NET Core plus the Windows Hosting Module into a single package that is ready to go. Something similar will be available for desktop apps to combine the base runtime and desktop frameworks.
 
-Currently Microsoft has **no pre-packaged Desktop Runtime Package**, so the only way to install the shared Desktop Runtime currently is by installing the .NET Core 3.0 SDK. The SDK includes the .NET Core Runtime, the ASP.NET Core and Desktop Runtimes plus the actual SDK features. If you're building a 32 bit application as I do for Markdown Monster make sure you install the 32 bit SDK most likely in addition to the 64 bit SDK. Note that by the time you read this a Desktop Runtime may be available - check the download page **dot.net**.
+As of Preview 5, Microsoft has **no pre-packaged Desktop Runtime Package** so the only way to install the shared Desktop Runtime currently is by installing the .NET Core 3.0 SDK. The SDK includes the .NET Core Runtime, the ASP.NET Core and Desktop Runtimes plus the actual SDK features. If you're building a 32 bit application as I do for Markdown Monster make sure you also install the 32 bit SDK. Note that by the time you read this a Desktop Runtime may be available - check the download page at **dot.net**.
 
-One key point with shared runtimes is that **.NET Core applications target a specific runtime version** and a compatible version needs to be installed on the target machine at runtime. Compatible means either the same version or a higher minor version has to be available in order for your application to run. So if you build your application for .NET Core 3.0.1 and only .NET Core 3.1.1 is installed your application still works but if only 3.0 is install it won't launch and you get a runtime launch error as shown in **Figure 8**.
+One additional important point about shared runtimes is that **.NET Core applications target a specific .NET Core runtime version** and a compatible version needs to be installed on the target machine at runtime. Compatible means either the same version or a higher minor version has to be available in order for your application to run. So if you build your application for .NET Core 3.0.1 and only .NET Core 3.1.1 is installed your application still works, but if only 3.0 is installed it won't launch and you get a runtime launch error as shown in **Figure 8**.
 
 ![](Figure8-RuntimeNotFound.png)
 
@@ -334,65 +379,21 @@ As you might expect this is not a small installation as shown in **Figure 9**.
 
 <small>**Figure 9** - A self-contained runtime installation is not small at 190mb</small>
 
-The Markdown Monster installation clocks in at nearly 200 megs in self-contained mode. That's a far cry from the 25 megs or so of the shared runtime installation.
+The Markdown Monster installation clocks in at nearly 200mb in self-contained mode. A compressed version in a 7z archive clocks in around 55mb. Although that is quite large, a shared install is around 90mb raw and ~15mb zipped.
 
-the runtimes are pinned to specific versions and unlike full framework each version has a specific compatibility range. An application build against a specific version of .NET Core has to run against either the same exact version or a higher version within the same point release. The version rules are 
+The nice thing about a self-contained install is that it is truly self-contained and includes all dependencies in the project. You can move that application to any machine including one that doesn't have any version of .NET Core installed and run it there.
+  
+This is obviously useful in some scenarios, especially corporate scenarios where many applications have to co-exist and where you can ensure that your application gets the exact runtime that you built it with during development.
 
+I plan on using shared distribution - eventually. Self-contained distribution is simply too large to distribute at this time. Microsoft is working on Ahead of Time (AOT) compilation which is supposed to eventually fully optimized binaries that only ship the actual code your application runs and touches. But this tech is still a ways off and definitely past the .NET Core 3.0 release cycle in September.
 
-small and then provide specific target framework packages on top of the base runtime. Microsoft also plans on publishing framework specific packages that include everything you need to run desktop applications similar to the ASP.NET Core Windows Hosting Package.
+Today it makes little to no sense shipping a .NET Core 3.0 application. Between the runtime requirements and the fact that there's really no tangible feature or performance benefit to my customers, I see no reason to actually ship a .NET Core 3.0 version in the near term. But I don't regret having put in the time to port to .NET Core 3.0 because I think in the future there may very well be good reasons to run on .NET Core if nothing else just to stay up with the latest .NET Core runtime improvements. Nobody wants to work on a non-evolving platform and .NET Core is clearly the path forward.
 
+## Done and Done
+And with that I'm done. Markdown Monster runs on .NET Core 3.0 and while for now I stick with the full .NET Framework, I can now keep this application in sync with .NET Core. If and when the time comes to go all in on .NET Core because of new features in the runtime or a more compelling deployment story, I'll be easy to switch easily. Today I'm dual targeting Markdown Monster to both .NET Core 3.0 and .NET 4.6.2 which allows me to keep an eye out for breaking changes I might introduce to the .NET Core code. For productivity and build time performance while working on features and updates, I target only `net462` and occasionally back check against `netcoreapp3.0` to make sure the code still compiles and runs on Core.
 
+In summary, above all .NET Core 3.0 currently is about the **potential for future improvements** in .NET Core that are beneficial for desktop application. 
 
+Full .NET Framework is done with .NET 4.8, and while it's totally fine to keep existing .NET framework desktop application on .NET 4.x, if you want to keep moving forward and take advantage of the changes Microsoft is making to .NET and C#, then .NET Core is your only way forward. For now this isn't may not seem enticing but I think as time goes on more and more new features in .NET Core will come up that you'll want to take advantage of even in desktop applications. 
 
-
-
-
-
-And this is where you currently run into some serious Preview Release pain. As of Preview 5 Microsoft doesn't actually ship a Shared Runtime Installer that can run a .NET Core 3.0 Desktop application.
-
-
-
-
-## .NET Core Desktop Change
-
-
-To make that transition possible .NET 3.0 provides a new project type:
-
-```xml
-<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
-```
-
-a specific desktop framework target:
-
-```xml
-<UseWPF>true</UseWPF>
-```
-
-and the most important bit in my view, the Windows Compatibility layer:
-
-```xml
-<PackageReference 
-  Include="Microsoft.Windows.Compatibility" 
-  Version="2.0.1" />
-```  
-
-In combination these three items provide unique functionality to build desktop applications with .NET Core 3.0
-       
-## Distribution Choices
-So far I've talked about how to get my WPF to run on .NET Core. Aside from some of the edge cases that my particular application faced, moving to .NET Core from full framework is perhaps a bit tedious, but otherwise pretty straight forward. 
-
-But once you have your 
-
-### Summary
-
-Full .NET Framework is done and while it's totally fine to keep your existing .NET framework desktop application on .NET 4.x, if you want to keep moving forward and take advantage of the changes Microsoft is making to .NET and C#, then .NET Core is your only way forward. 
-
-Moving to .NET Core there's no guarantee that WPF or WinForms will see any meaningful changes, but at least with .NET Core the open source projects are likely to garner at least some improvements and fixes just by their open source nature. On full framework you're guaranteed that nothing will change.
-
-
-
-.NET Core also requires
-
-There are choices to make. .NET Framework provides a comfortable distribution model for applications especially for wide audience applications because the .NET Framework is just there. 
-
-
+But only time will tell...
