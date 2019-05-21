@@ -7,7 +7,7 @@ postDate: 2019-05-11T11:59:27.7074678-10:00
 
 At Build 2019 Microsoft announced the release dates of .NET Core 3.0 and the highly touted support for desktop platforms like **WinForms** and **WPF** later this year in September. Today theres's still a large developer base building desktop applications using these .NET Windows desktop frameworks and by using .NET Core 3.0 you can now build desktop applications on the .NET Core platform.
 
-Microsoft is accomplishing this task via a new Windows Desktop package (similar to the ASP.NET platform package), a desktop project type that knows about WinForms and WPF, and runtime NuGet packages that allow targeting desktop specific applications that can produce standalone .NET executables on .NET Core. The Windows support libraries provide access to all those Windows specific APIs that the .NET Core Runtime does not support.
+Microsoft is accomplishing this task via a new Windows Desktop package (similar to the ASP.NET platform package), a desktop project type that knows about WinForms and WPF, and runtime NuGet packages that allow targeting desktop specific applications that can produce standalone .NET executables on .NET Core. The Windows support libraries provide access to all those Windows specific APIs that the .NET Core Runtime does not support. 
 
 In this article I start by taking a look at what .NET Core support offers and what it means for existing desktop application, followed by a practical example of porting a production WPF desktop application to .NET Core to demonstrate what's involved in that process.
 

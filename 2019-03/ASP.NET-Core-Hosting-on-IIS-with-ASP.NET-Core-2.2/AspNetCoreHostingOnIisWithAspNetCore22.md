@@ -6,7 +6,7 @@ categories: ASP.NET Core, IIS
 weblogName: West Wind Web Log
 postId: 1188401
 permalink: https://weblog.west-wind.com/posts/2019/Mar/16/ASPNET-Core-Hosting-on-IIS-with-ASPNET-Core-22
-postDate: 2019-03-17T02:10:34.3710764-07:00
+postDate: 2019-03-16T23:10:34.3710764-10:00
 customFields:
   mt_githuburl:
     key: mt_githuburl
