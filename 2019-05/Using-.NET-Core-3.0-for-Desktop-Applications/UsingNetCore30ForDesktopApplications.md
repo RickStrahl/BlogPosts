@@ -62,7 +62,13 @@ One big complaint with full framework desktop applications has been that applica
 .NET Core addresses the problem by providing either side by side shared frameworks, or a fully self-contained install that contains all the runtime files directly with your application. This makes it possible to ensure that you have **exactly** the right version of the framework that matches is required to run your application, regardless what other applications are using and requiring. As long as a compatible shared runtime or a dedicated install is available the application can use that exact configuration.
 
 ### Use the New Project Style for Desktop Apps
-Along with the desktop specific runtimes there's also a new SDK style desktop project that you can use. This project style is much simpler and it has some basic understanding of features of both WinForms and WPF. The project file automatically pulls in all files, automatically compiles Xaml documents in WPF, automatically picks up resource depedencies in WebForms and so on. The end result is that you end up with a project file that is very simple to understand and reason about. Rather than adding every file to the project you want to compile, you only explicitly add files you want to exclude or have to perform special operations like **Copy to Output Directory** on content files.
+Along with the desktop specific runtimes there's also a new SDK style desktop project that you can use:
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+```
+
+This project style is much simpler and it has some basic understanding of features of both WinForms and WPF. The project file automatically pulls in all files, automatically compiles Xaml documents in WPF, automatically picks up resource depedencies in WebForms and so on. The end result is that you end up with a project file that is very simple to understand and reason about. Rather than adding every file to the project you want to compile, you only explicitly add files you want to exclude or have to perform special operations like **Copy to Output Directory** on content files.
 
 To be fair this feature is not tied to .NET Core 3.0 - you can also use this new project type with full framework projects. In fact as you'll see later in this article you can even multi-target both for .NET Framework **and** .NET Core from the same project.
 
