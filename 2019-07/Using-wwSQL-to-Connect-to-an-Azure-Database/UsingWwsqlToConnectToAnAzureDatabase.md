@@ -1,13 +1,15 @@
 ---
 title: Using FoxPro to Connect to an Azure SQL Database
 abstract: You can use FoxPro's SQL Server connectivity to connect to Microsoft's SQL Azure. This post describes a few things you have to do set up your application to work with Azure's SQL Server implementation which requires a little extra configuration work.
-categories: FoxPro, Azure, SQL Server
 keywords: FoxPro, SQL, Azure
+categories: FoxPro, Azure, SQL Server
 weblogName: Web Connection Weblog
 postId: 953
 postDate: 2019-07-21T14:02:02.2796691+02:00
 ---
 # Using FoxPro to Connect to an Azure SQL Database
+
+![](RemoteBanner.jpg)
 
 Several times now people have asked me whether you can use FoxPro's SQL Server features, and the [wwSQL class](https://client-tools.west-wind.com/docs/_s8x03tcfs.htm) in particular to connect to a remote Azure SQL database. The answer is a hearty **yes, of course**. 
 
@@ -57,11 +59,11 @@ You can do this in the portal by specifying any number of IP addresses here:
 
 ![](DatabaseIPAccess.png)
 
-As you can see you can specify a begin and end IP Address which is a range and each user or server requires a configuration (if they are not in the same location). For example, in this database Markus Egger and I work on this application and we both have multiple locations we're accessing the application from.
+As you can see you can specify a begin and end IP Address which is a range and each user or server requires a configuration (if they are not in the same location). For example, in this database Markus Egger and I work on, we both have multiple locations we're accessing that application from.
 
-Note that the Azure server locations if you are using an Azure Web application to connect, are automatically included so you don't have to explicitly enable those.
+Note that the Azure server locations, if you are using an Azure Web application to connect, are automatically included so you don't have to explicitly enable those.
 
-For a single IP use the same IP for both start and end ips. I tend to use the full range of the subnet just because an ISP often will change your IP Address when your address' lease expires.
+For a single IP address use the same IP for both start and end ips. I tend to use the full range of the subnet just because an ISP often will change your IP Address when your address's lease expires.
     
 If you forget to set the IP Address access the remote IP Address will not be exposed, and a connection attempt will hang typically for the timeout of the connection.
 
