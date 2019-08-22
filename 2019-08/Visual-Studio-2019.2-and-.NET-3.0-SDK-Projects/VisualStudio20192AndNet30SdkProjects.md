@@ -12,7 +12,7 @@ postDate: 2019-08-21T09:54:45.4024862-07:00
 
 ![](BrokenGlass.jpg)
 
-After upgrading to Visual Studio 2019.2.3 you may find that if you're using projects that use the .NET Core 3.0 SDKs will no longer work out of the box.
+After upgrading to Visual Studio 2019.2.3 you may find that if you're using projects that use the .NET Core 3.0 SDKs will no longer work out of the box. To be fair, Microsoft recommends that you use the VS 2019.3.x for working with .NET Core 3.0 and the 3.0 SDK, but up until recently working with the 3.0 SDK had been no problem even in the released, non-preview VS 2019.2.x releases.
 
 I have several 3.0 projects, but the one I use the most is my [Markdown Monster](https://markdownmonster.west-wind.com) project which is a .NET SDK WPF project that uses the new project format. This all worked perfectly fine in previously releases but after the update to 2019.2.3 I now get this:
 
@@ -33,10 +33,14 @@ The frustrating thing is that the proper SDKs are installed and Visual Studio no
 That's not an improvement!
 
 ### 3.0 SDK Required!
-The problem in the project above is that it's a .NET SDK project that **requires** the V3.0 SDK as it uses WPF which is part of the Windows platform support that was added in the 3.0 SDK versions. This project type doesn't work in older pre-3.0  versions of the SDK. So while other .NET Core 2.x projects compile just fine using the defaults, this particular project does not, even though the proper 3.0 Preview SDK is in fact installed. This worked before, but now fails.
+The problem in the project above is that it's a .NET SDK project that **requires** the V3.0 SDK as it uses WPF which is part of the Windows platform support that was added in the 3.0 SDK versions. This project type doesn't work in older pre-3.0  versions of the SDK. 
 
-### Fix It with global.json - sort of
-The solution to SDK versioning problems in projects or Solutions is to use a `global.json` file in the Solution root to **specify a specific version of an SDK** to use with your project.
+So while other .NET Core 2.x projects compile just fine using the defaults, this particular project does not, even though the proper 3.0 Preview SDK is in fact installed. This worked before, but now fails.
+
+The failure is due to a change in Visual Studio that no longer looks at preview SDKs by default. So it finds the latest 2.x **release SDKS** but not the 3.0 preview SDKs - by default. Hrrmpf.
+
+### Overriding the SDK used with global.json - sort of
+The solution to SDK versioning problems in projects or Solutions is to use a `global.json` file in the project or solution root to **specify a specific version of an SDK** to use with your project or solution.
 
 In there I can specify a specific version of my SDK I want to use for this project/solution:
 
@@ -48,28 +52,35 @@ In there I can specify a specific version of my SDK I want to use for this proje
 }
 ```
 
-That works, but it is a **terrible** solution to this problem. It sucks because now I'm pinning my solution to a very specific (preview) version of the SDK. Since this project lives on Github and is shared anybody using the project now too ends up needing to use this same version of the SDK. Worse - if SDKs are updated now, I have to remember to update the `global.json` version to get the latest SDK, instead of the latest installed.
+That works, but it is a **terrible** solution to this problem. It sucks because now I'm pinning my solution to a very specific (preview) version of the SDK. Since this project lives on GitHub and is shared anybody using the project now too ends up needing to use this same version of the SDK if I check in `global.json`. Alternately I can not check it in, in which case the project just won't build unless a Preview release of VS is used. Bah!
 
-For now I decided to **not include the global.json in the Github repo**, which is also a sucky proposition as that likely means that after people pull the project it likely won't build unless a `global.json` is explicitly added with a valid SDK version.
+Maybe even worse using global.json, if SDKs are updated now, I have to remember to update the `global.json` version to get the latest SDK rather than the one that now is pinned in `global.json`.
 
-I tried using more generic version numbers (3.0 and 3.0.*), but no luck with that - the only thing that worked for me was using a very specific version number.
+I tried using more generic version numbers (3.0 and 3.0.*) which seems like a logical and expressive solution to this problem, but that doesn't appear to work - the only thing that worked for me was using a very specific version number.
 
-### This needs to be Fixed
-I'm not sure how this went through Quality Control and still has not been fixed even though there has been another point update to Visual Studio 2019.2, but I'm hoping this is a glitch in the SDK installation/configuration routines in Visual Studio and not by design.
+### Use Previews of the .NET Core SDK Setting in Visual Studio
+Of course moments after I posted somebody from Microsoft mentioned that *"there's a switch for that!"*, that you can set in the current 2019.2 release of Visual Studio to force it to also look at preview SDKs for versioning.
 
-There have been a lot of cries for help on this on Twitter, and on various mailing lists. This behavior is just very unexpected, and the error messages don't make it obvious what's wrong, much less provide hints on how to fix it.
+You can use **Tools->Options->Environment->Preview Features** to specify that you want to enable Preview SDKs:
 
-Part of the caveat here is that 2019.2 isn't specifically designed to work with 3.0 anything at this point is still designated as preview. B
+![](UsePreviewSdks.png)
 
-But still Microsoft has to know that lots of people are using the newer SDKs at least especially since this has all been working just fine for quite a while. I've been using the 3.0 SDK with Markdown Monster for a half a year at least in the RTM (not preview) versions of Visual Studio with no issues until recently.
+ This enables finding the latest version rolling forward to the latest preview SDK installed. 
+ 
+ After setting that switch - my project now works without requiring an explicit `global.json`.
+ 
+### Use Visual Studio Preview 2019.3
+Another option is to use the latest Preview release of Visual Studio - VS 2019.3 which has support for .NET Core 3.0 and the 3.0 SDKs and defaults to using the 3.0 .NET Preview SDKs. It automatically recognizes the current preview SDKs.
 
-I tried to figure out how Visual Studio is actually determining which SDK to use in lieu of a `global.json` but I see no obvious configuration setting for that.
+This is what Microsoft recommends currently if you are working with .NET Core 3.0 and any of the newer SDK style projects like WPF/WinForms, but these previews have been a bit shaky for my tastes with lots of instabilities especially with Extension tooling.
 
-There needs to be better support for this. At minimum the project should clearly show what SDK it is using and then perhaps allow easy options to choose one of the installed SDKs. More importantly though there really needs to be an option to choose an SDK level (ie. I don't care which specific version you use but use a 3.x version of the  SDK) so that my project at least builds.
-
+### SDK Tooling Delivery and Usage Improvements?
 Microsoft has stated that they are [trying to address the SDK install problems](https://devblogs.microsoft.com/dotnet/improving-net-core-installation-in-visual-studio-and-on-windows/) and that the current releases (rtm and preview) of Visual Stuio are starting to reflect that. The new SDK installers are supposed to clean up old SDKs and leave behind only one version plus specific preview SDKs. Since SDKs are backwards compatible and can compile older versions or project formats there should be little reason to keep older SDKs around.
 
-That sounds good on paper, but whatever is happening in this current release is not working as expected. Hopefully, this will get addressed quickly as this is an annoying quirk that's biting a lot of people.
+We can hope that this will get better as time goes on. This issue certainly was confusing and frustrating to me - one minute it works, next you update and it doesn't which is never a good experience.
+
+It took a note from a Microsoft developer to find the Preview switch in options, but this sort of thing should be more prominently displayed in error messages like the message that shows in the output window. 
+
 
 <div style="margin-top: 30px;font-size: 0.8em;
             border-top: 1px solid #eee;padding-top: 8px;">
