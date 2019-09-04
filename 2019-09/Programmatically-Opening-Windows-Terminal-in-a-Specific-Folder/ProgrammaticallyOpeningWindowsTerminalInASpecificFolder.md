@@ -1,12 +1,16 @@
 ---
 title: Programmatically Opening Windows Terminal in a Specific Folder
 abstract: The new Windows Terminal provides many cool new features and much improved Terminal performance which makes it very desirable to use even in its current preview state. However, unfortunately the Terminal currently lacks a command line interface to control startup, do if you want to externally launch a shell some workarounds are required to get it to start out of a specific folder.
-keywords: Windows, Windows Terminal, Terminal
-categories: Windows
+keywords: Windows, Windows Terminal, Terminal,.NET
+categories: Windows, .NET
 weblogName: West Wind Web Log
 postId: 1378839
 permalink: https://weblog.west-wind.com/posts/2019/Sep/03/Programmatically-Opening-Windows-Terminal-in-a-Specific-Folder
 postDate: 2019-09-03T17:06:58.8783960-07:00
+customFields:
+  mt_githuburl:
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2019-09/Programmatically-Opening-Windows-Terminal-in-a-Specific-Folder/ProgrammaticallyOpeningWindowsTerminalInASpecificFolder.md
 ---
 # Programmatically Opening Windows Terminal in a Specific Folder
 I've been using Windows Terminal for a while now since it was announced and made available [in the Windows Store](https://www.microsoft.com/en-us/p/windows-terminal-preview/9n0dx20hk701?activetab=pivot:overviewtab) a few months back. 
@@ -71,9 +75,17 @@ MM does this from number of places:
 
 I get a lot of use out of that feature and I suspect others use it quite a bit as well especially given several of the Window Terminal requests.
 
-Unfortunately if I want to use `wt.exe` as my shell option, I can't pass automate the command parameters the way I currently do, which by using custom launch commands in the shell to open a folder.
+Unfortunately if I want to use `wt.exe` as my shell option, I can't pass the command parameters the way I currently do with the other shells, which is by using custom launch commands in the shell to change to a specific folder.
 
-I also can't specify which configured terminal to start up via code at this time - basically all you can do is `wt.exe` and hope for the best.
+For example for the default Powershell terminal the default is:
+
+```ps
+powershell.exe     -NoExit -Command  "& cd '{0}'"
+```
+
+Since Windows Terminal is really a shell host, rather than an actual shell, you can't pass parameters directly to the shell. `wt.exe` currently doesn't have any command line parameters (AFAIK) so there's no way to set the working folder or push a command to the launched shell.
+
+I also can't specify which configured terminal to start up via an option  - basically all you can do is `wt.exe` without arguments at the moment and hope for the best.
 
 ## Automating anyway
 To launch Windows Terminal programmatically I can use code like the following:
@@ -89,20 +101,18 @@ Process.Start(pi);
 
 and that works, **except it fails to load out of the `WorkingDirectory`**.
 
-The problem with this approach is that you get only the default configuration, and the folder - even though set via the `WorkingDirectory` in the start info - is completely ignored by the `wt.exe` startup. Hrmph!
+The problem with this approach is that you get only the default configuration, and the folder - even though set via the `WorkingDirectory` in the start info - is completely ignored by the `wt.exe` startup due to a default profile setting. Hrmph!
 
 ### Windows Terminal Profiles
-The bad news is that currently you can't force the folder externally via a startup command yet.
+The bad news is that you can't pass a working folder to `wt.exe` via a startup command yet.
 
-You **can** however customize the startup Profile and change it so the profile starts the shell in the currently selected folder. You can make a change to a configuration key in the default profile.
+What you **can** do however is to customize the startup Profile and change it so the profile starts the shell in the currently active folder. You can make a change to a configuration key in the default Windows Terminal Shell profile.
 
-While this works, it means **it's up to the user to customize their default profile**, which isn't terribly user friendly, but it's a workaround for now.
+This works, but it means **it's up to the user to customize their default profile**, which isn't terribly user friendly, but it's a workaround that works for now.
 
-You can access the Windows Terminal profile at:
+You can access the Windows Terminal profile JSON file by going to Settings in the Terminal itself using the down button:
 
-<small><b>
-%USERPROFILE%\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\RoamingState\profiles.json
-</b></small>
+![](SettingsOption.png)
 
 If you edit that file you'll find:
 
