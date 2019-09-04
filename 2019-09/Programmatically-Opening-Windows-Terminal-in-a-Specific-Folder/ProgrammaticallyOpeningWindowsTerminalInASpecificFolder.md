@@ -44,12 +44,21 @@ or by using the installed shortcut.
 
 One problem currently is that you can't easily automate the terminal application when it launches. There are **no command line options** supported yet (although there's discussion around this and it will come eventually), which means you can't start up the shell in a specific folder, execute a startup command or even pick a profile to start with.
 
-## Automating anyway
 Recently I had several people asking about Windows Terminal in [Markdown Monster](https://markdownmonster.west-wind.com):
 
 > How can I launch Windows Terminal as my Terminal Viewer in Markdown Monster
 
-Markdown Monster has configuration options that let you customize the Terminal executable and Command Arguments so you can customize which terminal gets launched with the various folder options in the program from various context menu options:
+The short answer is:
+
+* You can customize the startup default Terminal Shell Profile
+* Set `"startingDirectory" : "%__CD__%"`   
+which starts the Shell out of the active OS folder
+* Side effect: Windows shortcut launching launches from System folder
+
+For more information read on.
+
+## Markdown Monster and Terminals
+Markdown Monster has configuration options that let you customize the Terminal executable and Command Arguments so you can customize which terminal gets launched. The default is Powershell but it's easy to add a commandline to switch the `Cmd.exe` or WSL or another version of Bash. In the program the terminal launching is provided via context menu options from with from various folder related operations:
 
 ![](MarkdownMonsterTerminalContextMenu.png)
 
@@ -66,6 +75,7 @@ Unfortunately if I want to use `wt.exe` as my shell option, I can't pass automat
 
 I also can't specify which configured terminal to start up via code at this time - basically all you can do is `wt.exe` and hope for the best.
 
+## Automating anyway
 To launch Windows Terminal programmatically I can use code like the following:
 
 ```csharp
@@ -105,9 +115,9 @@ Each profile has a `guid` key that uniquely identifies it and the startup profil
 ### Forcing the Startup Path
 So in Markdown Monster I would love to use Windows Terminal and after searching around a little bit unsuccessfully to find command line options I posted a message on Twitter asking if anybody had gotten this launching WT in a specific folder to work.
 
-[@Christof](Janshttps://twitter.com/ChristofJans) ended up helping me out:
+[@ChristofJans](https://twitter.com/ChristofJans) ended up helping me out:
 
-![](ProfileTweet.png)
+[![](ProfileTweet.png)](https://twitter.com/RickStrahl/status/1169014217929908224)
 
 Here are the relevant keys:
 
