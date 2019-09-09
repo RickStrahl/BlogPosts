@@ -1,8 +1,8 @@
 ---
 title: Programmatically Opening Windows Terminal in a Specific Folder
 abstract: The new Windows Terminal provides many cool new features and much improved Terminal performance which makes it very desirable to use even in its current preview state. However, unfortunately the Terminal currently lacks a command line interface to control startup, do if you want to externally launch a shell some workarounds are required to get it to start out of a specific folder.
-keywords: Windows, Windows Terminal, Terminal,.NET
 categories: Windows, .NET
+keywords: Windows, Windows Terminal, Terminal,.NET
 weblogName: West Wind Web Log
 postId: 1378839
 permalink: https://weblog.west-wind.com/posts/2019/Sep/03/Programmatically-Opening-Windows-Terminal-in-a-Specific-Folder
@@ -13,9 +13,9 @@ customFields:
     value: https://github.com/RickStrahl/BlogPosts/blob/master/2019-09/Programmatically-Opening-Windows-Terminal-in-a-Specific-Folder/ProgrammaticallyOpeningWindowsTerminalInASpecificFolder.md
 ---
 # Programmatically Opening Windows Terminal in a Specific Folder
-I've been using Windows Terminal for a while now since it was announced and made available [in the Windows Store](https://www.microsoft.com/en-us/p/windows-terminal-preview/9n0dx20hk701?activetab=pivot:overviewtab) a few months back. 
+I've been using Windows Terminal for a while now since it was announced and made available [in the Windows Store](https://www.microsoft.com/en-us/p/windows-terminal-preview/9n0dx20hk701?activetab=pivot:overviewtab) a few months back.
 
-![](WindowsTerminal.png)
+![](WindowsTerminal.png) 
 
 There are lots of reasons to like this new Terminal and I don't want to get into all of them here. For me, the main reason is that it ships with a new `ConHost.exe`, that is considerably faster than the ConHost shipped with Windows which results in much faster terminal painting and scrolling.
 
@@ -40,7 +40,7 @@ To make it easy to load, Microsoft provides a globally mapped executable - `wt.e
 
 You can launch Windows Terminal from anywhere with:
 
-```
+```ps
 wt.exe
 ```
 
@@ -148,14 +148,14 @@ Here are the relevant keys:
 
 The gist of is that by default all profiles are configured with a hard coded `startingDirectory` setting to the user profile
 
-```
+```json
 "startingDirectory" : "%USERPROFILE%","
 ```
 
 You can change this folder to use the active working directory with the following change:
 
 ```json
-"startingDirectory" : "%__CD__%",
+"startingDirectory" : "%__CD__%"
 ```
 
 And voila WT now opens in the specified path if you set the path prior or provide a `WorkingDirectory` to the CreateProcess APIs.

@@ -6,7 +6,7 @@ categories: ASP.NET Core
 weblogName: West Wind Web Log
 postId: 1283920
 permalink: https://weblog.west-wind.com/posts/2019/Jun/03/Building-Live-Reload-Middleware-for-ASPNET-Core
-postDate: 2019-06-03T10:17:45.8069309-10:00
+postDate: 2019-06-03T13:17:45.8069309-07:00
 ---
 # Building a Live Reload Middleware Component for ASP.NET Core
 
@@ -102,7 +102,7 @@ And you can use these configuration settings:
     "ClientFileExtensions": ".cshtml,.css,.js,.htm,.html,.ts,.razor,.custom",
     "ServerRefreshTimeout": 3000,
     "WebSocketUrl": "/__livereload",
-    "WebSocketHost": "ws://localhost:5000"
+    "WebSocketHost": "ws://localhost:5000",
     "FolderToMonitor": "~/"
   }
 }
