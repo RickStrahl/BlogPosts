@@ -12,7 +12,7 @@ postDate: 2019-09-24T12:34:26.5276731-07:00
 
 ![](AlbumViewerBanner.jpg)
 
-ASP.NET Core 3.0 shipped yesterdaym and it's a big release with many new features and a huge batch of performance updates. Although this is a major release that touches a lot of the existing framework code, a lot of the big changes happen under the covers. For the most part this is an incremental update and doesn't require monumental changes to upgrade. Some changes are required to be sure - mainly in the `Startup` class configuration - but considering the feature changes and enhancements they are pretty tame.
+ASP.NET Core 3.0 shipped yesterday and it's a big release with many new features and a huge batch of performance updates. Although this is a major release that touches a lot of the existing framework code, a lot of the big changes happen under the covers. For the most part this is an incremental update and doesn't require monumental changes to upgrade. Some changes are required to be sure - mainly in the `Startup` class configuration - but considering the feature changes and enhancements they are pretty tame.
 
 To give an idea of what's involved in updating an application - even if a very small one -  I'll describe the steps I went through to upgrade my AlbumViewer Angular ASP.NET Core application from .NET Core 2.2 to 3.0 as I've done for most of the previous major releases.
 
