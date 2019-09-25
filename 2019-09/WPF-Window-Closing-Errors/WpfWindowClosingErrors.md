@@ -7,6 +7,10 @@ weblogName: West Wind Web Log
 postId: 1383816
 permalink: https://weblog.west-wind.com/posts/2019/Sep/02/WPF-Window-Closing-Errors
 postDate: 2019-09-02T11:07:48.1917660-07:00
+customFields:
+  mt_githuburl:
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2019-09/WPF-Window-Closing-Errors/WpfWindowClosingErrors.md
 ---
 # WPF Window Closing Errors
 
@@ -81,9 +85,13 @@ This was my initial fix and while it worked to bring down the error counts, it d
 ## Deferring Close() Handler Logic
 In the MahApps Github issue @batzendev provided the solution, but initially I figured this would be difficult to manage deferring operations because of the potential to abort shutdown. But after I continued to see errors with the simple solution above, I realized this had to be fixed properly using deferred execution as @batzendev suggested..
 
-The idea is that the Close() handler shouldn't execute any code directly but always defer operation. To make this work the handler should by default always be set to not close the form **unless an explicit flag is set to force the form closed**. IOW, the application has to be in charge of when to actually shut down the window. Anything that fires `OnClosing()` is initially deferred.
+The idea is that **the Close() handler shouldn't execute any code directly** but always defer operation. To make this work the handler by default shouldn't close the form, **unless an explicit flag is set to force it to be closed**. IOW, the application has to be in charge of when to actually shut down the window rather than `OnClosing()` on its own. As a result anything that fires `OnClosing()` is initially deferred, until the closing logic decides that the form should indeed be closed. 
 
-Luckily WPF makes deferring operations pretty easy using a Dispatcher and Async invocation. The only other thing needed is the logic to flag the shutdown operation via a `ForceClose` flag.
+This allows for the closing abort scenarios such as when there are open, unsaved documents and the user decides to Cancel and keep the app open. In that case, the `ForceClose` flag is left unset and the method returns, leaving the form open. Otherwise, the flag is set and the `Close()` method is called again with the `ForceClose` flag set which causes the form to immediately close. 
+
+This frees WPF from having to potentially fight with multiple close operations because the actual `OnClosing()` code has been distilled down to a very quick binary operation.
+
+Luckily WPF makes deferring operations pretty easy to implement using a Dispatcher and Async invocation. The only other thing needed is the logic to flag the shutdown operation via a `ForceClose` flag.
 
 Here's what that code looks like:
 
@@ -128,19 +136,12 @@ private void ShutdownApplication()
             return;
         }
 
-        // hide the window quickly
-        Top -= 10000;
-
-        FolderBrowser?.ReleaseFileWatcher();
-        bool isNewVersion = CheckForNewVersion(false, false);
-
         PipeManager?.StopServer();
 
         AddinManager.Current.RaiseOnApplicationShutdown();
         AddinManager.Current.UnloadAddins();
         
         App.Mutex?.Dispose();
-        PipeManager?.WaitForThreadShutDown(5000);
         mmApp.Shutdown();
 
         // explicitly force the window to close
@@ -154,7 +155,7 @@ private void ShutdownApplication()
 }
 ```
 
-The key here is that any call to `OnClosing()` immediately returns with the Window not left in a closing state **except when the ForceClose flag is set to `true`**. When starting the shutdown logic, the code just calls an async dispatcher, but leaves the closing state unset. This means the code keeps running while the actual closing processing is handled in the separate operation that on the Dispatcher. 
+The key here is that any call to `OnClosing()` **immediately returns** with the Window not left in a closing state **except when the ForceClose flag is set to `true`**. When starting the shutdown logic, the code just calls an async dispatcher, but leaves the closing state unset. This means the code keeps running while the actual closing processing is handled in the separate operation that fires on the Dispatcher. 
 
 If `OnClosing()` is actually going to close, the closing logic then explicitly call the `CloseForced()` method to  explicitly close the form. The code boils down to this:
 
@@ -172,7 +173,7 @@ CloseForced();
 This solution is hacky, but it seems to work well. Initially I thought it was going to be difficult to handle the out of band logic of prompting for confirmation on open documents but due to the easy way you can use Dispatchers that really isn't an issue - you can just throw those operations onto an out of band dispatcher operation and it just works. Nice.
 
 ## Proof's in the Pudding
-The change has been running in Markdown Monster for a couple of weeks now and and since implementation the errors in the logs have disappeared for the new versions. Big improvement and a much cleaner log although I see plenty of the errors from previous versions.
+The change has been running in Markdown Monster for a couple of weeks now and and since implementation the errors in the logs have disappeared for the new versions. Big improvement and a much cleaner log although I see plenty of the errors from previous versions but that will rollof soon.
 
 ## Summary
 This is an edge case error and workaround, but it's common enough based on the number of questions I've seen in regards to this error message while tracking this down. The solution is pretty simple once you understand the problem and how to offload the `OnClosing()` logic via out of band operation on a Dispatcher.

@@ -3,7 +3,7 @@ title: Controlling the JSON.NET Version in wwDotnetBridge with Assembly Redirect
 abstract: JSON.NET is the most popular .NET component used in more components than any other and because of that you can end up finding other components that also use JSON.NET and perhaps with a different version. Trying to load a different version of JSON.NET in an application can cause runtime failures for loading the assembly. The workaround is to use .NET Assembly Redirects in the application's .config file. Here's how to do this.
 keywords: JSON.NET,FoxPro,wwdotnetBridge
 categories: FoxPro,wwDotnetBridge
-weblogName: West Wind Web Log
+weblogName: Web Connection Weblog
 postId: 927
 postDate: 2018-09-17T11:24:31.0762884-07:00
 ---
@@ -56,7 +56,7 @@ The following is an example of `.config` file that forces JSON.NET usage of any 
     <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
       <dependentAssembly>
         <assemblyIdentity name="Newtonsoft.Json" publicKeyToken="30ad4fe6b2a6aeed" culture="neutral" />
-        <bindingRedirect oldVersion="0.0.0.0-6.0.0.0" newVersion="8.0.0.0" />
+        <bindingRedirect oldVersion="0.0.0.0-11.0.2.0" newVersion="11.0.2.0" />
       </dependentAssembly>
 	</assemblyBinding>      
   </runtime>
@@ -76,6 +76,3 @@ This approach can however also fail if you have component that is not backwards 
 Version conflicts can be painful, and the error messages you get for version conflicts are often not very conclusive and seem to point to other issues (the usual error is: Unable to load dependent assembly) and the worst part is that usually the .NET error message doesn't provide any information on which sub-component failed to load.
 
 The first line of defense are assembly redirects that you can specify in your application's `.config` file and in most common version conflict situations this the solution as is the case for JSON.NET version conflicts which is probably the most common one you might run into.
-
-
-
