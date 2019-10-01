@@ -7,6 +7,10 @@ weblogName: West Wind Web Log
 postId: 1404094
 permalink: https://weblog.west-wind.com/posts/2019/Sep/30/Serving-ASPNET-Core-Web-Content-from-External-Folders
 postDate: 2019-09-30T08:15:12.8759172-10:00
+customFields:
+  mt_githuburl:
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2019-09/Serving-ASP.NET-Core-Web-Content-from-External-Folders/ServingAspNetCoreWebContentFromExternalFolders.md
 ---
 # Serving ASP.NET Core Web Content from External Folders
 
@@ -16,6 +20,7 @@ ASP.NET Core makes it easy to create a Web application regardless of whether you
 
 I love the fact that you can easily create a self-contained, **local** web server with ASP.NET Core. I have a lot of scenarios in desktop applications that need access to local Web content for rendering or preview functionality and having a quick way to display content is useful. I also have a host of local static documentation sites that I need to often tweak the HTML with and having a local Web Server that includes LiveReload functionality is very useful for quickly making small quick-fix changes.
 
+## Standalone Generic Local Web Server in .NET
 One scenario I've been thinking about recently is to build a generic Web server that makes it easy to serve Web content **from an arbitrary local folder - generically**. Yeah, I know there are lots of NodeJs tools that do this, but **it's just as easy to create a standalone server in .NET now**. By writing my own I can customize and **provide exactly the features I need**.
 
 It's easy to build and just as easy to then publish that customized generic server as a .NET tool or as a self-contained EXE, so it's easy to share - even if it's just for myself on other machines. 
