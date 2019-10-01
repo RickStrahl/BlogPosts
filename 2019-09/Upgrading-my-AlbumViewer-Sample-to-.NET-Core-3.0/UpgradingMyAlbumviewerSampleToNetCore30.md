@@ -1,7 +1,7 @@
 ---
 title: Upgrading my AlbumViewer Sample Application to ASP.NET Core 3.0
 abstract: .NET Core 3.0 is here and in this post I describe the process of updating an existing ASP.NET Core Angular API application to this latest release. For the most part the update process is very smooth with a few configuration changes required, but there are also a few gotchas that have bitten me and I'll cover those here.
-keywords: ASP.NET Core 3.0,Upgrade,Installation,Configuration,EF Core
+keywords: ASP.NET Core 3.0, Upgrade, Installation, Configuration, EF Core
 categories: ASP.NET Core
 weblogName: West Wind Web Log
 postId: 1399487
@@ -43,7 +43,9 @@ The second thing that is very noticable is that performance of .NET Core 3.0 app
 I tend to run projects with `dotnet watch run` from the command line and the auto-restarts now seem considerably quicker than in 2.x. 
 
 ## .NET Core 3.0 Updates
-Ok, so now let's take a look through a few of the changes I had to make to the AlbumViewer application in order to make it work with .NET Core 3.0. All of these are configuration changes that are essentially isolated to `Startup.cs`, which is a testament to the nice organization of configurability in ASP.NET Core. While configuration can become quite complex in large projects, at least it's easy to find where you need to look for the configuration options.
+Ok, so now let's take a look through a few of the changes I had to make to the AlbumViewer application in order to make it work with .NET Core 3.0. All of these are configuration changes that are isolated to `Startup.cs`, which is a testament to the nice organization of configurability in ASP.NET Core. While configuration can become quite complex in large projects, at least it's easy to find where you need to look for the configuration options.
+
+You can see most of the updates in [this commit on GitHub](https://github.com/RickStrahl/AlbumViewerVNext/commit/8a48e63ee60d04df05fe48a247cbd7ae29b6e31d).
 
 ### EndPoint Routing
 One of the new features of ASP.NET Core that was already introduced in 2.2 and has been moved front and center in 3.0 is **[EndPoint Routing](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/routing?view=aspnetcore-3.0)**.
@@ -232,17 +234,17 @@ In 2.2 I used the above Policy definition in `ConfigureServices()` and then appl
 
 In 3.0 it looks like you're supposed to explicitly attach the policy to an endpoint.  You still need to specify `app.UseCors()` (without a policy just to enable it), and then add it to the controller mapping:
 
-**new (but doesn't work!)
+**new (but doesn't work!)**
 
 ```cs
-app.UseCors()
+app.UseCors(); // enable CORS
 
 ...
 
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers()
-        .RequireCors("CorsPolicy");  
+        .RequireCors("CorsPolicy");   // set a specific policy
 });
 ```
 
@@ -253,9 +255,9 @@ I had to go back to the original `app.UseCors("CorsPolicy")` to get CORS work...
 This is a bit frustrating. The CORS documentation is very complex mainly because there are a number of combinations, and the fact that there seems to be some duplication and non-functionality of features seems odd.,
 
 ## IHostingEnvironment to IWebHostEnvironment
-Another minor change due to the endpoint routing changes is that the Startup class now by default injects an `IWebHostEnvironment` instead of a more generic `IHostEnvironment`. The naming reflects Web specific features as well as some new functionality that's more specific to Web applications.
+Another minor modification due to the endpoint routing changes is that the Startup class now by default injects an `IWebHostEnvironment` instead of a more generic `IHostEnvironment`. The naming reflects Web specific features as well as some new functionality that's more specific to Web applications.
 
-The change is basically a search and replace for `IHostingEnvironment` to `IWebHostingEnvironment`. This affects the startup class and any other places where you might be injecting the hosting environment. In my AlbumViewer I use the Hosting Environment to extract some status information about the application to be displayed in the about page as well as finding the Content and Web roots for the application for reading the intial album data file for import.
+The change is a search and replace for `IHostingEnvironment` to `IWebHostingEnvironment`. This affects the startup class and any other places where you might be injecting the hosting environment. In my AlbumViewer I use the Hosting Environment to extract some status information about the application to be displayed in the about page as well as finding the Content and Web roots for the application for reading the intial album data file for import.
 
 ## Entity Framework 3.0 Fail
 The final migration bits are related to Entity Framework and here I ran into some serious issues that I couldn't resolve. In fact I ended up going back to EF Core 2.2 because EF Core 3.0 just didn't work correctly with the data I was working with even for a really simple use case.
@@ -287,25 +289,24 @@ public async Task<List<Album>> GetAllAlbums(int page = 0, int pageSize = 15)
 
 Yet it fails. I couldn't find a workaround and [an issue on GitHub is pending for this](https://github.com/aspnet/EntityFrameworkCore/issues/18007).
 
-There were also changes in the way that child entities are handled in one to many relationships - whereas in previous versions you didn't have to explicitly have to  `Context.Add()` new or `Context.Update()` existing entities when you added them to a loaded parent object, you now **always** have to explicit add, update and remove entities. This is perhaps more consistent as there can be scenarios where your entity may not be loaded from the DB and so adding wouldn't do anything, but still this is a breaking change that is likely to affect a lot of people because it worked previously. In my scenario I didn't have any places where this was an issue but in several other applications I did.
-
+There were also changes in the way that child entities are handled in one to many relationships - whereas in previous versions you didn't have to explicitly have to  `Context.Add()` new or `Context.Update()` existing entities when you added them to a loaded parent property collection, you now **always** have to explicit add, update and remove entities. This is perhaps more consistent as there can be scenarios where your entity may not have been loaded from the DB yet, and so adding wouldn't do anything, but still this is a breaking change that is likely to affect a lot of people because it worked previously. In my scenario I didn't have any places where this was an issue but in several other applications I did. This can be problematic because you won't see those breaks show up until runtime.
 
 ### Roll back to Entity Framework 2.2
-The first problem above though was a show stopper for me. I couldn't get past that issue, so I ended up rolling back to EF Core 2.2 which just worked  without the former error.
+The first problem above was a show stopper for me. I couldn't get past that issue, so I ended up rolling back to EF Core 2.2 which just worked properly returning the result set with its children as expected.
 
 The good news is that EF Core 2.2.6 works just fine in .NET Core 3.0 applications - I didn't see any side effects due to old dependencies and existing functionality worked just fine with the 2.2.6 libraries. For now and for me at least I can't justify dealing with the issues in EF Core 3.0.
 
-This is obvious not idea, but until EF Core 3.0 can iron out some of these issues using 2.2 is the only way I can move forward for the moment.
+This is obvious not ideal, but until EF Core 3.0 can iron out some of these issues using 2.2 is the only way I can move forward for the moment.
 
 ### EF Core Problems Continue
-It's disheartening to see where EF Core is headed. This and previous releases removed features, changed a number of core behaviors, and apparently has a number of show stopper issues that as far as I can tell don't have a workaround.
+It's disheartening to see where EF Core is headed. This and previous releases removed features, changed a number of core behaviors, and apparently has a number of show stopper issues that as far as I can tell don't have a workaround. While I'm sure these initial release issues will get addressed quickly in patch releases, I do wonder how a bug like the child entity loading ever made it into production - this has to be a very common scenario that just about every application uses.
 
-Database applications are at the core of the vast majority of applications that are built, and having a solid data stack is a vital component of any application stack. EF Core seems barely able to fill that role. While there are better alternatives, they are not an easy sell with many customers due to the perception that EF comes from Microsoft and so that has to be the good enough solution. Only it shouldn't be the *good enough* data solution, it should be as kick ass as the rest of the .NET stack.
+Database applications are at the core of the vast majority of applications that are built today, and having a solid data stack is a vital component of any application stack. EF Core seems barely able to fill that role. While there are better alternatives, they are not an easy sell with many customers due to the perception that EF comes from Microsoft and so that has to be the good enough solution. Only it shouldn't be the *good enough* data solution, it should be as kick ass as the rest of the .NET stack. It is not - it's been a real struggle to work with EF Core since the beginning and it's not really getting better as new versions are coming out.
 
-I realize that it's difficult to build a reliable, consistent and performant data access layer/platform and that it takes time to get that right. But at the same time the EF Core team has had a **lot of time** and 3 major versions (with several major sub-versions) to build out a mature and reliable platform. Instead EF Core still feels like a V1 product with all the inherent inconsistencies and behavior and API changes.
+I realize that it's difficult to build a reliable, consistent and performant data access layer/platform, and that it takes time to get that right. But at the same time the EF Core team has had the benefit of the doubt for 3 major versions (with several major sub-versions) to build out a mature, stable and reliable platform. Instead EF Core still feels like a V1 product with all the inherent inconsistencies and behavior and API changes. It's one thing if you see this from a vendor or third party but quite another when it's the 'official data platform' for the entire .NET platform.
 
 ## Summary
-Overall the upgrade process for ASP.NET Core 3.0 was pretty painless. The bulk of it - sans the debugging of the EF Core data issue and the CORS config issue - took around 20 minutes. The data issue took a while to track down and then some additional time going back to EF Core 2.2 and re-testing. But even so the process is relatively minor as there are just a few places that need to be updated.
+Overall the upgrade process for ASP.NET Core 3.0 was pretty painless. The bulk of it - sans the debugging of the EF Core data issue and the CORS config issue - took around 20 minutes. The data issue took a while to track down and then some additional time going back to EF Core 2.2 and re-testing. Plus time to report and follow up on it with Microsoft. But even so the process is relatively minor as there are just a few places that need to be updated.
 
 At the end of the day make sure you double check each of the Startup class configuration section for things like Authentication, CORS, Routing, Logging and see if the syntax or behavior has changed.
   
