@@ -466,7 +466,13 @@ If all goes well you should then be able to run the tool:
 LiveReloadServer --WebRoot c:\temp\MySite\web
 ```
 
-If that all works, the next step is to publish the package to NuGet. I like to use the [NuGet Package Explorer](https://github.com/NuGetPackageExplorer/NuGetPackageExplorer) for this (but you can also use command line tools to do it if you choose):
+If that all works, the next step is to publish the package to NuGet. In order to publish to NuGet you need to set up an account on the [NuGet Web site](https://www.nuget.org/). Once you have an account you can generate a NuGet publisher Id which you can then use to publish your packages. Packages can be published using [`nuget push ` from the command line](https://docs.microsoft.com/en-us/nuget/reference/cli-reference/cli-ref-push).
+
+```cs
+nuget push  -ApiKey YourKeyHere ./nupkg/LiveReloadServer.0.1.1.nupkg
+```
+
+Personally, I like to use the [NuGet Package Explorer](https://github.com/NuGetPackageExplorer/NuGetPackageExplorer) for this (but you can also use command line tools to do it if you choose) since pushing a package is generally a last step that I'd rather perform explicitly anyway.
 
 ![](NuGetPackageExplorer.png)
 
@@ -478,13 +484,13 @@ Once pushed to NuGet you can now install the global tool on any machine that has
 dotnet tool install LiveReloadServer -g
 ```
 
-and then run it:
+and then run it from anywhere on the local machine:
 
 ```ps
-# run in current folder
+# run site in current folder
 LiveReloadServer
 
-#specify a WebRoot
+#specify a WebRoot to run site in
 LiveReloadServer --WebRoot c:/temp/mysite/web
 ````
 
