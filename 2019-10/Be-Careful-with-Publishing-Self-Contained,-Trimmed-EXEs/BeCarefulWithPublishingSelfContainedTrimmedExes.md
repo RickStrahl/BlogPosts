@@ -1,5 +1,5 @@
 ---
-title: Be Careful with Publishing Self-Contained, Trimmed EXEs
+title: A few Gotchas for Self-contained Published EXEs with .NET Core 3.0
 weblogName: West Wind Web Log
 postDate: 2019-10-20T10:25:38.0359001-10:00
 ---
@@ -21,7 +21,54 @@ You use `/p:PublishSingleFile=true` and specify a **specific** platform runtime 
 
 It's takes very little effort, to turn any kind of .NET Core 3.0 application into a self contained package.
 
-Note that single file exes can only build **fully self-contained executables** that include the runtimes. There are no options to build a self-contained EXE for shared runtime execution, which would be a nice feature to have, although that would require that the required runtime is already installed for the EXE to run.
+## Self Contained Only
+Note that single file exes can only build **fully self-contained executables** that include the runtimes.
 
-## Cracking down on the size
+There are currently no options to build a self-contained EXE for shared runtime execution, which would be a nice feature to have, although that would require that the required runtime is already installed for the EXE to run.
+
+## Watch out for Trimmed EXEs
 So the big downside to using a self-contained EXE is that the packages are positively massive. For a typical Web application that includes ASP.NET Core.
+
+## No InProcess IIS Hosting For Self-Contained EXEs
+If you are building a self-contained ASP.NET Core application, you can use the final EXE to host it in IIS. However, you are limited to hosting it as an out of process assembly.
+
+Note that you can 
+
+## You an Host the same EXE from Multiple IIS Sites
+Using the ASP.NET Core hosting module you can specify a path to the hosting executable. By default this points at the local folder `.\MySelfContainedExe` or at `dotnet.exe` (which is globally on the path) plust an argument of the DLL to load.
+
+However you can also specify a full OS path like this:
+
+```xml
+<handlers>
+  <add name="aspNetCore" path="*" verb="*" modules="AspNetCoreModuleV2" resourceType="Unspecified" />
+</handlers>
+<aspNetCore 
+    processPath="C:\WebConnection\LocalWebServer\WebConnectionWebServer.exe" 
+    arguments="" 
+    stdoutLogEnabled="true" 
+    stdoutLogFile=".\logs\stdout" 
+    hostingModel="OutOfProcess" />
+</aspNetCore> -->
+```
+
+Notice the `processPath` is pointing at a physical path on disk. You can have many applications that point at that very same exe and run side by side without having to copy the large EXE into each of the Web application folders. 
+
+Note that the startup folder may be affected by this.
+
+## Self Contained and Configuration Settings
+Ran into another issue with Self-Contained EXEs: The log file settings in my configured settings.json file are not being respected and the EXE is logging at default `Information` level. My first thought here 
+
+## Build Replacement Weirdness
+When building I've found that often times a build/publish will not properly update all the files in the output folder when changing compiler options. It looks like the `dotnet publish` does some build caching and if you switch certain options - like the `publishTrimmed` option - the compiler doesn't do a full rebuild, which can result in a non-trimmed or vice versa version of the final EXE.
+  
+Along the same lines you can have a custom `web.config` in your project to add additional environment variables or switch the hosting model explicitly in your output folder. However, once the `web.config` exists in the output folder it's not replaced. So you can make changes to the Web.config in your project and although it's marked for copying into the output folder it's not actually updating the file in the output.
+
+My recommendation: Always clear the output folder before building:
+
+```ps
+remove-item ./bin/ExeFile/*.*
+dotnet publish -c Release /p:PublishSingleFile=true /p:PublishTrimmed=false -r win-x64 -o ./bin/ExeFile
+```
+
+to ensure you're always getting all the files copied and replaced completely.

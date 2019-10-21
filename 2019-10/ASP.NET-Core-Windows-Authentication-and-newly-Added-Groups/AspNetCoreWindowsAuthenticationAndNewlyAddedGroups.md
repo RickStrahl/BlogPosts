@@ -1,8 +1,8 @@
 ---
 title: Windows Authentication and Account Caching on Web Browser Auto-Logins
 abstract: If you're working with Windows authentication to access Windows or Active Directory groups be aware that there's a gotcha with newly added groups when users are automatically logged into the Web browser.
-categories: ASP.NET Core, Windows, IIS
 keywords: Windows Authentication, IIS, Kestrel
+categories: ASP.NET Core, Windows, IIS
 weblogName: West Wind Web Log
 postId: 1425674
 permalink: https://weblog.west-wind.com/posts/2019/Oct/19/Windows-Authentication-and-Account-Caching-on-Web-Browser-AutoLogins
@@ -87,9 +87,50 @@ When Gabriel first pointed this out in the Stack Overflow post, I didn't believe
 
 It turns out that apparently I did not reboot or log out. I did however, eventually explicitly log out of my Windows box, and logged back in, and lo and behold all the accounts are showing up now.
 
-## Summary
-This is one of those things that makes a good deal of sense once you understand what's happening, but while it's happening it seems incredibly broken. In fact, I posted an issue on the ASP.NET Core repo for this, because I was sure this **had to be a bug** in how groups were handled - either in Windows or inside of ASP.NET Core. I went to extreme lengths to validate this with different scenarios - running with Kestrel, running with IIS Express, running under IIS proper.
+## Updating Groups without a Logoff?
+It is possible to refresh groups by essentially reissuing the Windows Login security ticket. There's a lot of info in this article:
 
-In the end this is a problem in Windows behavior with a relatively simple solution: Log out to see your new group memberships and other updated user account info. This isn't ideal, because I suspect I'm not the only user who rarely logs out or reboots his machine these days. It's not uncommon for me to be logged in this way for a few weeks at a time. In an application that means that if users are added to groups and your application depends on that you have to have some sort of notification that reminds people to log off to see those new groups which isn't a great user experience to say the least.
+[How to refresh Groups Membership with User Logoff](http://woshub.com/how-to-refresh-ad-groups-membership-without-user-logoff/)
+
+The following commands are lifted from the above article. You can check for group membership of the current user with:
+
+```ps
+whoami /groups
+```
+
+or you can use:
+
+```ps
+gpresult /r
+```
+
+This is useful to see what your actual user account is actually seeing, vs what a manual logon sees.
+
+The latter is very slow as it scours the network for domain servers, but it provides a lot of information about the user including the group membership as well as when the auth ticket was created. When I just ran this on my machine it showed a date nearly 2 weeks ago. Yikes.
+
+For ActiveDirectory logins you use:
+
+```ps
+klist
+```
+
+to list logins, and 
+
+```ps
+klist purge
+```
+
+to clear all logins which will force a new login next time you try to access a resource. In a Web Browser this will then force the browser dialog to pop up for explicit login which is then cached for subsequent auto-logins.
+
+This works, but these tools are pretty obscure (I certainly never heard of them), but it's a possibility to perhaps integrate them via command line execution from within an application to refresh logins. Note all these commands don't require admin rights, so they can be run in user scope.
+
+## Summary
+This is one of those things that makes a good deal of sense once you understand what's happening, but while it's happening it seems incredibly broken. In fact, I [posted an issue on the ASP.NET Core repo](https://github.com/aspnet/AspNetCore/issues/14766) for this, because I was sure this **had to be a bug** in how groups were handled - either in Windows or inside of ASP.NET Core. I went to extreme lengths to validate this with different scenarios - running with Kestrel, running with IIS Express, running under IIS proper.
+
+In the end this is a problem in Windows behavior with a simple solution: Log out to see your new group memberships and other updated user account info. 
+
+This isn't ideal obviously and can easily bite you, because I suspect I'm not the only user who rarely logs out or reboots his machine these days. For me It's not uncommon to be logged in without an explicit log off for a few weeks at a time which is a long time to not refresh your account group settings.
+
+In an application that means that if users are added to Windows or Active Directory Groups and your application depends on those new groups, you have to force users to log out and back in. This is problematic on several fronts -detectingg when that happens, and getting users to actually perform an annoying log off/log on cycle.
 
 It's an edge case to be sure, but if you have long logged in accounts which is not uncommon these days, this issue might come to bite you too... now you know what to do :-)
