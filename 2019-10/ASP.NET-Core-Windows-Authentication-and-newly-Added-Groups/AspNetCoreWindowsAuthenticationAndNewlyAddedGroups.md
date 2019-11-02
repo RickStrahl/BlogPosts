@@ -7,9 +7,14 @@ weblogName: West Wind Web Log
 postId: 1425674
 permalink: https://weblog.west-wind.com/posts/2019/Oct/19/Windows-Authentication-and-Account-Caching-on-Web-Browser-AutoLogins
 postDate: 2019-10-19T11:50:46.5698331-10:00
+customFields:
+  mt_githuburl:
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2019-10/ASP.NET-Core-Windows-Authentication-and-newly-Added-Groups/AspNetCoreWindowsAuthenticationAndNewlyAddedGroups.md
 ---
 # Windows Authentication and Account Caching on Web Browser Auto-Logins
 
+![](Authentication.jpg)
 Last week I ran into a nasty issue that had me seriously stumped. I've been working on an ASP.NET Core application that uses Windows Authentication to capture the network Active Directory login and needs access the user's AD and Windows group membership. 
 
 Seems easy enough - ASP.NET Core includes support for Windows Authentication including in Kestrel and on Windows this works as you would expect it to.
