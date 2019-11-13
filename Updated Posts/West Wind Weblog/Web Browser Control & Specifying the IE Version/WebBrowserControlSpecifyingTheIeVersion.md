@@ -8,7 +8,7 @@ postId: 1034578
 ---
 # Web Browser Control & Specifying the IE Version
 
-<small style="color:red">updated Aug 26th, 2016 - the original was published in May 2011</small>
+<small style="color:red">updated Aug 26th, 2016</small>
 
 I use the Internet Explorer Web Browser Control in a lot of my desktop applications to display document content. For example [Markdown Monster](http://markdownmonster.west-wind.com), [Help Builder](http://helpbuilder.west-wind.com) and [WebSurge](http://websurge.west-wind.com) rely heavily on the Web Browser Control to render their document centric or even rich interactive UI (in the case of Markdown Monster which hosts an HTML editor). Whether you're just rendering document content, or you're interacting with rich interactive content, HTML happens to be one of the most common document formats to display or interact with and it makes a wonderful addition to conventional forms based UI. Even in desktop applications, is often way easier than using labels or edit boxes or even some of the WPF text containers. HTML is easy to generate, generally re-usable, and easily extensible and distributable. The Web Browser Control allows for an effective way to display HTML in your applications in a way that blends in and becomes part of your application.
 
@@ -228,4 +228,13 @@ It would be nice if the Web Browser Control would just use the native Internet E
 
 Personally I've used the registry hack for all of my apps that use the Web Browser Control because my applications tend to render HTML from all sorts of different sources - local generated content, as well as Web loaded pages for previews and sometimes even dynamically injected content. It's better to force the latest IE version for all content than forget the fact you need custom headers for other non-application content you might display (update notices, registration forms, notifications etc.)
 
-These days most machines will be running either IE 10 or 11, so there's much less of a problem with differening browser behavior than there used to be.
+These days most machines will be running either IE 10 or 11, so there's much less of a problem with differing browser behavior than there used to be.
+
+<div style="margin-top: 30px;font-size: 0.8em;
+            border-top: 1px solid #eee;padding-top: 8px;">
+    <img src="https://markdownmonster.west-wind.com/favicon.png"
+         style="height: 20px;float: left; margin-right: 10px;"/>
+    this post created and published with the
+    <a href="https://markdownmonster.west-wind.com" 
+       target="top">Markdown Monster Editor</a> 
+</div>
