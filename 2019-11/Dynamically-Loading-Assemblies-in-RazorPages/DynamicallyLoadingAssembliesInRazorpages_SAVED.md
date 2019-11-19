@@ -1,23 +1,25 @@
 ---
 title: Dynamically Loading Assemblies in RazorPages
 weblogName: West Wind Web Log
+postId: 1452164
+permalink: https://weblog.west-wind.com/posts/2019/Nov/05/Dynamically-Loading-Assemblies-in-RazorPages
 postDate: 2019-11-05T09:19:08.4354133-10:00
 ---
 # Dynamically Loading Assemblies in RazorPages
 I've been working on some standalone tools that are generically serving static content as well as ASP.NET Core content **from an arbitrary folder**. With ASP.NET Core it's now possible using several different approaches to create standalone server applications that provide all sorts of utility with relative ease.
 
-The tool I've built recently is a .NET based,  standalone local dev server with built-in Live Reload functionality and it's main purpose is to serve static content locally in a self-contained fashion.
+The tool I've built recently is a .NET based,  standalone local dev server with built-in Live Reload functionality and its main purpose is to serve static content locally in a self-contained fashion.
 
 If you're interested you can grab the [Dotnet Tool](https://www.nuget.org/packages/LiveReloadServer/) or a [Standalone Exe (zipped)](https://github.com/RickStrahl/Westwind.AspnetCore.LiveReload/blob/master/LiveReloadServer/LiveReloadWebServer.zip).
 
-To install the Dotnet Tool (requires .NET Core 3.0 SDK):
+To install the Dotnet Tool (requires .NET Core 3.0 SDK and works on Windows, Mac, Linux):
 
 
 ```ps
 dotnet tool install --global LiveReloadServer
 ```
 
-Install from [Chocolatey](https://chocolatey.org/packages/LiveReloadWebServer) as a standalone EXE (no dependencies):
+Install from [Chocolatey](https://chocolatey.org/packages/LiveReloadWebServer) as a standalone EXE (no dependencies, Windows only):
 
 ```ps
 choco install LiveReloadWebServer
