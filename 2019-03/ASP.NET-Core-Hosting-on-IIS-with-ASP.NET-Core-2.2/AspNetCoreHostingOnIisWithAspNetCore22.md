@@ -1,5 +1,5 @@
 ---
-title: ASP.NET Core In Process Hosting on IIS with ASP.NET Core 2.2
+title: ASP.NET Core In Process Hosting on IIS with ASP.NET Core
 abstract: In version 2.2 ASP.NET Core adds support for direct in-process hosting which improves throughput considerably using an easy mechanism that allows switching between in-process and out-of-process hosting. In this post I describe how to use in process hosting and how it works.
 keywords: ASP.NET Core, IIS, Hosting, InProcess, AspNetCoreModule, Kestrel
 categories: ASP.NET Core, IIS
@@ -12,17 +12,17 @@ customFields:
     key: mt_githuburl
     value: https://github.com/RickStrahl/BlogPosts/blob/master/2019-01/ASP.NET-Core-Hosting-on-IIS-with-ASP.NET-Core-2.2/Publishing%20and%20Running%20ASP.NET%20Core%20Applications%20on%20IIS.md
 ---
-# ASP.NET Core InProcess Hosting on IIS with ASP.NET Core 2.2
+# ASP.NET Core InProcess Hosting on IIS with ASP.NET Core
 
 ![](Hosting.jpg)
 
 ASP.NET Core 2.2 has been out for a while now and with it come some significant improvements to the hosting model if you plan on hosting in IIS. In previous versions you were required to host ASP.NET Core applications by proxying requests from IIS into the ASP.NET Core Kestrel server with IIS effectively as a Reverse Proxy. I wrote about this [in a detailed blog post](https://weblog.west-wind.com/posts/2016/Jun/06/Publishing-and-Running-ASPNET-Core-Applications-with-IIS) a while back.
 
-In version 2.2 ASP.NET Core adds support for direct in-process hosting which improves throughput considerably using an easy mechanism that allows switching between in-process and out-of-process hosting.
+Version 2.2 and later of ASP.NET Core adds support for direct in-process hosting which improves throughput considerably using an easy mechanism that allows switching between in-process and out-of-process hosting.
 
 In this post I'll focus on the new In Process hosting model since that's what's changed and is improved, but I'll review the basics of both models here so this post can stand on its own. I'll start with what's changed and then dig a little deeper into how the models work and how they differ.
 
-## ASP.NET Core 2.2 adds InProcess Hosting on IIS
+## ASP.NET Core 2.2 and later adds InProcess Hosting on IIS
 The original versions of ASP.NET Core required you to host on IIS using an **Out of Process model** that proxies through IIS. Requests hit IIS and are forwarded to your ASP.NET Core app running the Kestrel Web Server. 
 
 **Out of Process Hosting (pre v2.2 model)**

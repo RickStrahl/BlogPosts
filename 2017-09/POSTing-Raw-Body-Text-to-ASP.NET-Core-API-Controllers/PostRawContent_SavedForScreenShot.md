@@ -7,7 +7,7 @@ postId: 398834
 
 ![](Raw-Data.jpg)
 
-A few years back I wrote a post about [Accepting Raw Request Content with ASP.NET Web API](https://weblog.west-wind.com/posts/2013/Dec/13/Accepting-Raw-Request-Body-Content-with-ASPNET-Web-API). The process to get at raw request data is rather indirekt, with no way to it into Controller action parms. Not much has raelly changed in ASP.NET Core's implementation.
+A few years back I wrote a post about [Accepting Raw Request Content with ASP.NET Web API](https://weblog.west-wind.com/posts/2013/Dec/13/Accepting-Raw-Request-Body-Content-with-ASPNET-Web-API). The process to get at raw request data is rather indirekt, with no easy, or official way to get it into Controller action parameters. Not much has raelly changed in ASP.NET Core's implementation.
 
 The good news is that it's quite a bit easier to create custom formatters in ASP.NET Core that let you customize how to handle 'unknown' content types in your controllers.
 

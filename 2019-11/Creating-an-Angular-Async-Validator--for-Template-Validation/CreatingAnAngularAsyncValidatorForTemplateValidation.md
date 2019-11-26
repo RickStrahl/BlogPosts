@@ -7,12 +7,16 @@ weblogName: West Wind Web Log
 postId: 1456016
 permalink: https://weblog.west-wind.com/posts/2019/Nov/18/Creating-Angular-Synchronous-and-Asynchronous-Validators-for-Template-Validation
 postDate: 2019-11-18T15:23:46.3250382-10:00
+customFields:
+  mt_githuburl:
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2019-11/Creating-an-Angular-Async-Validator--for-Template-Validation/CreatingAnAngularAsyncValidatorForTemplateValidation.md
 ---
 # Creating Angular Sync and Async Validators for Template Validation
 
-![](Validate.png)
+![](Validate.jpg)
 
-This isn't a new topic, but I've had a hard time to find consolidated information on Validators for the scenario I describe here so I decided to write this down. It took me **way too much time** to hunt down all the pieces to make Async validators work, and I hope this post makes that process a little easier.
+This isn't a new topic, but I've had a hard time to find consolidated information on Validators for the scenario I describe here so I decided to write this down. Although not complicated, it took me **way too much time** to hunt down all the information to make Async validators work, and I hope this post makes that process a little easier. I'm writing this, while using the current version which is Angular 8.
 
 Angular provides a bunch of validation features and validators out of the box for the built-in HTML validations. So things like `required`, `min-width` and `max-width` and a generic RegEx validator just work without creating any custom validators. 
 
@@ -23,7 +27,7 @@ The process for creating custom validators is:
 * Create a class derived from [Validator](https://angular.io/api/forms/Validator) or [AsyncValidator](https://angular.io/api/forms/AsyncValidator)
 * Implement the `validate()` method
 * Return `null` for valid, or an `ValidationErrors` object for invalid
-* Async Validators return an Observable instead
+* Async Validators return an `Observable<ValidationErrors>` instead
 * Add the class to Module Declarations
 * Add the class to the component Provider list
 
@@ -32,7 +36,7 @@ To use it then:
 * Create declarative Validator(s) on HTML Template controls
 * Add error blocks for validation errors
 
-Synchronous and asynchronous Validators are very similar - the main difference is that a sync Validator returns an error object instance directly, while the async version returns an Observable of the the same object. I'll look at creating the sync version first then modify for async and finish off with an example AsyncValidator that makes an HTTP call to a server to validate.
+Synchronous and asynchronous Validators are very similar - the main difference is that a sync Validator returns an error object instance directly, while the async version returns an Observable of the the same object. The most common use case for async Validators is doing a server validation via an HTTP Callback. I'll look at creating the sync version first, then modify for simulated async, and then finish off with an example `AsyncValidator` that makes an HTTP call to a server to validate some server side business logic.
 
 Note, I prefer to use **declarative validation** with validators applied in the HTML template, so that's what I'll talk about here. But all of this also works with Reactive Forms where you can just provide the validator directly to the FormControl creation process.
 
@@ -43,7 +47,13 @@ Let's create a very simple validator - a YesNoValidator. The validator takes an 
 <input name="Name" yesNoValidator="no" />
 ```
 
-If the key item in the above is the `yesNoValidator="yes"` on the `<input>` element. Yes should give me no error and `yesNoValidator="no"` should display an error message. Note that validators don't require a value, and usually don't have one so providing a value is totally optional.
+If the key item in the above is the `yesNoValidator="yes"` on the `<input>` element no error is shown as the validation is valid. `yesNoValidator="no"` should display an error message. Note that validators don't require a value so you could have a validator like:
+
+```html
+<input name="Name" yesNoValidator />
+```
+
+and that would still work. But if you do need to pass a value to the to the validator you can access it via the passed in `control.value` property. It's more typical to not have explicit values as in the latter example.
 
 > #### @icon-info-circle Validator Naming Conventions
 > The docs show validator selector names without a `Validator` postfix as I do here. I find that problematic because in a lot of cases it's not very obvious that the attribute is a validator. `yesNo` as an attribute is pretty ambiguous and to me at least `yesNoValidator` is not, so I'm leaving the `Validator` on in my selectors unless the name is obviously for validation.
@@ -195,7 +205,7 @@ Note that I'm using Angular Material which automatically detects validator error
 With plain HTML you have to use something `<div *ngIf='...'` to trigger rendering of errors explicitly. For Angular Material, the `*ngIf` expressions are necessary only if you have multiple validators and you want to selectively display one or the other.
 
 ## Async Validators
-The good news is that if you need an Async validator the process is really not much different. There are only a few small changes aside from implementing your validation logic using an `Observable`.
+The good news is that if you need an Async validator, the process is pretty much the same. The main difference is that you will be returning an `Observable<ValidationErrors>` rather than a the object directly and setting a couple of configuration strings differently.
 
 ### Updated Async Validator
 Since we've already seen the majority of the code that is required for a validator and that is also used from an AsyncValidator here's the `AsyncValidator` implementation:
@@ -238,6 +248,8 @@ export class YesNoValidator implements AsyncValidator {
 }
 ```
 
+I moved the old validation function into an private function to call, and then simply used the `of` rxJs operator to turn that result `ValidationErrors` value into an Observable. This is super contrived since there's nothing async happening here, but it demonstrates the async setup in the most minimal fashion possible.
+
 ### Key Changes
 The key code changes are:
 
@@ -247,7 +259,7 @@ The key code changes are:
     ```
 * Return an Observable instead of a concrete value:  
     ```ts
-    validate(control: AbstractControl): Observable<ValidationErrors | null> {
+    validate(control: AbstractControl): Observable<ValidationErrors|null> {
         // turn into an observable
         return of( this._validateInternal(control));
     }
@@ -259,10 +271,10 @@ The key code changes are:
     ]
     ```
 
-There are no implementation changes once you add it to the HTML Template. The same `.errors` object is returned along with the validated values.
+There are no implementation changes in the HTML template - the same exact syntax is used. The same `.errors` object is returned along with the validated values.
 
 ### A more practical Async Validation Example
-So the above example is a bit contrived because it's basically non-async operation turned into an Observable. The more common scenario is to run some server side validation with an HTTP call.
+The more common scenario for async Validations is to run some server side validation with an HTTP call.
 
 Here's an example of an application level Validator that calls back to a server to determine whether an entered name already exists:
 
@@ -286,7 +298,6 @@ export class InstrumentationNameValidator implements AsyncValidator {
                                          this.user.userPk);
         const obs = this.http.get<boolean>(url)
             .pipe(
-                debounceTime(350),   // from keyboard input
                 map((isUsed) => {
                     // null no error, object for error
                     return !isUsed ? null : {
@@ -316,12 +327,23 @@ To use it:
 </mat-form-field>
 ```
 
-Any keystroke in the field triggers a delayed (debounced) server request to check against an API whether the name entered already exists. If it doesn't null is returned, otherwise the ValidationErrors object is returned. When that happens it triggers the second `<mat-error>` block and that displays the error message generated by the validator:
+Any keystroke in the field triggers the validate method which creates a delayed (debounced) server request to check against an API whether the name entered already exists. The service returns `true` or `false` and `map()` turns that into `null` for false (no errors) or a ValidationErrors object if the value is true (has errors). Same as in the sync sample, but wrapped into the Observable.
+
+When not valid, it triggers the second `<mat-error>` block and that displays the error message generated by the validator:
 
 ![](NameExistsValidator.png)
 
-Note that you can also pick up an error message from the server and forward that into the Validator which is useful for more complex server-side validation rules.
+Voila - an async Validator at work.
 
 
 ### Summary
-There you have it. Val
+There you have it. Validators are not complex to create, but it's a bit tedious to declare and hook them up so that Angular can find and use them. There are a few magic string combinations that can easily screw you up. Ask me how I know :-) - operator error opportunities abound here. I've written down the things that helped me and that put all the pieces in context, so I hope that this is useful for some of you as well. 
+
+<div style="margin-top: 30px;font-size: 0.8em;
+            border-top: 1px solid #eee;padding-top: 8px;">
+    <img src="https://markdownmonster.west-wind.com/favicon.png"
+         style="height: 20px;float: left; margin-right: 10px;"/>
+    this post created and published with the 
+    <a href="https://markdownmonster.west-wind.com" 
+       target="top">Markdown Monster Editor</a> 
+</div>
