@@ -1,12 +1,12 @@
 ---
 title: Programmatically Opening Windows Terminal in a Specific Folder
 abstract: The new Windows Terminal provides many cool new features and much improved Terminal performance which makes it very desirable to use even in its current preview state. However, unfortunately the Terminal currently lacks a command line interface to control startup, do if you want to externally launch a shell some workarounds are required to get it to start out of a specific folder.
-categories: Windows, .NET
 keywords: Windows, Windows Terminal, Terminal,.NET
+categories: Windows, .NET
 weblogName: West Wind Web Log
 postId: 1378839
 permalink: https://weblog.west-wind.com/posts/2019/Sep/03/Programmatically-Opening-Windows-Terminal-in-a-Specific-Folder
-postDate: 2019-09-03T17:06:58.8783960-07:00
+postDate: 2019-09-03T14:06:58.8783960-10:00
 customFields:
   mt_githuburl:
     key: mt_githuburl
@@ -46,7 +46,7 @@ wt.exe
 
 or by using the installed shortcut.
 
-One problem currently is that you can't easily automate the terminal application when it launches. There are **no command line options** supported yet (although there's discussion around this and it will come eventually), which means you can't start up the shell in a specific folder, execute a startup command or even pick a profile to start with.
+One problem currently is that you can't easily automate the terminal application when it launches. There are **no command line options** supported yet (although [there's discussion around this](https://github.com/microsoft/terminal/issues/607) and it will come eventually), which means you can't start up the shell in a specific folder, execute a startup command or even pick a profile to start with.
 
 Recently I had several people asking about Windows Terminal in [Markdown Monster](https://markdownmonster.west-wind.com):
 
@@ -173,8 +173,17 @@ The ideal solution here would be for `WT.exe` to provide a way to select a profi
 
 Overall profiles are great because they do make it easy to create new shell configurations quickly simply by copying profile entries and modifying a couple of obvious settings.
 
+## Using Windows Terminal as an External Tool in Visual Studio
+So with what you know now you can also set Windows Terminal as an external tool in other applications like Visual Studio's External tools for example. I like to have a quick way to open a terminal in the currently selected item's folder. You can do this with this in Visual Studio **Tools -> External Tools...**:
+
+![](VisualStudioExternalTool.png)
+
+Notice that this is a bit convoluted because Visual Studio **fails to directly load `wt` or `wt.exe`**. Not sure why given that it seems to work using `Process.Start()` in .NET even without shell execution, but using `wt.exe` directly gives an *Invalid Executable* error. So this instead launches a `CMD` shell and the `START` command which does use shell commands, to launch Windows Terminal via the `WT` command. Ugly because it briefly flashes the `CMD` window, but otherwise it works.
+
+Remember that you need the default directory of the default profile set to ` "startingDirectory" : "%__CD__%"` in order to launch from the base folder rather than some other hardcoded path.
+
 ## Summary
-The good news is that with the `StartingDirectory` value set in the default profile, it works and I can now use `wt.exe` as my terminal command in Markdown Monster:
+The good news is that with the `startingDirectory` value set in the default profile, you can get Windows Terminal to launch from a folder of your choice. This makes it possible to use Windows Terminal from Visual Studio and also from Markdown Monster:
 
 ![](MarkdownMonsterConfig.png)
 

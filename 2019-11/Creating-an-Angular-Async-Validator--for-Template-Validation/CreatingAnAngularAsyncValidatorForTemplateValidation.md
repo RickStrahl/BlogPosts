@@ -18,9 +18,11 @@ customFields:
 
 This isn't a new topic, but I've had a hard time to find consolidated information on Validators for the scenario I describe here so I decided to write this down. Although not complicated, it took me **way too much time** to hunt down all the information to make Async validators work, and I hope this post makes that process a little easier. I'm writing this, while using the current version which is Angular 8.
 
-Angular provides a bunch of validation features and validators out of the box for the built-in HTML validations. So things like `required`, `min-width` and `max-width` and a generic RegEx validator just work without creating any custom validators. 
+Angular provides a bunch of [built-in validators](https://angular.io/api/forms/Validators) out of the box for the common client side validations. So things like `required`, `min-width` and `max-width` and a generic RegEx `pattern` validator just work without creating any custom validators. 
 
 But if you're building any type of reasonably complex application you're likely to require custom validations that require firing of custom business logic and at that point you'll have to dig in and create custom validators. If that business logic happens to live in data that's only on the server you will need to call an async validator which is just a little different.
+
+<div style="page-break-after: always;"></div>
 
 The process for creating custom validators is:
 
@@ -64,13 +66,13 @@ Lets start with the sync implementation by deriving a class from `Validator` and
 ```typescript
 import {
     AbstractControl,
-   NG_VALIDATORS,
+    NG_VALIDATORS,
     ValidationErrors, Validator
 } from '@angular/forms';
 import {Directive} from '@angular/core';
 
 @Directive({
-    selector: '[yesNoValidator][ngModel],[yesNoValidator][FormControl]',
+    selector: '[yesNoValidator]',
     providers: [
         {provide: NG_VALIDATORS, useExisting: YesNoValidator, multi: true}
     ]
@@ -82,18 +84,61 @@ export class YesNoValidator implements Validator {
 
     validate(control: AbstractControl): ValidationErrors | null {
         const val = control.value;
-
-        console.log("yesno validator: ",val);
         if (!val || val.toLowerCase() === 'yes') {
-            return null;
+            return null;   // valid
         }
-        return {yesNoValidator: 'You chose no, no, no!'};
+        
+        // invalid - validation errors display
+        return {yesNoValidator: 'You chose no, no, no!'};   
     }
 }
 ```
 
+#### The `validate()` method
+Validators work primarily through what's returned from the `validate()` method. The `validate(control:abstractControl): ValidationErrors|null` implementation of a Validator works by returning `null` if the validation is valid (no error), or returning a `ValidationErrors` object that contains an error key/value. Typically this is an object map with a single value that corresponds to the validator name.
+
+The error value can be something as simple as a `true` or `false` value, which is what some of the built-in Validators do.
+
+For example the built-in `required` validator returns this when validation fails:
+
+```ts
+{ required:  true; }
+```
+
+I find it more useful to return an error message, so in the above `yesNoValidator` I return:
+
+```ts
+{ yesNoValidator: "You said, no, no, no." }
+```
+
+You can also return something more complex like an object:
+
+```ts
+{ 
+    yesNoValidator: {
+        isValid: false,
+        message: "You said, no, no, no." 
+    }
+}    
+```
+
+It's up to you what to return, and what is then exposed to your error display logic in the template. By convention you should be able to rely on a **truthy value** to determine if the validator is valid or invalid. Beyond that you have to know what it returns. This is the reason most of the built-in ones return simple `true` or `false` values and rely on templates to render error messages.
+
+If the control validation fails,  the result `validationErrors` object is available to the form as `form1.controls['controlName']?.errors?.yesNoValidator` (or if you implement an object `.yesNoValidator.message`) property and you can then decide how to work with the values. I recommend keeping the results simple and personally I prefer to return error strings.
+
+
+
+### Selector in the Class Directive
+To specify how you can access this validator you provide a Selector in the Class Directive header. The selector is the attribute name you'll use for the validator in an HTML element tag and here I use `yesNoValidator`. 
+
+```typescript
+selector: '[yesNoValidator]',
+```
+
+Note that the syntax is a bit funky which requires that the selector(s) is specified inside of square brackets and **without quotes** around the name(s). You can specify multiple names separated by commas.
+
 ### Register the Validator as a Validator and Provider
-Make sure you provide the Validator to Angular's validator provider list in the class header using `NG_VALIDATIONS` in the provider list:
+Validators have to be registered so Angular is aware of them and can use them during binding. Make sure you provide the Validator to Angular's validator provider list in the class header using `NG_VALIDATIONS` in the provider list:
 
 ```typescript
 providers: [
@@ -101,7 +146,7 @@ providers: [
 ]
 ```
 
-If you're building an async Validator use `NG_ASYNC_VALIDATIONS`. This is an **easy thing to miss** if you're converting a Validator from sync to Async so heads up!
+If you're building an async Validator use `NG_ASYNC_VALIDATIONS`. This is an **easy thing to miss** if you're converting a Sync Validator from sync to Async so heads up! (ask me how I know :-))
 
 ### Register the Validator Declaration in the Module
 Finally, register the Validator with a module (or root module) where it's to be used:
@@ -140,38 +185,6 @@ If I run this now and use `no` as the value I get:
 
 If I run it with `yes` no error shows.
 
-### The `validate()` method
-
-The `validate(control:abstractControl): ValidationErrors|null` implementation of a Validator works by returning `null` if the validation is valid (no error), or returning a `ValidationErrors` object that contains an error key/value. 
-
-The error value can be something that's simply a single true/false value, which is what some of the built-in Validators do For example `required` returns:
-
-```ts
-{ required:  true; }
-```
-
-I find it more useful to return an error message, so in the above `yesNoValidator` I return:
-
-```ts
-{ yesNoValidator: "You said, no, no, no." }
-```
-
-You can make this more complex as well to return an object:
-
-```ts
-{ 
-    yesNoValidator: {
-        isValid: false,
-        message: "You said, no, no, no." 
-    }
-}    
-```
-
-IOW, it's up to you what to return, and what is then exposed to your error display logic in the template.
-
-This object is then available on the `form1.controls['name']?.errors?.yesNoValidator?.message` property and you can then decide how to work with the values. I recommend keeping it simple and personally I like to use strings.
-
-In a nutshell, for errors return an object with a single property and value that can produce a thruthy expression (which is just about anything).
 
 ### Displaying Errors on a Declarative Form
 Errors can be displayed based on the error status of a control. You can reference a Form Control and its `.errors` property to determine whether the are any errors. By convention it's something like:
@@ -274,7 +287,7 @@ The key code changes are:
 There are no implementation changes in the HTML template - the same exact syntax is used. The same `.errors` object is returned along with the validated values.
 
 ### A more practical Async Validation Example
-The more common scenario for async Validations is to run some server side validation with an HTTP call.
+The more common scenario for async Validations is to run some server side validation with an HTTP call that returns an `Observable<T>` result.
 
 Here's an example of an application level Validator that calls back to a server to determine whether an entered name already exists:
 
@@ -338,6 +351,12 @@ Voila - an async Validator at work.
 
 ### Summary
 There you have it. Validators are not complex to create, but it's a bit tedious to declare and hook them up so that Angular can find and use them. There are a few magic string combinations that can easily screw you up. Ask me how I know :-) - operator error opportunities abound here. I've written down the things that helped me and that put all the pieces in context, so I hope that this is useful for some of you as well. 
+
+### Resources
+
+* [Angular Built-in Validators](https://angular.io/api/forms/Validators)
+* [Angular Validator Docs](https://angular.io/api/forms/Validator)
+* [Angular Async Validator Docs](https://angular.io/api/forms/AsyncValidator)
 
 <div style="margin-top: 30px;font-size: 0.8em;
             border-top: 1px solid #eee;padding-top: 8px;">

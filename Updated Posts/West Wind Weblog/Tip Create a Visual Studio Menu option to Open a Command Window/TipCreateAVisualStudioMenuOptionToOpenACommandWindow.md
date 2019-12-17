@@ -1,8 +1,8 @@
 ---
 title: 'Tip: Create a Visual Studio Menu option to Open a Command Window'
 abstract: I'm finding myself using the command line more and more, especially with ASP.NET vNext for running Web apps from the command line, accessing git and JavaScript build tools. Here's a real easy way to pop open a Command Window in the active project directory from Visual Studio.
-categories: Visual Studio
 keywords: Console,Visual Studio
+categories: Visual Studio
 weblogName: West Wind Web Log
 postId: 922728
 permalink: https://weblog.west-wind.com/posts/2015/Jan/09/Tip-Create-a-Visual-Studio-Menu-option-to-Open-a-Command-Window
@@ -73,6 +73,20 @@ Here are a few variations:
 
 **Initial Directory:**  
 `$(ItemDir)`
+
+#### Windows Terminal 
+
+**Command:**
+`cmd.exe`
+
+**Arguments:**
+`/c start wt`
+
+**Initial Directory:**
+`$(ItemDir)`
+
+> Note: in order for the directory selection to work you need to change the start folder of the default profile in the configuration to `"startingDirectory" : "%__CD__%"`.
+[more info](https://weblog.west-wind.com/posts/2019/Sep/03/Programmatically-Opening-Windows-Terminal-in-a-Specific-Folder#forcing-the-startup-path)
 
 #### ConEmu with PowerShell
 
