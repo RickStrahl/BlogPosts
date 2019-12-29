@@ -214,7 +214,7 @@ try
     var asm = AssemblyLoadContext.Default.LoadFromAssemblyPath(file);
     
     // Let Razor know about the assembly
-    mvc@DamianEdwards Builder.AddApplicationPart(asm);
+    mvcBuilder.AddApplicationPart(asm);
 }
 ```
 

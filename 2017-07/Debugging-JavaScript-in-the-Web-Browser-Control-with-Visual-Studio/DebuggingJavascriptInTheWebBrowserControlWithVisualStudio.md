@@ -5,11 +5,19 @@ keywords: Web Browser Control, Debugging, Visual Studio, IE
 categories: Web Browser Control, Windows, Visual Studio, WPF, Internet Explorer
 weblogName: West Wind Web Log
 postId: 300323
+permalink: https://weblog.west-wind.com/posts/2017/Jul/06/JavaScript-Debugging-in-a-Web-Browser-Control-with-Visual-Studio
 postDate: 2019-01-08T18:59:08.9867874-10:00
 ---
 # JavaScript Debugging in a Web Browser Control with Visual Studio
 
 ![](ScriptDebuggingInVisualStudio.png)
+
+> ##### Visual Studio 2019 Update
+> <small><i>In Visual Studio 2019 Microsoft has removed the JavaScript Console from the product, so while you can still step through the code, look at the call stack and view variables, you can no longer view  `console.log()` output, nor dynamically execute code or view console variables. You can continue to use these features in VS2017 and for this reason I keep my VS2017 installation alive.
+>
+> If this feature is important to you **please submit feedback in Visual Studio** via the Feedback -> Feature Request option and let Microsoft know you'd like this feature back in VS2019 and beyond.
+</i></small>
+
 
 Debugging an embedded Web Browser control in a Windows application can be a pain. The Web Browser control is essentially an embedded instance of the Internet Explorer engine, but it lacks any of the support (F12) tooling for debugging.
 

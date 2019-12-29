@@ -27,6 +27,7 @@ Lets start with a non-raw request, but rather with posting a string as JSON sinc
 [Route("api/BodyTypes/JsonStringBody")]
 public string JsonStringBody([FromBody] string content)
 {
+
     return content;
 }
 ```

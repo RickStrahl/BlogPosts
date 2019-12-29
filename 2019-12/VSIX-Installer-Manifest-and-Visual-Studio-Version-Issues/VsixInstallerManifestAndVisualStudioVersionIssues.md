@@ -88,8 +88,8 @@ Note that both of these settings - the Installation Targets and Prerequisites - 
 So you can set those same values there instead of in the `source.extension.vsmanifest` file.
 
 ## Summary
-Visual Studio extensions are always a pain in the ass. The documentation is terrible and VSIX installer is absolutely god-awful. Every single thing i've built as a VSIX has major problems as part of the install process, and this is just one more thing to add to the long list of UI and functionality failures of this whole process. 
+Visual Studio extensions are always a pain in the ass. The documentation is terrible and VSIX installer is absolutely god-awful. But hopefully this post helps you find this information if this same kind of version conflict happens to you, so you don't have to waste an hour or a few trying to randomly change things in hope that it'll fix the problem...
 
-It is a great example of **user hostile UI**! How hard would it be instead of just displaying and disabling checkboxes, to display an error message or at the very least a **more info** Web link? But no - let's let users and the developers just poke around in the dark. 
+## Resources
 
-Hopefully this post helps you find the information to solve this particular issue if this same kind of version conflict happens to you, so you don't have to waste an hour or a few trying to randomly change things in hope that it'll fix the problem...
+* [Mads Kristensen: Visual Studio extensions and version ranges demystified](https://devblogs.microsoft.com/visualstudio/visual-studio-extensions-and-version-ranges-demystified/).
