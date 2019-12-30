@@ -1,19 +1,24 @@
 ---
 title: A HighlightJs Copy Code Badge Component
 abstract: In this post I describe a small, very specialized addon component for the HighlightJs Syntax highlighter that displays a badge that lets you copy the code snippet and displays the syntax language. The post covers how to use this simple component,  and a look behind the scenes on how it works.
-categories: Javascript,Blogging
 keywords: HighlightJs,Clipboard,Copy,Paste,Syntax Highlighting
+categories: Javascript,Blogging
 weblogName: West Wind Web Log
 postId: 1497784
-postStatus: draft
-permalink: https://weblog.west-wind.com/posts/2019/Dec/27/A-HighlightJs-Copy-Code-Badge-Component
-postDate: 2019-12-27T13:40:20.9563310-10:00
+permalink: https://weblog.west-wind.com/posts/2019/Dec/30/A-HighlightJs-Copy-Code-Badge-Component
+postDate: 2019-12-30T13:40:20.9563310-10:00
+customFields:
+  mt_githuburl:
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2019-12/A-HighlightJs-Code-Copy-Badge-Component/AHighlightjsCodeCopyBadgeComponent.md
 ---
 # A HighlightJs Copy Code Badge Component
 
 ![HighlightJs-Badge in action](HilightBadge.gif)
 
-A while back I created a small addon component for use with [HighlightJs](https://highlightjs.org/) that provides the ability to copy a code snippet and display the active language in a little badge above the code snippet. If you're using HighlightJs for your code snippets you might find this a useful enhancement for your snippets.
+A while back I created a small addon component for use with [HighlightJs](https://highlightjs.org/) that provides the ability to copy a code snippet and display the active language in a little badge above the code snippet. HighlightJS is a JavaScript based syntax highlighter that can pick out code snippets based on a simple and commonly used convention which uses `<pre><code class="hljs language-javascript">` as it's trigger to render code snippets with one of several code styles.
+
+If you're using HighlightJs for your code snippets in your blog, documentation or dynamic Markdown parsing on your Web site you might find this a useful enhancement for your code snippets.
 
 Here's what the code-badge looks like:
 
@@ -21,7 +26,7 @@ Here's what the code-badge looks like:
 
 The badge picks up and displays the language that HighlightJs renders. This is either the explicit value specified or the inferred value that HighlightJS tries to auto-discover. The badge is shown in low opacity that gets solid when hovering over the badge and you can click on the copy icon to copy the code block's content to the clipboard.
 
-Here is a live example of code blocks in this Weblog you can play with:
+Here are some live example of code blocks in this Weblog you can play with:
 
 ### Single Line Code
 ```javascript
@@ -68,7 +73,7 @@ The main reason I built this is that I have quite a few content Web sites and to
 
 * Several blogs
 * Tons of documentation sites
-* Markdown Monster uses HighlightJS code snippets
+* [Markdown Monster](https://markdownmonster.west-wind.com/) uses HighlightJS code snippets
 
 All of these Web based content generating tools and engines use code blocks, and can use this same component now (or will be anyway :-)). Originally I had just a few hacked scripts in several different sites and decided that I should consolidate them into something that can be more easily shared amongst all of my content.
 
@@ -469,3 +474,12 @@ This seems like a minor feature for code snippet rendering and when a user reque
 So yeah, it was worth the effort.
 
 As is often the case for me, it's a very specialized type of component, but if you're using highlightJs you might find this useful as a ready-to-go addin. If you're using something else for code highlighting it probably wouldn't be hard to adjust the badge injection code to work with an alternate syntax highlighter either. Enjoy...
+
+<div style="margin-top: 30px;font-size: 0.8em;
+            border-top: 1px solid #eee;padding-top: 8px;">
+    <img src="https://markdownmonster.west-wind.com/favicon.png"
+         style="height: 20px;float: left; margin-right: 10px;"/>
+    this post created and published with the 
+    <a href="https://markdownmonster.west-wind.com" 
+       target="top">Markdown Monster Editor</a> 
+</div>
