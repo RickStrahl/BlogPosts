@@ -13,7 +13,7 @@ postDate: 2019-12-05T18:45:17.0566758-10:00
 
 So, you've built your shiny new [Web Connection](https://webconnection.west-wind.com/) Application on your local machine for development and you're proud of what you've accomplished. Now it's time to take that local masterpiece and get it online: **Ship it!**
 
-How do you do this?
+So how exactly do you **Ship It**?
 
 In this long article I'll take you to the process of creating a small placeholder application and deploy it to a live server on a hosted service called [Vultr](https://www.vultr.com/?ref=6820014) which provides low cost, and high performance virtual machine services that are ideal of hosting a Web Connection site.
 
@@ -622,6 +622,13 @@ You've seen:
 Full circle. :white_circle: 
 
 You now have all you need to know to publish your Web Connection applications successfully.
+
+```foxpro
+*** Server Update Urls - fix these to point at your production Server/Virtual
+
+HTTP_UPDATEURL 	  =         "http://publishing.west-wind.com/UpdateExe.wc"
+```
+
 
 ## Resources
 * [Session Materials](https://github.com/RickStrahl/SWFOX2019_WebConnectionDeployment)
