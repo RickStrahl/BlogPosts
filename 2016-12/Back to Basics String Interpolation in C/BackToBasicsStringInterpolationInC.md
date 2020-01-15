@@ -1,3 +1,14 @@
+---
+title: 'Back to Basics: String Interpolation in C#'
+featuredImageUrl: https://weblog.west-wind.com/images/2016/Back%20to%20Basics%20String%20Interpolation%20in%20C/LineKnot.jpg
+abstract: String Interpolation provides string templating for string literals in C#. Rather than using string.Format you can use string interpolation to produce much more readable code that embeds expression values directly into string literals rather than escaping numeric arguments as you do with string.Format(). In this post I look at how string interpolation works, what the compiler does under the covers and some common use cases where it makes life easier.
+keywords: C#,String,String Interpolation,string.Format,Template,Literals
+categories: C#,.NET
+weblogName: West Wind Web Log
+postId: 100480
+permalink: https://weblog.west-wind.com/posts/2016/Dec/27/Back-to-Basics-String-Interpolation-in-C
+postDate: 2020-01-13T12:39:05.0226461-10:00
+---
 # Back to Basics: String Interpolation in C#
 
 ![](LineKnot.jpg)
@@ -47,7 +58,7 @@ The second example is much more readable, especially if you have a few expressio
 
 The following is a simple math expression:
 
-```c#
+```csharp
 int x = 20;
 int y = 15
 string = $"Adding {x} + {y} equals {x + y}"
@@ -147,7 +158,7 @@ output.Dump();
 
 which turns into this IL code (as decompiled by [LinqPad](https://www.linqpad.net/)):
 
-```ini
+```text
 IL_0000:  nop         
 IL_0001:  ldstr       "Rick"
 IL_0006:  stloc.0     // name
@@ -179,7 +190,7 @@ public void Log(Exception ex)
 
 which turns into:
 
-```ini
+```text
 IL_0000:  nop         
 IL_0001:  ldstr       "{0} - DOM Doccument update failed: {1}"
 IL_0006:  call        System.DateTime.get_UtcNow
@@ -209,10 +220,24 @@ But this is micro optimization at best. If performance is that important to you 
 ### Where can you use it?
 You can use String Interpolation with C# 6.0, and any post 4.5 version of .NET assuming you are using the C# 6 or later Roslyn compiler. Although Roslyn can compile down to .NET 4, String Interpolation relies on newer features of the framework to work properly - specifically **FormattableString**. You can still use this feature in older versions by [poly filling the missing methods](https://www.thomaslevesque.com/2015/02/24/customizing-string-interpolation-in-c-6/). Thanks to [Thomas Levesque](https://twitter.com/thomaslevesque) for pointing this out in the comments. 
 
-### Summary
-String Interpolation is a great way to make **code** more readable, but keep in mind that it's not a runtime templating solution as you can't read a format string into memory and then evaluate it - that's not possible using the String Interpolation syntax. This is purely a compiler feature that makes inlined string literals in your code more readable and maintainable. 
+### Refactoring Concatenated Strings to Interpolated Strings
+Both Resharper and Visual Studio have refactorings for turning concatenated strings into Interpolated Strings.
 
-Out of the feature set in C# 6 this feature (and the null propagation operator) is the one I probably use the most. I find I constantly use it for notification messages (status, message boxes, task notifications) and logging messages. It sure beats writing out verbose `string.Format()` commands.
+If you're using [ReSharper from Jetbrains](https://www.jetbrains.com/resharper/) you can  use the **Convert concatenation to interpolation** Refactoring:
+
+![](Refactoring.png)
+
+The native Visual Studio version looks like this (not quite as accessible):
+
+![](RefactoringVisualStudio.png)
+
+I find that invaluable because out of habit I tend to type concats, and I like converting them after the fact. For me it's faster than typing all the `$` and `{}` characters. There probably are Roslyn Analyzers you can pick up for this as well.
+
+
+### Summary
+String Interpolation is a great way to make **code** more readable, but keep in mind that **it's not a runtime templating solution** as you can't read a format string into memory and then evaluate it - that's not possible using the String Interpolation syntax. This is **purely a compiler feature** that makes inline string literals in your code more readable and maintainable. 
+
+Out of the feature set in C# 6 this feature (along with the null propagation 'Elvis' operator) is the one I probably use the most. I find I constantly use it for notification messages (status, message boxes, task notifications) and logging messages. It sure beats writing out verbose `string.Format()` commands.
 
 What do you use String Interpolation for? Chime in in the comments.
 
@@ -222,31 +247,3 @@ What do you use String Interpolation for? Chime in in the comments.
 * [Customizing String Interpolation in C# 6](https://www.thomaslevesque.com/2015/02/24/customizing-string-interpolation-in-c-6/)
 
 <small>post created with [Markdown Monster](https://markdownmonster.west-wind.com/)</small>
-
-
-<!-- Post Configuration -->
-<!--
-```xml
-<blogpost>
-<title>Back to Basics: String Interpolation in C#</title>
-<abstract>
-String Interpolation provides string templating for string literals in C#. Rather than using string.Format you can use string interpolation to produce much more readable code that embeds expression values directly into string literals rather than escaping numeric arguments as you do with string.Format(). In this post I look at how string interpolation works, what the compiler does under the covers and some common use cases where it makes life easier.
-</abstract>
-<categories>
-C#,.NET
-</categories>
-<keywords>
-C#,String,String Interpolation,string.Format,Template,Literals
-</keywords>
-<isDraft>False</isDraft>
-<featuredImage>https://weblog.west-wind.com/images/2016/Back%20to%20Basics%20String%20Interpolation%20in%20C/LineKnot.jpg</featuredImage>
-<weblogs>
-<postid>100480</postid>
-<weblog>
-West Wind Web Log
-</weblog>
-</weblogs>
-</blogpost>
-```
--->
-<!-- End Post Configuration -->
