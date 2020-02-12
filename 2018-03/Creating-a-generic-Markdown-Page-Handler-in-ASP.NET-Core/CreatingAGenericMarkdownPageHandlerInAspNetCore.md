@@ -5,6 +5,7 @@ keywords: Markdown, ASP.NET Core
 categories: ASP.NET Core, Markdown
 weblogName: West Wind Web Log
 postId: 744512
+permalink: https://weblog.west-wind.com/posts/2018/Apr/18/Creating-a-generic-Markdown-Page-Handler-using-ASPNET-Core-Middleware
 postDate: 2018-04-18T01:47:01.8636657-10:00
 ---
 # Creating a generic Markdown Page Handler using ASP.NET Core Middleware
