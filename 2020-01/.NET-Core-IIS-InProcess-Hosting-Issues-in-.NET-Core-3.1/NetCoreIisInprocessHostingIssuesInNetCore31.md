@@ -7,6 +7,10 @@ weblogName: West Wind Web Log
 postId: 1515835
 permalink: https://weblog.west-wind.com/posts/2020/Jan/14/ASPNET-Core-IIS-InProcess-Hosting-Issues-in-NET-Core-31
 postDate: 2020-01-14T14:52:21.8608225-10:00
+customFields:
+  mt_githuburl:
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2020-01/.NET-Core-IIS-InProcess-Hosting-Issues-in-.NET-Core-3.1/NetCoreIisInprocessHostingIssuesInNetCore31.md
 ---
 # .NET Core IIS InProcess Hosting Issue in .NET Core 3.1
 
