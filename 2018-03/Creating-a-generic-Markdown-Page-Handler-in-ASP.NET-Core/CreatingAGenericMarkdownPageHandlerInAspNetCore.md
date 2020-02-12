@@ -75,6 +75,7 @@ As usual for ASP.NET Core Middleware, you need to both hook up `ConfigureService
 
 The following configures up a `/posts/` folder for processing for Markdown files:
 
+
 ```cs
 public void ConfigureServices(IServiceCollection services)
 {
@@ -89,7 +90,38 @@ public void ConfigureServices(IServiceCollection services)
 }
 ```
 
-You then also need to hook up the Middleware in the `Configure()` method:
+You then also need to hook up the Middleware in the `Configure()` method. Note the procedure is different depending on whether you use .NET Core 2.x or 3.x.. 
+
+**.NET Core 3.x**  
+
+
+```csharp
+public void Configure(IApplicationBuilder app)
+{
+    // if you use default files make sure you do it before markdown middleware
+    app.UseDefaultFiles(new DefaultFilesOptions()
+    {
+        DefaultFileNames = new List<string> { "index.md", "index.html" }
+    });
+    
+    app.UseMarkdown();
+    app.UseStaticFiles();
+    
+    // the following enables MVC and Razor Pages
+    app.UseRouting();
+    
+    app.UseEndpoints(endpoints =>
+    {
+        // endpoints.MapRazorPages();  // optional
+        
+        // MVC routing is required for Markdown Pages
+        endpoints.MapDefaultControllerRoute();
+    });
+}
+```
+
+**.NET Core 2.x**  
+The 2.2 setup is a little simpler because MVC is the default routing mechanism:
 
 ```csharp
 public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -102,6 +134,8 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
     app.UseMvc();
 }
 ```
+
+Note if you are only using Markdown parsing or the tag helper **you don't need any of the routing or MVC bits**. Those are required **only if you use the Markdown Page rendering**.
 
 ### Create a Razor Host Template
 Next we need a Razor template that will host the rendered Markdown. This template is the "site chrome" that surrounds a rendered Markdown page. Each folder you configure can have its own template, so it's possible to vary the template. The template is just a Razor page that receives `MarkdownModel` which includes among other things a `Model.RenderedMarkdown` that you can embed into the page.
