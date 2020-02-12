@@ -90,10 +90,9 @@ public void ConfigureServices(IServiceCollection services)
 }
 ```
 
-You then also need to hook up the Middleware in the `Configure()` method. Note the procedure is different depending on whether you use .NET Core 2.x or 3.x.. 
+You then also need to hook up the Middleware in the `Configure()` method. This code is different for the 3.x and 2.x of .NET Core as the routing mechanics have changed.
 
 **.NET Core 3.x**  
-
 
 ```csharp
 public void Configure(IApplicationBuilder app)
@@ -104,12 +103,15 @@ public void Configure(IApplicationBuilder app)
         DefaultFileNames = new List<string> { "index.md", "index.html" }
     });
     
+    // required for all Markdown features
     app.UseMarkdown();
+    
     app.UseStaticFiles();
     
-    // the following enables MVC and Razor Pages
+    // the following enables MVC and Razor Pages -- needed only for Markdown Pages
     app.UseRouting();
     
+    // needed only for Markdown Pages
     app.UseEndpoints(endpoints =>
     {
         // endpoints.MapRazorPages();  // optional
@@ -121,16 +123,16 @@ public void Configure(IApplicationBuilder app)
 ```
 
 **.NET Core 2.x**  
-The 2.2 setup is a little simpler because MVC is the default routing mechanism:
 
 ```csharp
 public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 {
+    // required for all Markdown Features
     app.UseMarkdown();
 
     app.UseStaticFiles();
     
-    // we need MVC for the customizable Razor template
+    // required only for Markdown Pages
     app.UseMvc();
 }
 ```
