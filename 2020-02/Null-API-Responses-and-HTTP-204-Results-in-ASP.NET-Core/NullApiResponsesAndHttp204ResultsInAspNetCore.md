@@ -7,12 +7,16 @@ weblogName: West Wind Web Log
 postId: 1568307
 permalink: https://weblog.west-wind.com/posts/2020/Feb/24/Null-API-Responses-and-HTTP-204-Results-in-ASPNET-Core
 postDate: 2020-02-24T00:17:03.2271554-10:00
+customFields:
+  mt_githuburl:
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2020-02/Null-API-Responses-and-HTTP-204-Results-in-ASP.NET-Core/NullApiResponsesAndHttp204ResultsInAspNetCore.md
 ---
 # Null API Responses and HTTP 204 Results in ASP.NET Core
 
 ![](204NoContentResponseBanner.png)
 
-ASP.NET Core 3.x has a behavior that results in API results that return null from the controller action returning a `HTTP 204 - No Content` response rather than a **null JSON result**. Presumably the idea is that if you return null from an API, your intention is to return *'no content'* and that sort of make sense in some cases. Except... when you're building an API **null actually may actually have a meaning on the client** or the client at minimum may be expecting a proper JSON response.
+ASP.NET Core 3.x has a behavior that results in API results that return null from the controller action returning a `HTTP 204 - No Content` response rather than a **null JSON result**. Presumably the idea is that if you return null from an API, your intention is to return *'no content'* and that sort of make sense in some cases. Except... when you're building an API **null may actually have a meaning on the client** or the client at minimum may be expecting a proper JSON response.
 
 I've never been a fan of ASP.NET's API controllers 'helpfully' fixing up content like this. [String API results](https://weblog.west-wind.com/posts/2017/Sep/14/Accepting-Raw-Request-Body-Content-in-ASPNET-Core-API-Controllers) also don't return an `application/json` string result, but rather unhelpfully return `text/plain` raw text. That has never made sense to me and the auto 204 result is no better.
 
