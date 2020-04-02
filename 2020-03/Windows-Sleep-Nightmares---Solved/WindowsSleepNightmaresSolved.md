@@ -1,12 +1,16 @@
 ---
 title: Troubleshooting Windows Sleep Insomnia
 abstract: Windows long has had problems making machines stay in Sleep mode. In this post I describe some of the problems and likely solution by using `powercfg.exe` to hunt down and disable devices that can wake the computer from sleep.
-keywords: sleep,wake, powercfg, Windows
 categories: Windows
+keywords: sleep,wake, powercfg, Windows
 weblogName: West Wind Web Log
 postId: 1581650
-permalink: https://weblog.west-wind.com/posts/2020/Apr/02/Troubleshooting-Windows-Sleep-Insomnia
-postDate: 2020-04-02T01:10:54.9871884-10:00
+permalink: https://weblog.west-wind.com/posts/2020/Mar/02/Troubleshooting-Windows-Sleep-Insomnia
+postDate: 2020-03-02T01:10:54.9871884-10:00
+customFields:
+  mt_date:
+    key: mt_date
+    value: 2020-03-02T01:10:54.9871884-10:00
 ---
 # Troubleshooting Windows Sleep Insomnia
 

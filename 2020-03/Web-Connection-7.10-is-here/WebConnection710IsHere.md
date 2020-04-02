@@ -1,8 +1,8 @@
 ---
 title: Web Connection 7.10 is here
 abstract: Web Connection 7.10 is out and this is the official release post with a lot of detail over what's new and what's changed. This release brings a new self-contained Web Connection Web server and part of the post goes behind the rational of adding this new server to make it easier to get started with Web Connection.
-keywords: Release, Web Server, Web Connection
 categories: Web Connection
+keywords: Release, Web Server, Web Connection
 weblogName: Web Connection Weblog
 postId: 958
 postDate: 2020-03-08T01:24:24.8266218-10:00
@@ -59,6 +59,7 @@ Some considerations:
 * Requires a different but very small `web.config` for IIS Hosting
 
 Although in theory you can use this Web Server as a production Web Server without a front end Web server like IIS, generally the accepted approach is to run a production application behind IIS to provide features, auto-restart, lifetime management of the server, SSL Certificates, Host Header support for multiple domains on a single IP Address, static content compression, static file caching etc.  All these things can be handled by the Web Connection Server (courtesy of ASP.NET Core) but IIS is much better suited and vastly more efficient for these non-application Web Server tasks due to its tight Windows Kernel integration.
+
 
 ### Easy Configuration
 The most compelling reason for this new Web Server is that it's very easy to get started with. When you create a new project, the Web Connection Console now automatically creates a configuration file for both classic ASP.NET and the ASP.NET Core module. 
@@ -233,6 +234,26 @@ While the new server supports hosting under IIS, you can still use the existing 
 
 Performance of the server is on par with the old module inside of IIS - in informal testing I don't see any significant performance gain or loss of using the .NET Core application inside of IIS.
 
+### Linux?
+And yes, it's also possible to run this Web Server on Linux (or a Mac for that matter). Which means that you can deploy this server on a cheap Linux machine. You can do this - same as on Windows - both in standalone mode running the Web Connection Web Server's HTTP services directly, or running it behind a Web front like [ngnix](https://www.nginx.com/) or [HAProxy](https://www.haproxy.org/) or [Apache](https://httpd.apache.org/) in reverse proxy mode behind one of these front Web services. Note that this latter approach is common for Linux environment application services - NodeJs, most Java frameworks and many other solutions use this same approach.
+
+Now this is important: 
+
+> While You can run Web Connection Web server on Linux the FoxPro Web Connection Server application you create still needs to run on Windows. 
+
+The idea is that you use **File Mode** processing with temporary files written to a location that accessible both to the Linux Web Connection server, and your Web Connection FoxPro server. The shared file access makes it possible for the Windows application to take requests from the Linux based server.
+
+Currently this is not documented yet, but you'll hear more on this going forward.
+
+While I don't necessarily think this is the best solution, I've heard requests for this sort of functionality for years from many users as their company infrastructure doesn't use Windows web servers. This would allow those shops to use Linux Web servers with Windows application servers.
+
+### Local Web Server
+To be clear you can run the Web Connection Web Server on its own without any front end Web server on any of the supported platforms. This means you can copy the server with your application and run as a local server for a locally distributed application. If you have an internal network that you need to run the Web application on, you can expose a specific (typically non-80/222) port in the Firewall to serve the application **directly from the Web Connection Server**. For non-public facing applications, or APIs where URL syntax optics are not critical this is a acceptable scenario.
+
+The key is that you have options: Need a fully reliable and recoverable server setup? Use IIS or run the Web Connection server behind something like nginx on Linux. Your needs are simple and you need to expose HTTP services from an existing application? You can use the Web Connection server's HTTP services directly without anything else.
+
+It gives you choices that simply weren't available before.
+
 ### Why this server?
 As mentioned the main motivation for this server is the self-contained nature that makes it much easier to get started with Web Connection. You can simply install Web Connection - and make sure a .NET Core 3.x+ runtime is installed - and then run the WebConnectionWebServer locally. With integrated `launch()` behavior this can make getting started a no-configuration process.
 
@@ -292,7 +313,7 @@ Because there are different modes, the Console writes separate config files:
 * `web.AspNetHandler.config`
 * `web.DotNetCore.config`
 
-which are configured for the application and can be swapped into the live `web.config`. Typically you only use this for a production site swapping `web.FotnetCore.config` into the production `web.config` file for IIS hosting.
+which are configured for the application and can be swapped into the live `web.config`. Typically you only use this for a production site swapping `web.DotnetCore.config` into the production `web.config` file for IIS hosting.
 
 
 The `Launch.prg` file has been updated to make it easier to launch in different modes more easily. If you haven't used `Launch.prg` before, it provides application launching with a single command that:
@@ -331,9 +352,11 @@ You can now bypass Admin access if:
 * You know that your account has permissions 
   to write files in the targeted project folders
   
+ 
 If you're not sure on the latter point - Windows can be a pain with where your local account can write to - it's still best to run as Admin.
 
 What this means if you're creating new projects locally and you choose IIS Express or the new Web Connection Web Server it's possible to do those operations without Admin requirements.
+
 
 ## Simplified Live Reload Configuration for ASP.NET Module
 Previously the ASP.NET Module configuration for Live Reload required two steps:
