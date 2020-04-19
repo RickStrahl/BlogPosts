@@ -14,7 +14,7 @@ Client side applications have been using **Live-Reload** behavior forever. When 
 Unfortunately the same cannot be said for server side code. When making changes to script pages in Web Connection I make a change, then manually flip over to the browser to review the change. While it's not the end of the world, it's much nicer to have a browser side by side to my editor and see the change side by side.
 
 ### Linking Browser and File Watchers
-If you haven't used client side frameworks before and you don't know how browser syncing works here's a quick review. Browser synching typically works via tooling that does two things:
+If you haven't used client side frameworks before and you don't know how browser syncing works here's a quick review. Browser syncing typically works via tooling that does two things:
 
 * File Change Monitoring 
 * Updating the browser
@@ -71,6 +71,10 @@ Note the `--proxy localhost/wconnect` switch which tells browser-sync that I hav
 
 
 Here's what this looks like when you run browser sync:
+
+![](https://raw.githubusercontent.com/RickStrahl/ImageDrop/master/WebConnection/LiveReloadAndBrowserSync.gif)
+
+On the command line you run BrowserSync:
 
 ![](https://west-wind.com/wconnect/weblog/imageContent/2018/Using-Browser-Sync-To-Synchronize-Server-Side-Code/BrowserSyncTerminal.png)
 
@@ -145,7 +149,7 @@ Browser sync works great for any content that lives in the Web folder structure.
 So for 'real' code changes you're still going to have some manual cycling time. But that's probably OK. The time consuming stuff usually revolves around the fiddly HTML and CSS manipulation and that's where browser-sync can really help make you more productive.
 
 ### Caveats
-I've been using Browser Sync for a while now and while it works pretty good it does get 'stuck' every once in a while. It usally starts by the browser taking a long time to refresh a page or navigate to a new one. It doesn't happen very often, but it does happen enough to mention it here. Incidentally I see the same thing happening with the WebPack dev server in Angular. These tools are pretty hacky in how they intercept traffic and refresh so I'm not surprised that the Web Socket connection gets flakey in some situations. In fact, I'm rather surprised how well it works if anything.
+I've been using Browser Sync for a while now and while it works pretty good it does get 'stuck' every once in a while. Iusuallyly starts by the browser taking a long time to refresh a page or navigate to a new one. It doesn't happen very often, but it does happen enough to mention it here. Incidentally I see the same thing happening with the WebPack dev server in Angular. These tools are pretty hacky in how they intercept traffic and refresh so I'm not surprised that the Web Socket connection gets flakey in some situations. In fact, I'm rather surprised how well it works if anything.
 
 Once I see the browser navigating slowly or refreshing really slowly I simply kill the console window that's running the browser-sync code and I re-run `DO browsersync` from the FoxPro command line to start a new instance.
 

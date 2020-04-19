@@ -1,18 +1,18 @@
 ---
 title: Building a Live Reload Middleware Component for ASP.NET Core
 abstract: In my last way I showed how to use Live Reload in ASP.NET Server side applications using a tool called BrowserSync. In this post I replace BrowserSync's functionality with a custom Live Reload Middleware component for ASP.NET Core that's more efficient and doesn't require installing and running a separate tool. I'll show how Live Reload works, and how to implement the component in some detail.
-keywords: Live Reload,LiveReload,Middleware,Development,Debugging,AspNetCore
 categories: ASP.NET Core
+keywords: Live Reload,LiveReload,Middleware,Development,Debugging,AspNetCore
 weblogName: West Wind Web Log
 postId: 1283920
 permalink: https://weblog.west-wind.com/posts/2019/Jun/03/Building-Live-Reload-Middleware-for-ASPNET-Core
-postDate: 2019-06-03T13:17:45.8069309-07:00
+postDate: 2019-06-03T10:17:45.8069309-10:00
 ---
 # Building a Live Reload Middleware Component for ASP.NET Core
 
 ![](Refresh.jpg)
 
-In [my last post](https://weblog.west-wind.com/posts/2019/May/18/Live-Reloading-Server-Side-ASPNET-Core-App) I discussed how to integrate Live Reload in ASP.NET Core using a third party NodeJs application loaded from NPM called [BrowserSync](https://browsersync.io). While that works just fine, having to run yet another command line utility on top of `dotnet watch run` **just to provide Live Reload functionality** is a bit of a pain. 
+In [my last post](https://weblog.west-wind.com/posts/2019/May/18/Live-Reloading-Server-Side-ASPNET-Core-Apps) I discussed how to integrate Live Reload in ASP.NET Core using a third party NodeJs application loaded from NPM called [BrowserSync](https://browsersync.io). While that works just fine, having to run yet another command line utility on top of `dotnet watch run` **just to provide Live Reload functionality** is a bit of a pain. 
 
 Also in the last post I mentioned that it would be nice to build some middleware to provide the live client reloading functionality...  well, I got that itch to sit down and take a stab at it and the result is this [ASP.NET Core Live Reload Middleware Component](https://github.com/RickStrahl/Westwind.AspnetCore.LiveReload). 
 

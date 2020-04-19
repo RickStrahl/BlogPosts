@@ -77,6 +77,3 @@ Unfortunately that was way after I tried to trace down the problem in other ways
 
 ### The Moral of the Story
 The moral is this: Make sure your Async methods are actually called asynchronously especially if it deals with ASP.NET Core Response output. Without it the code might work - or it might not depending on timing of the async code running making for some really crazy inconsistent errors.
-
-
-

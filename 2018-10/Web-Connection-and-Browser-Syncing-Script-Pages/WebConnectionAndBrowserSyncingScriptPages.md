@@ -4,7 +4,7 @@ abstract: Live reloading is common in client side applications, but server side 
 keywords: 'Browser Sync, Web Connection'
 categories: Web Connection,Productivity
 weblogName: Web Connection Weblog
-postId: 944
+postId: 943
 postDate: 2018-10-10T00:28:09.5783959-07:00
 ---
 # Using Browser Sync to automatically reload Web Connection Server Changes

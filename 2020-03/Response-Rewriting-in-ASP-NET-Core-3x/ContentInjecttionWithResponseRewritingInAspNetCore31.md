@@ -1,21 +1,20 @@
----
-title: Content Injection with Response Rewriting in ASP.NET Core
+﻿---
+title: Content Injection with Response Rewriting in ASP.NET Core 3.x
 abstract: If you're creating middleware components you might need at some point to inject content in the existing HTTP output stream in ASP.NET Core. In this post I discuss how to intercept Response output by using a customized stream, modify the data and update the final output generated, effectively providing response filtering.
 keywords: Response, Filtering, Rewriting, Filter, ASP.NET Core, Injection, HTML, Headers
 categories: ASP.NET Core
 weblogName: West Wind Web Log
-postId: 1637390
-permalink: https://weblog.west-wind.com/posts/2020/Apr/02/Content-Injection-with-Response-Rewriting-in-ASPNET-Core-3x
-postDate: 2020-04-01T01:10:14.8494061-10:00
+postId: 1669004
+permalink: https://weblog.west-wind.com/posts/2020/Mar/29/Content-Injection-with-Response-Rewriting-in-ASPNET-Core-3x
+postDate: 2020-03-29T01:10:14.8494061-10:00
 customFields:
   mt_date:
     key: mt_date
-    value: 2020-04-02T01:10:14.8494061-10:00
+    value: 2020-03-29T01:10:14.8494061-10:00
 ---
-# Content Injection with Response Rewriting in ASP.NET Core
+# Content Injection with Response Rewriting in ASP.NET Core 3.x
 
 ![](Injection.png)
-
 
 In building my [Westwind.AspNetCore.LiveReload middleware component](https://github.com/RickStrahl/Westwind.AspnetCore.LiveReload) a while back, one issue that came up was how to handle Response rewriting in ASP.NET Core. This middleware provides optional live reload functionality to ASP.NET Core projects letting you reload the active page as soon as any monitored file is changed. Rather than an external tool it provides this functionality as middleware that can be plugged in and turned on/off via configuration.
 
@@ -223,7 +222,7 @@ Regardless, since this middleware injects additional script into the page, `Cont
 
 To make this scenario even worse, in [ASP.NET Core 3.0 there was a bug](https://github.com/dotnet/aspnetcore/issues/14056#issuecomment-532066740) that fired the stream's `FlushAsync()` method **before the first `Write` operation** when the initial Response stream was created. Arrgh! So the code also checks `FlushAsync()` for HTML content and resets the `Content-Length` there. That was a fun one to track down. . Luckily it **looks like that issues was fixed in ASP.NET Core 3.1.**.
 
-## The Actual Rewrite Code
+### The Actual Rewrite Code
 The actual rewrite code rewrites the incoming byte buffer as it comes into any of the Stream write operations. Because there are a number of overloads and sync and async versions, this code is moved out into separate helper methods that are called from the appropriate Write methods.  The code uses `Span<T>` to split the inbound buffer to avoid additional allocation of an extra buffer and then writes the three buffers - pre, script, post - out into the stream:
 
 ```cs

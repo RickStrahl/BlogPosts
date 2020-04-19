@@ -1,8 +1,8 @@
 ---
-title: Live Reloading Server And Client Side ASP.NET Core Apps
+title: Live Reloading Server And Client Side ASP.NET Core Apps  with BrowserSync
 abstract: Client side live reloading is one of the most compelling features of client side JavaScript development. Instant updates of any code changes in the browser are a huge productivity booster - WYSIWYG on steroids. Unfortunately for ASP.NET Core server side code and MVC apps there aren't any comparable easy solutions. In this post I show how I use Browser Sync and `dotnet watch` in combination to provide live reloading for both server and client side changes.
-keywords: Live Reload,BrowserSync, dotnet watch, browser-sync, MVC, API
 categories: ASP.NET Core,HTML,MVC
+keywords: Live Reload,BrowserSync, dotnet watch, browser-sync, MVC, API
 weblogName: West Wind Web Log
 postId: 1269466
 permalink: https://weblog.west-wind.com/posts/2019/May/18/Live-Reloading-Server-Side-ASPNET-Core-Apps
@@ -12,9 +12,11 @@ customFields:
     key: mt_githuburl
     value: https://github.com/RickStrahl/BlogPosts/blob/master/2019-05/Using-Browser-Sync-with-ASP.NET-Core/UsingBrowserSyncWithAspNetCore.md
 ---
-# Live Reloading Server and Client Side ASP.NET Core Apps
+# Live Reloading Server and Client Side ASP.NET Core Apps with BrowserSync
 
 ![](banner.jpg)
+
+<small style='color: #C83D26; font-style: italic'>This post uses a a third party tool called BrowserSync to handle client side refreshing. [There's a newer post](https://weblog.west-wind.com/posts/2019/Jun/03/Building-Live-Reload-Middleware-for-ASPNET-Core) that uses an [ASP.NET Core middleware component](https://github.com/RickStrahl/Westwind.AspnetCore.LiveReload) that can integrate Live Reload right into your ASP.NET Core application. For ASP.NET Core applications this is a cleaner way that doesn't require an additional command line tool.</small>
 
 Client side in-browser hot reloading is one of the most compelling features of client side development. If you're using any client side framework like Angular, Vue or React they all come with integrated CLIs that provide instant live reloading of content as soon as you make a change.
 
@@ -40,7 +42,8 @@ You also need to run 2 terminal windows for this particular solution to work.
 
 Here's what the end result looks like:
 
-![AspNet Live Reload with BrowserSync and Dotnet Watch](https://westwindserverstorage.blob.core.windows.net/blogimages/2019/05/AspNetCore_LiveReload_With_BrowserSyncAndDotnetWatch.gif)
+![AspNet Live Reload with BrowserSync and Dotnet Watch](https://github.com/RickStrahl/ImageDrop/raw/master/BlogPosts/AspNetCore_LiveReload_With_BrowserSyncAndDotnetWatch.gif)
+
 
 The process I describe deals with two distinct scenarios: Server side code change detection and restarting, that require recompilation and re-running of your server app, followed by a refresh of client pages. Client side refresh for static content like HTML, CSS, JavaScript/TypeScript as well as for Razor pages/views which update client side using Browser Sync. 
 
