@@ -147,7 +147,7 @@ To set the Environment and turn on Detailed Error logging in `web.config`:
 </aspNetCore>             
 ```
 
-Turns out in this case that didn't help and I didn't actually get more detailed error info because this happened as part of the initial startup sequence, but this is good advice nevertheless for startup debugging.
+Turns out in this case that didn't help either and I didn't actually get more detailed error info because this happened as part of the initial startup sequence, but this is good advice nevertheless for startup debugging. **Remember to do this only for debugging** as it will slow down your application and potentially expose sensitive detail into the logs.
 
 Damian Edwards also chimed in with looking in the Event Log:
 
@@ -204,8 +204,15 @@ So this particular failure is specific to self-contained runtime installs and no
 
 Either way, it's a good idea to check for the errant 2.2 packages because... they shouldn't be there regardless of whether it works or not. Once I removed the 2.2 package reference shown above, the runtimes folder was removed from the NuGet Tool package and from the self-contained publish runtimes folder. The standalone published application then started working InProcess.
 
+### Follow the Event Log
+For all the griping about misleading error messages, this is not always the case and in fact I have to give kudos for the ASP.NET team for providing excellent error info to tricky problems in other scenarios. A few weeks after I posted this entry, I ran into another hosting startup problem and in that situation the hosting module along with the Event Log entry provided good information for tracking down the problem.
+
+Check out this sequence of log messages that lead to the solution - fixing the Application Pool bitness which was set to 32 bit when no 32 bit SDK was present:
+
+![](EventLogDebuggingGoneRight.png)
+
 ## Summary
-Long story short, the 2.2 dependency is what broke the InProcess Hosting in IIS in .NET Core 3.1 for a self-contained runtime install. The 2.2 dependency can come from a direct dependency or potentially from an indirect dependency to other ASP.NET Core 2.2 references in child dependencies, so it may not be quite so easy to see where a 2.2 reference is coming from or potentially be difficult to remove if you don't control some component that's loading it. The IIS assembly should be safe to be only in Application code, buyt the `Microsoft.AspNetCore` reference could be more tricky if a component is referencing that. 
+Long story short, for the original problem the 2.2 dependency is what broke the InProcess Hosting in IIS in .NET Core 3.1 for a self-contained runtime install. The 2.2 dependency can come from a direct dependency or potentially from an indirect dependency to other ASP.NET Core 2.2 references in child dependencies, so it may not be quite so easy to see where a 2.2 reference is coming from or potentially be difficult to remove if you don't control some component that's loading it. The IIS assembly should be safe to be only in Application code, buyt the `Microsoft.AspNetCore` reference could be more tricky if a component is referencing that. 
 
 This is a regression bug in .NET Core 3.1  and will be fixed in future updates so this bug won't be around in later updates (current version 3.1.101 which is still broken), but until this is fixed this might bite a few of you as it did me and hopefully this post makes it a little easier to find the solution.
 

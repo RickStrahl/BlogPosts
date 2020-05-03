@@ -1,4 +1,4 @@
----
+﻿---
 title: Missing Sharing Tab in Windows Explorer and Sharing with PowerShell
 abstract: "On several of my machines I've found that the 'Sharing Tab' in Explore had gone missing and I've been unable to create a share through the Windows UI. Apparently some update or software installed mucked with my settings that created an explicit exclusion to disable this Shell Addin. In this post I describe how to fix this problem and then offer several solutions: Fixing the UI problem and maybe more usefully show how you can use Powershell to share a folder or drive instead of the Windows UI."
 keywords: Sharing Tab,Sharing,Explorer,New-SMBShare,Get-SMBShare
@@ -20,13 +20,14 @@ Specifically I wanted to share my `projects` work folder with development work b
 
 ![](NoSharingTab.png)
 
-Nope - no soup - eh sharing for you!
+Nope - no soup - errr, Sharing Tab for you!
 
 ### Blocked Shell Extensions
 After a long bit of searching I ran into an obscure comment on [a Windows Club post](https://www.thewindowsclub.com/sharing-tab-is-missing-windows) which points at the solution:
 
 Windows has a Blocked Shell Extensions Section in the registry and in my case the Sharing Tab somehow ended up on that list.
 
+#### Make sure Sharing is Enabled
 The Windows Club article doesn't go into the blocked shell extensions, but it shows how to enable the sharing tab feature in Windows if for some reason it's disabled by enabling in the registry:
 
 * Use RegEdit
@@ -36,7 +37,10 @@ if it doesn't exist
 
 This enables the functionality, but I suspect that for most installations this setting will already be there as it was in my case. So I didn't have to add anything **yet the Sharing Tab was still missing**.
 
+#### Check to ensure Sharing isn't Blocked
 The actual problem is that the extension was explicitly blocked in my registry Blocked Shell Extensions list. Remember that Shell ID Guid from above? That sucker ended up in the exclusion list effectively blocking the Sharing Tab.
+
+![](SharingBlockedInRegistry.png)
 
 To fix this:
 
@@ -45,8 +49,6 @@ To fix this:
 * Check for the `{f81e9010-6ea4-11ce-a7ff-00aa003ca9f6}` Id
 
 If that id is present then the Sharing Tab is blocked. For me it was in there and hence - no Sharing Tab.
-
-To fix the problem then:
 
 * Remove the `{f81e9010-6ea4-11ce-a7ff-00aa003ca9f6}` entry   
 from the Blocked list
