@@ -1,4 +1,14 @@
-﻿# Bootstrap Modal Dialog showing under Modal Background
+﻿---
+title: Bootstrap Modal Dialog showing under Modal Background
+abstract: On more than a few occasions I've run into issues with Bootstrap's Modal dialog rendering incorrectly with the dialog showing underneath the overlay. There are a number of ways around this problem, but none of them are universal that depend on how your pages are laid out. It's especially problematic for applications that dynamically render components where there's no good control on where the elements are placed outside of the components DOM containership. In this post, I describe a few of the workarounds and their limitations.
+categories: CSS,Angular
+keywords: Modal,Bootstrap,CSS,Angular,Overlay,Fail
+weblogName: West Wind Web Log
+postId: 12344
+permalink: https://weblog.west-wind.com/posts/2016/Sep/14/Bootstrap-Modal-Dialog-showing-under-Modal-Background
+postDate: 2020-07-22T21:53:53.4672214-10:00
+---
+# Bootstrap Modal Dialog showing under Modal Background
 I've repeatedly run into the following problem with Bootstrap's modal dialog where the dialog ends up **showing** underneath the modal background:
 
 ![](BootstrapModalFail.png)
@@ -56,17 +66,19 @@ Well not quite. If you can move your elements - great, but in dynamic applicatio
 
 The problem is that the `.modal-backdrop` overlay sits in the root of the DOM tree while the other content is buried in a separate DOM node tree. 
 
-If anything inside of that tree is relatively positioned, the z-index can no longer be compared effectively. I tried with a number of values but it **just doesn't work** in this scenario:
+If anything inside of that tree is relatively positioned, the z-index can no longer be compared effectively. You can try using the following (Bootstrap 4 - in 3 use `.modal-dialog` instead of `.modal-content`:
 
 ```css
 .modal-backdrop {
     z-index: 1040 !important;
 }
-.modal-dialog {
+.modal-content {
     margin: 2px auto;
     z-index: 1100 !important;
 }
 ```
+
+This **does work** in some situations but not in others, so this may depend on your application's layout. Just make sure you use `!important` and you ensure that the `.modal-content` is set higher than `.modal-backdrop`.
 
 
 One workaround is to essentially force the modal out to the body tag with script. Since I trigger the modal in code anyway, it's easy enough to do the following:
@@ -130,7 +142,6 @@ You can also turn off the background on a case by case basis using an attribute 
 ```
 which works if you have a mixed bag of dialogs that are perhaps defined globally and statically at the root, along with application generated and embedded modals.
 
-
 ### Summary
 This isn't exactly news, but after repeatedly running into this problem I decided to write it down so **I** can remember how the heck to fix it next time it happens.
 
@@ -138,10 +149,13 @@ To summarize:
 
 * If possible move the Modal into the `<body>` element
 * If possible have no position fixed, absolute or relative elements above the `.modal`
-* If possible use code tomove the `.modal` to the `<body>` tag, and remove or move back when done
+* If possible use code to move the `.modal` to the `<body>` tag, and remove or move back when done
+* Explicitly override the `.modal-backdrop` and `.modal-content` `zindex` style
 * If all else fails, remove the background on `.modal-background` with `display: none` or the `data-background=false` attribute.
 
-It's crazy to think that the Bootstrap folks have decided to not fix this common issue. The volume of answers and comments on [this StackOverflow issue](http://stackoverflow.com/questions/10636667/bootstrap-modal-appearing-under-background) as well as [the GitHub issue](https://github.com/twbs/bootstrap/issues/16148) are huge, yet this hasn't been addressed in well over a year and a half.  There's a supposed fix (which moves the overlay into the same DOM tree as the modal) but experimenting with that by explicitly moving it in code just proved to be even weirder with strange opacity behavior and other weird artificats.
+It's crazy to think that the Bootstrap folks have decided to not fix this common issue.
+
+The volume of answers and comments on [this StackOverflow issue](http://stackoverflow.com/questions/10636667/bootstrap-modal-appearing-under-background) as well as [the GitHub issue](https://github.com/twbs/bootstrap/issues/16148) are huge, yet this hasn't been addressed in well over a year and a half.  There's a supposed fix (which moves the overlay into the same DOM tree as the modal) but experimenting with that by explicitly moving it in code just proved to be even weirder with strange opacity behavior and other weird artificats.
 
 For me personally the `display:none` trick is what I went with because it just works without any changes.
 
@@ -152,27 +166,3 @@ If anybody can think of a way we could make this work in a **dynamic** applicati
 * [A million questions and answers on this topic on StackOverflow](http://stackoverflow.com/questions/10636667/bootstrap-modal-appearing-under-background)
 * [Thread on BootStrap GitHub Repo](https://github.com/twbs/bootstrap/issues/16148)
 * [Supposed fix (not integrated)](https://github.com/twbs/bootstrap/pull/16432)
-
-<!-- Post Configuration -->
-<!--
-```xml
-<blogpost>
-<abstract>
-On more than a few occasions I've run into issues with Bootstrap's Modal dialog rendering incorrectly with the dialog showing underneath the overlay. There are a number of ways around this problem, but none of them are universal that depend on how your pages are laid out. It's especially problematic for applications that dynamically render components where there's no good control on where the elements are placed outside of the components DOM containership. In this post, I describe a few of the workarounds and their limitations.
-</abstract>
-<categories>
-CSS,Angular
-</categories>
-<keywords>
-Modal,Bootstrap,CSS,Angular,Overlay,Fail
-</keywords>
-<weblogs>
-<postid>12344</postid>
-<weblog>
-Rick Strahl's Weblog
-</weblog>
-</weblogs>
-</blogpost>
-```
--->
-<!-- End Post Configuration -->

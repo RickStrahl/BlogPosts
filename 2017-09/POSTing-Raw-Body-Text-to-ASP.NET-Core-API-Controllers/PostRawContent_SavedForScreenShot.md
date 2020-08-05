@@ -1,23 +1,21 @@
 ---
-title: Accepting Raw Request Body Content in ASP.NET Core API Controllers
+title: Accepting Raw Request Body Content in ASP.NET Core API
 weblogName: West Wind Web Log
 postId: 398834
----
+--- 
 # Accepting Raw Request Body Content in ASP.NET Core 
 
 ![](Raw-Data.jpg)
 
-A few years back I wrote a post about [Accepting Raw Request Content with ASP.NET Web API](https://weblog.west-wind.com/posts/2013/Dec/13/Accepting-Raw-Request-Body-Content-with-ASPNET-Web-API). The process to get at raw request data is rather indirekt, with no easy, or official way to get it into Controller action parameters. Not much has raelly changed in ASP.NET Core's implementation.
-
-The good news is that it's quite a bit easier to create custom formatters in ASP.NET Core that let you customize how to handle 'unknown' content types in your controllers.
+A few years back I wrote a post about [Accepting Raw Request Content with ASP.NET Web API](https://weblog.west-wind.com/posts/2013/Dec/13/Accepting-Raw-Request-Body-Content-with-ASPNET-Web-API). The process to get at raw request data is rather indirext, with no easy, or official way to get it into Controller action parameters. Not much has raelly changed in ASP.NET Core.
 
 ### Creating a Simple Test Controller
-To check this out I created a new stock Core Web API project and changed the default `ValuesController` to this sample controller to start with:
+To check this out I created a new stock Core Web API project and changed the default `ValuesController` to this:
 
 ```cs
 public class BodyTypesController : Controller 
 { }
-```    
+```
 
 #### JSON String Input
 Lets start with a non-raw request, but rather with posting a string as JSON since that is very common. You can accept a string parameter and post JSON data from the client pretty easily.
@@ -27,7 +25,6 @@ Lets start with a non-raw request, but rather with posting a string as JSON sinc
 [Route("api/BodyTypes/JsonStringBody")]
 public string JsonStringBody([FromBody] string content)
 {
-
     return content;
 }
 ```

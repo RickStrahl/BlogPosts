@@ -4,13 +4,9 @@ abstract: If you're creating middleware components you might need at some point 
 keywords: Response, Filtering, Rewriting, Filter, ASP.NET Core, Injection, HTML, Headers
 categories: ASP.NET Core
 weblogName: West Wind Web Log
-postId: 1669004
+postId: 1746559
 permalink: https://weblog.west-wind.com/posts/2020/Mar/29/Content-Injection-with-Response-Rewriting-in-ASPNET-Core-3x
 postDate: 2020-03-29T01:10:14.8494061-10:00
-customFields:
-  mt_date:
-    key: mt_date
-    value: 2020-03-29T01:10:14.8494061-10:00
 ---
 # Content Injection with Response Rewriting in ASP.NET Core 3.x
 
