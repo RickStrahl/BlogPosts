@@ -7,6 +7,10 @@ weblogName: West Wind Web Log
 postId: 1900072
 permalink: https://weblog.west-wind.com/posts/2020/Aug/05/Using-NET-Core-Tools-to-Create-Reusable-and-Shareable-Tools-Apps
 postDate: 2020-08-05T00:14:17.5009200-10:00
+customFields:
+  mt_githuburl:
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2020-08/DotnetTools/DotnetTools.md
 ---
 # Using .NET Core Tools to Create Reusable and Shareable Tools & Apps
 
@@ -30,6 +34,10 @@ And while the original idea was to build tools to aid as part of the build and d
 ### Why use Dotnet Tools?
 While the idea behind Dotnet Tools isn't anything new, this tooling does provide a number of benefits to developers and the entire .NET Core eco system. The big selling points are:
 
+**Easy to use**
+* Single command install. Example: `dotnet tool install -g LiveReloadServer`
+* Global path access to run command: `LiveReloadServer --help`
+
 **Easy to build**
 
 * Uses standard .NET Core Projects
@@ -40,7 +48,7 @@ While the idea behind Dotnet Tools isn't anything new, this tooling does provide
 **Sharing**
 
 * Can be easily shared
-* Can reach a large number of users
+* Can reach a large number of users via NuGet
 * Quickly published and available 
 * No explicit package validation
 
@@ -259,7 +267,7 @@ But... this doesn't work yet, because I haven't published the package yet. You c
 
 Et voila! You've just installed the Dotnet Tool locally and you can now run the tool simply by typing `magicwindball` into the Terminal. **Figure 3** shows building, installing and running the tool in a Terminal window.
 
-![](../Conferences/PADNUG2020/images/BuildAndRunLocal.png)  
+![](images/buildandrunlocal.png)
 <small>**Figure 3** - Build and run your Dotnet Tool locally</small>
 
 #### Publishing to NuGet
@@ -305,18 +313,16 @@ You can now install and run the component from the NuGet Package Store. **Figure
 
 If you need to update the Dotnet Tool, make your code changes and increment the version number of the project then simply, re-publish to NuGet. A new package with the new version number is created and pushed and that becomes available on Nuget. Then use `dotnet tool update -g dotnet-magicwindball` to update the local tool installation. 
 
-
 ### How a Tool gets Executed
-Dotnet Tools are deployed as .NET NuGet packages that **don't include an OS specific executable file**. Rather, when a tool is installed, a proxy launcher executable is created that acts as a proxy loader for the .NET Core runtime, which then bootstraps the dotnet tool application. The proxy is created in a system mapped `.dotnet` folder and is then globally available by the command name. **Figure 6** shows the proxy and the actual install folder that holds only the .NET assemblies that can execute on any platform.
+Dotnet Tools are deployed as .NET NuGet packages which **don't include an OS specific executable file**. Rather, when a tool is installed, a plaform specific, native launcher executable is generated that acts as a proxy loader for the .NET Core runtime, which then bootstraps the dotnet tool application. The launcher is created in a system mapped `.dotnet` folder and is then globally available using the `<CommandName>` specified by the project. **Figure 6** shows the proxy and the actual install folder that holds only the .NET assemblies that can execute on any platform.
 
 ![](images/DotnetToolsProxyFolder.png)  
 <small>**Figure 6** - An installed Dotnet Tool uses a proxy loader to launch the Dotnet Tool.</small>
 
-The `.dotnet/.store` path holds the actual unpacked NuGet package content for each tool installed. When you run the proxy stub (`magicwindball.exe` in this case), the launcher starts, loads the .NET Core runtime and then calls the `static void Main()` entry point in the entry assembly of the package. The `.exe` you see on the left in **Figure 6** is only a loader. If hook up an IL decompiler to the EXE you'll find that the exe is a native binary, not a .NET assembly.
+The `.dotnet/.store` path holds the actual unpacked NuGet package content for each tool installed. When you run the launcher stub (`magicwindball.exe` on Windows), the launcher starts, loads the .NET Core runtime and then calls the `static void Main()` entry point in the entry assembly of the package. The `.exe` you see on the left in **Figure 6** is only a loader. If hook up an IL decompiler to the EXE you'll find that the exe is a native binary, not a .NET assembly. 
 
 ![](images/NotADotnetAssembly.png)  
 <small>**Figure 7** - The Dotnet Tool proxy executable is a native launcher</small>
-
 
 ### Running on another Platform: Linux with WSL
 Dotnet Tools are platform agnostic and assuming your application doesn't use any platform specific features, they can run as is on Windows, Mac or Linux.
@@ -389,7 +395,9 @@ Then to run the converter you can specify a source snippet or folder and an outp
 snippetconverter "~\Visual C#\My Code Snippets" -o "~\ww-csharp.code-snippets" -r -d
 ```
 
-To make the snippet location easier to use the tool lets you use `~` for the default snippet folders. For Visual Studio you can specify 
+To make the snippet location easier to use the tool lets you use `~` for the default snippet folders. For Visual Studio this points to the `<Documents>\Visual Studio 2019 Code Snippets` folder for example.
+
+**Figure 11** shows the source snippet folder and output generated by the Visual Studio code export:
 
 ![](images/SnippetConverterExportedSnippets.png)  
 <small>**Figure 11** - Migrated snippets in VS Code</small>
@@ -519,6 +527,10 @@ Hopefully this post has given you some ideas of tools that you might want to use
 Rock on!
 
 ## Resources
+* [MagicWindball Project on GitHub](https://github.com/RickStrahl/CodeMagazine-DotnetTools/tree/master/Source/MagicWindBall)
+* [PowerPoint Slides for this Session](https://github.com/RickStrahl/CodeMagazine-DotnetTools/raw/master/DotnetCoreTools.pptx)
+
+
 * [Nate McMaster's Tool List](https://github.com/natemcmaster/dotnet-tools)
 * [ToolGet Tool Package Search](https://www.toolget.net/)
 * [NuGet Package Explorer](https://github.com/NuGetPackageExplorer/NuGetPackageExplorer)
