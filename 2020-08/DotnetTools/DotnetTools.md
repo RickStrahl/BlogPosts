@@ -1,5 +1,6 @@
 ---
 title: Using .NET Core Tools to Create Reusable and Shareable Tools & Apps
+featuredImageUrl: https://jekyll.west-wind.com/assets/2020-08-05-Using-NET-Core-Tools-to-Create-Reusable-and-Shareable-Tools-&-Apps/banner.png
 abstract: Dotnet Tools offer a simple way to create, publish and consume what are essentially .NET Core applications that can be published and shared using the existing NuGet infrastructure for packaging and distribution. It's y quick and easy to build tools that you can share either publicly or privately.  In this article I make a case for why you might use or build a Dotnet Tool and show how create, build, publish and consume Dotnet tools as well as showing some examples of useful tools I've build and published.
 keywords: Dotnet Tool
 categories: .NET Core, ASP.NET Core
@@ -63,6 +64,11 @@ On the flip side there is a big prerequisite to using a Dotnet Tool:
 
 The SDK dependence is both a blessing and a curse: Because it's guaranteed that the .NET Core Runtime is installed, binaries of your Dotnet Tool can be very small and only consist of application specific files. But the .NET SDK has to exist on the target machine and the SDK install is neither small, nor something that a typical, non development user will already have installed. 
 
+### Global and Local Dotnet Tools
+Tools can be installed either as a  **global** or **local** tool. Global tools are easily accessible on the local machine in a central and path mapped location. Local tools are specifically installed 'locally' into a subfolder folder and only accessible from there. This is often useful for build tools and CI systems that need to install tools are used in the application build process.
+
+In this article I focus primarily on the usage for **global tools** and the sharing aspects of Dotnet Tools as general purpose utilities, although many of the concepts and operations also apply to local tools.
+
 ### Careful: Security of Dotnet Tools
 Since Dotnet Tools are executables that are installed from a remote source and there is no validation process for published tools, it's important to understand that **there is a potentially substantial security risk** to your machine. The code that comes down can execute locally on your system and  has access to your local resources when you run a tool.
   
@@ -104,6 +110,8 @@ There are a couple of other places you can check though:
 * Nate McMaster has a GitHub repo with a [list of many Dotnet Tools](https://github.com/natemcmaster/dotnet-tools)
 
 * The [ToolGet Site](https://www.toolget.net/tools?q=LiveReloadServer) searches NuGet with a Dotnet Tool filter!
+
+> Looks like Microsoft has very recently added support for searching for Dotnet Tools via Filters that have been added, so it's a bit easier now to do this right on the [NuGet Site](https://nuget.org).
 
 ### Dotnet Tool or Platform Specific Binary?
 .NET Core supports creating executable binaries for every platform that it supports. But each platform requires a custom executable launcher and runtime dependencies to run, which means each platform distribution is different. 
@@ -447,7 +455,7 @@ choco install htmlpackager
 ### Servers
 Because a .NET tool is just a .NET Core application you can take advantage of just about any .NET Core feature - including the ability to create self-contained Web server applications and services that can run locally. 
 
-#### [LiveRelodServer](https://github.com/RickStrahl/LiveReloadServer) - A Generic Static File Web Server
+#### [LiveReloadServer](https://github.com/RickStrahl/LiveReloadServer) - A Generic Static File Web Server
 I frequently run local static Web sites on my dev machine where I need to access some client side development site or if I need to do some quick fixes to some HTML or client side content and just push it back up to a server. 
 
 In order to do this efficiently I can spin up a full development environment or I can just quickly run a local development server and run the application. The `LiveReloadServer` tool I created is just that - a quick and dirty .NET Core based static Web Server that can serve local static file content out of an arbitrary folder you specify. It can:
@@ -522,7 +530,7 @@ Dotnet Tools provide a great way to share executable code from .NET Core in an e
 
 They are easy to consume which gives access to a variety existing tools and because they are so easy to share promote a community of tools to be created. 
 
-Hopefully this post has given you some ideas of tools that you might want to use, or better yet - create and share your own with the communicate or even just within your organization.
+Hopefully this post has given you some ideas of tools that you might want to use, or better yet - create and share your own with the community or even just within your organization.
 
 Rock on!
 
