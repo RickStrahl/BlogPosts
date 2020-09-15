@@ -1,79 +1,113 @@
 ---
-title: Don't get bitten by missing await for Response.Write() Code in Middleware
+title: Don't get burned by missing await Calls for Async Code in ASP.NET Core Middleware
+abstract: I recently got burned in an upgraded ASP.NET Core server application where a missing `await` statement caused wildly inconsistent and puzzling output failures. While a simple thing to avoid, once introduced it's possible to live with this error for some time before it manifests. In this post I show a scenario where a missing `await` was causing infrequent HTTP response errors, even though the client apparently receives a valid response.
+categories: ASP.NET Core
+keywords: Response.WriteAsync(), await, async
 weblogName: West Wind Web Log
-postDate: 2020-04-01T14:33:48.9553514-10:00
+postId: 1988467
+permalink: https://weblog.west-wind.com/posts/2020/Sep/14/Dont-get-burned-by-missing-await-Calls-for-Async-Code-in-ASPNET-Core-Middleware
+postDate: 2020-09-14T15:04:12.3348388-10:00
 ---
-# Don't get Burned by missing await Calls for Async Code in ASP.NET Core Middleware
+# Don't get burned by missing await Calls for Async Code in ASP.NET Core Middleware
 
-This falls in the category of stupid developer mistakes tnat are difficult to track down. In this post I'll discuss a nasty bug I ran into with my code that I totally misdiagnosed. It refers to an intermittent failure of HTTP requests in a custom middleware component where I would get HTTP errors **even though the actual response apparently was received properly**.
+This post falls into the category of stupid developer mistakes that are difficult to track down. In this post I'll discuss a nasty bug I ran into with my code, and which I totally misdiagnosed at first. It refers to an intermittent failure of HTTP requests in a custom middleware component where I would get HTTP errors **even though the actual response apparently was received properly**.
 
- Check out this request trace in Fiddler:
+Check out this request trace in Fiddler:
 
 ![](HttpFailures.png)
 
-Notice that the response code is a `200` response, but yet it shows with an error icon next to it. Per Eric Lawrence (the original author of Fiddler) I also checked the Session properties:
+Notice that the response code is a `200` response, but yet it shows with an error icon next to it. Per [Eric Lawrence](https://twitter.com/ericlaw) (the original author of Fiddler) I also checked the Session properties:
 
 ![](HttpFailureDetail.png)
 
-which seems to suggest that the response was aborted (`X-ABORTED-WHEN`). But looking at the actual response, it looks like the HTML output is all there and matches the content length. The content looks good, the size is good. It took a while to guess at it: Apparently ASP.NET is cutting the connection before the final output is sent, even though it appears that all bytes have been received per fiddler.
+which seems to suggest that the response was aborted (`X-ABORTED-WHEN`). 
 
-Worse: **it works most of the time - it only fails occasionally** on the same pages, creating the exact same content. Lovely!
+In the browser this page renders... blank. It comes up as a **totally white page** - not as an error, just blank. This happens both with and without Fiddler attached.
 
-### A Legacy Rewrite
-This particular problem was rearing its ugly head in a custom middleware component that interfaces with a **legacy backend application server** with the middleware middle more less serving as a request forwarder. The incoming request data is routed to the application server, which turns around and produces resulting byte stream output which the middleware then pipes into the ASP.NET Core HTTP output stream.  
+Looking at the actual response output in Fiddler, it looks like the HTML output is all there and matches the content length generated on the server. And yes, I logged the actual content size sent to the client and it matches the `Content-Length` header the client sees in Fiddler.
 
-The implementation of this middleware interface was ported from a **classic ASP.NET `IHttpHandler`** and re-built into ASP.NET Core middleware. Surprisingly this process was not too difficult - in fact the vast majority of this ancient .NET codebase originally written in .NET 1.1 (but updated through the years to run on 4.x) **just ported right over into .NET Core**. All the core application server interface features more or less worked using the old classes and data structures.
+What... the... heck???
 
-The middleware then basically re-implements the seams that push the data to the Application Server and receives back the resulting byte data. For the most part the code just ported, but the interface seams where the code hits the ASP.NET Core pipeline ran into the Async requirements of the HTTP output functionality - in ASP.NET Core all output creation has to be sent via Async calls like `WriteAsync()`. This of course resulted in the classic **async cascade** down the chain requiring all methods that send output be made `async`. Not hard, but tedious. And - as I was to find potentially error prone!
+As you can imagine, it took a while and a lot of false starts to find the culprit. Apparently ASP.NET Core is cutting the connection before the final output is sent, even though it appears that all bytes have been received per Fiddler.
 
-### Misdiagnosis after .NET Core 3.1 Failures
-I originally built this middleware for .NET Core 2.2 and it worked without any issues. 
+And... even worse: **it works most of the time - it only fails occasionally** on the same pages, creating the exact same content. Most of the times it works, sometimes it doesn't. A timing issue most likely... Lovely!
 
-Then I upgraded the application .NET Core 3.1 which by itself was a pretty easy process. When I started running the application in .NET Core 3.1 the aforementioned errors started showing up - infrequently which was puzzling. Switching back to .NET Core 2.2 the problems would go away, but when running under 3.1 the errors kept coming back.
+### (a)Wait for me!
+It turns out that in this application I failed to call an output generation method with an `await` statement.
 
-In trying different things one thing I did is move the Response processing to use `IHttpResponseBodyFeature` instead of directly updating the Response stream and that seemed to improve things at first. In fact I thought it was fixed, because the failures now became even less frequent... My assumption was it had something to do with changes in .NET Core 3.x.
-
-### The Real Culprit: A Non-Async call of an Async Method
-It turned out the error was a simple mistake made during the fixing of the **Async Cascade** - I updated one of the methods to an Async method, but **failed to actually call that method with an `await`**. 
+The response writing method in question looks like this:
 
 ```cs
-public async Task SendResponse()
-```
+ public async Task SendResponse()
+ {  
+     // pick up response data, add headers, re-route file transfers etc.
+     ...
+    
+     // eventually writes manipulated bytes into the output stream
+     await Response.Body.WriteAsync(msResponseOutput.ToArray(),
+                    (int) ContentPosition,
+                    (int) msResponseOutput.Length - (int) ContentPosition);
+ }
+ ```
 
-SendResponse then goes on to use async operations to write the incoming data into HTTP output stream using async methods. This of course works fine because the method is async.
-
-However, when calling this method in my mainline code, I forgot to with the `await` keyword:
-
-```cs
-SendResponse();
-```
-
-This actually compiles **and runs** just fine - well, most of the time anyway. On ASP.NET Core 2.2 I never saw any failures either in person or in my logs. Under 3.1 the errors are infrequent, but inconsistently so.
-
-So what's actually happening here? The code works because behind the scenes ASP.NET Core is still sending the output to the client. That's why the full response appears to show up on the client in most cases.
-
-But, because the call is not awaited, there's no guarantee that when the request is finished ASP.NET Core has completed sending the response. I think the failures are so inconsistent because if the timing is right the response probably sends before the entire request processing is complete and if that happens then there's no error. However, if the request completes quicker (or the response output is longer likely) then the problem shows up.
-
-The fix of course was simply to use the `await` clause on the call:
+And the method **should** then be called like this:
 
 ```cs
-await SendResponse();
+await  SendResponse();    // internally eventually does `await Response.WriteAsync(outputBytes)`
 ```
 
-Problem solved.
+But because this is legacy code that was moved from an old HttpHandler I forgot to add the  `await` in this call and left it as it originally was:
 
-### How could this happen?
-So, you might ask how could this happen? The .NET Core C# compiler actually warns of  `await`-not-used errors like this. In Visual Studio you actually get a warning like this:
+```cs
+SendResponse();   // sometimes no workey
+```
+
+This is perfectly valid C# code, although in this case not correct in terms of behavior.
+
+**And that right there is the culprit for the intermittent failures.**
+
+I had this code running for some time on .NET Core 2.1 without issues even without the `await` in place, but in .NET Core 3.1 the intermittent errors kept cropping up. .NET Core 3.1 and later is more strict with its async output generation as requests go through the `IHttpFeatures` pipeline rather than to direct `Response` output which seems to exacerbate the problem.
+
+In most cases the latter code actually works fine, and only **occasionally** would the code fail with the odd errors described above. 
+
+This appears to be a timing issue - it works when the writing completes before ASP.NET shuts down the actual connection, or it fails if the entire response has not been written. Note that no error appears in the ASP.NET application if the latter occurs - it fails silently.
+
+
+### But Rick - don't you look at Warnings?
+Fair question. 
+
+Chances are your Visual Studio, Rider and OmniSharp development environments/tools all should flag this call:
+
+```cs
+SendResponse();   // sometimes no workey
+```
+
+with a **warning in that async call is called without awaiting the result**. And they did. Now that I know where to look,  I could see the warning at the scene of the crime:
+
+![](AwaitWarningInVisualStudio2.png)
+
+or in the warning list:
 
 ![](AwaitWarningInVisualStudio.png)
 
-Yup... clearly operator error. 
+So the tooling can help avoid this error and in most cases that's probably a pretty obvious catch. 
 
-But for me the problem was that this ported project originally had a boatload of warnings (in the hundreds) that I was slowly shlogging through one at a time. This particular `await` warning and a couple of others were lost in the shuffle. But the code ran and seemed to be working perfectly especially in .NET Core 2.2 originally. But alas - cutting corners rarely works out :-)
+In my defense (ha!), I missed this because it's a legacy project that has been ported from a classic ASP.NET `HttpHandler` to an ASP.NET Core middleware component. Because this code is ancient there are tons of `[Obsolete]`, documentation and unused variable warnings etc. and the `SendResponse()` await warning was simply lost in the shuffle of a nearly 200 warnings. I've since fixed that (as you can see in the screen shot above), but it looked quite different before when I was trying to track down the bug.
 
-Yes, I eventually got through the pile of warnings, and by now all of that's cleaned and for sure in a clean project you'd see this warning right away.
+This was made even more insidious by the fact that the original code in .NET Core 2.1 worked just fine even without the `await` call, meaning this error cropped up a year or so after I had originally ported the code and had been running it successfully for that long.
 
-Unfortunately that was way after I tried to trace down the problem in other ways...
+That'll teach me to clean up even legacy code warnings or at least slog through huge numbers of warnings for that one critical one. Right...
+
+### Off Topic: Async Cascade
+I mentioned that this project was a port of an old, old `HttpHandler` moved from a classic ASP.NET application server. This process was surprisingly easy to work through with easily 90%+ of the code migrating straight across even though it includes a ton of legacy technology (COM) integration.
+
+The one thing that didn't 'just work' was the async requirement of ASP.NET Core's output generation. The old code - which originally was written for .NET 1.1 and then moved through generations of .NET through 4.5+ - didn't use async output, so all the code at the middleware API 'seam' needed to be changed to async. It's not too difficult to do but it's a thankless task: Just when you think *"I've got them all!"* there will be another async method you need to convert. And another, and another :smile:
+
+Initially there was one method that required Async access (`SendResponse()`) but then it turned out that the cascade required every single method that touched the HTTP output had to be made async as well as all the methods that call them. 90% of the original HttpHandler code ported without changes **except** for the changes around async conversion.
+
+And that's precisely where this error above was introduced. As I went through and updated calls I missed that one which ironically was the most important one through which most of the output in this middleware flows. 
 
 ### The Moral of the Story
-The moral is this: Make sure your Async methods are actually called asynchronously especially if it deals with ASP.NET Core Response output. Without it the code might work - or it might not depending on timing of the async code running making for some really crazy inconsistent errors.
+The moral of this story is this: Make sure your Async methods are actually called asynchronously especially if it deals with ASP.NET Core Response output. Without it, the code might work - or, it might not! It depending on timing of the async code running making for some really crazy inconsistent errors. Chances are if you screw this up, your IDE will catch this as a warning and hopefully you won't have the error clusterf*ck that I had to obscure the error.
+
+The second moral is directed at myself: Clean up your code, even if it's ported legacy code. I ended up doing this in this project after I figured out the problem and realized that a little housekeeping would have probably saved me a few hours of troubleshooting trying to track down exactly what was happening... well, next time I'll be wiser, right? <small>*(maybe)*</small>

@@ -12,6 +12,7 @@ customFields:
   mt_githuburl:
     key: mt_githuburl
     value: https://github.com/RickStrahl/BlogPosts/blob/master/2020-08/DotnetTools/DotnetTools.md
+extraValue1: Extra Value1
 ---
 # Using .NET Core Tools to Create Reusable and Shareable Tools & Apps
 

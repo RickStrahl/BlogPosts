@@ -88,6 +88,15 @@ The problem with Console logging is that logging to the console is dreadfully sl
 In .NET Core 2.0 and later improvements were made to provide a queue in front of the console and asynchronously log in a background thread writing out to the actual Console. Although that improved performance some the queue itself is also blocking so there's overhead there as well and performance still is quite slow potentially throttling request throughput.
 
 ### Default Logging Configuration
+The default logging configuration originates in the ASP.NET Core's default configuration which is part of the `WebHost.CreateDefaultBuilder()` configuration during the host startup in `program.cs`:
+
+```csharp
+public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+              WebHost.
+                CreateDefaultBuilder(args)
+                .UseStartup<Startup>();
+```                
+
 The good news is if you create new ASP.NET Core 2.x project the default configuration for production does the right thing by setting the logging level to `Warning` in `applicationsettings.json`:
 
 ```json
@@ -113,6 +122,7 @@ The development version in `applicationsettings.Development.json` is more libera
   }
 }
 ```
+
 
 Logging levels are incremental so Trace logs everything, Warning logs Warning, Error and Critical, and None logs... well none. 
 
@@ -145,7 +155,7 @@ Using the configuration settings in `appsetting.json` and setting to `Warning` w
 ### Where does Default Logging Configuration come from
 The default logging configuration originates in the ASP.NET Core's default configuration which is part of the  `WebHost.CreateDefaultBuilder()` configuration during the host startup in `program.cs`:
 
-```cs
+```csharp
 public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
                 WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>();
@@ -176,7 +186,7 @@ public class ValuesController : ControllerBase
 
     public ValuesController(ILogger<ValuesController> logger)
     {
-        Logger = logger;
+        Logger = logger; 
     }
 
     // GET api/values

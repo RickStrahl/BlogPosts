@@ -68,7 +68,7 @@ If you want to do this in ASP.NET Core the easiest way to do this is to use `app
 ### Re-Writing a URL
 Here's how to handle a **Rewrite** operation in `app.Use()` middleware:
 
-```cs
+```csharp
 app.Use(async (context,next) =>
 {
     var url = context.Request.Path.Value;
@@ -88,7 +88,7 @@ This intercepts every incoming request and checks for a URL to rewrite and when 
 
 You can use a similar approach for Redirecting, but the logic is slightly different because a Redirect is a new request and you'll want to terminate the middleware pipeline:
 
-```cs
+```csharp
 app.Use(async (context,next) =>
 {
     var url = context.Request.Path.Value;
