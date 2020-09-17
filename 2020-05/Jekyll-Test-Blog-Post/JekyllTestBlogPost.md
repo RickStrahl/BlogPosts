@@ -1,10 +1,15 @@
 ---
 title: Jekyll Test Post
-featuredImageUrl: https://jekyll.west-wind.com/assets/2020-05-20-Jekyll-Test-Post/MarkdownMonster.jpg
-keywords: .NET, Jekyll, WebLog, Markdown, Markdown Monster
+abstract: ''
 categories: .NET, Weblog, Markdown-Monster
-weblogName: Jekyll Test Site 2
+keywords: .NET, Jekyll, WebLog, Markdown, Markdown Monster
+weblogName: Local Jekyll Blog
+postId: 1991683
+featuredImageUrl: https://jekyll.west-wind.com/assets/2020-05-20-Jekyll-Test-Post/MarkdownMonster.jpg
+permalink: https://weblog.west-wind.com/posts/2020/May/21/Jekyll-Test-Post
 postDate: 2020-05-21T12:09:51.7229429-10:00
+custom1: Green Maniishi
+custom2: Red Manilishi
 ---
 # Jekyll Test Post
 

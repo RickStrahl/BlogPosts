@@ -1,12 +1,16 @@
 ---
 title: Using the brightness() CSS Filter to generically highlight Content
 abstract: Filters are not new in CSS, but their often overlooked for providing some useful generic behaviors for things like hover styling or nice background effects. In this post I discuss how to use the brightness() filter to create a generic button hover behavior and also briefly discuss the newish `backdrop-filter` property.
-keywords: filter,backdrop-filter,brightness,blur,css
 categories: CSS, HTML
+keywords: filter,backdrop-filter,brightness,blur,css
 weblogName: West Wind Web Log
 postId: 1883020
 permalink: https://weblog.west-wind.com/posts/2020/Jul/28/Using-the-brightness-CSS-Filter-to-generically-highlight-Content
 postDate: 2020-07-28T12:11:52.8659804-10:00
+customFields:
+  mt_githuburl:
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2020-06/Using-CSS-Filter-brightness()-to-generically-highlight-Content/UsingCssFilterBrightnessToGenericallyHighlightContent.md
 ---
 # Using the brightness() CSS Filter to generically highlight Content
 
@@ -64,10 +68,10 @@ For example, this is what I use for turning FontAwesome icons into using button-
   .fa-button.dark {
       background: #555;                      
   }
-  .fa-button:hover {
+  .fa-button:hover:not(.disabled) {
       cursor: pointer;
       border-radius: 3px;                    
-      filter: brightness(120%);                    
+      filter: brightness(110%) saturate(140%);                    
   }            
   .fa-button.disabled {
       filter: grayscale(100%);

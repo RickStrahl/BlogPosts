@@ -1,11 +1,11 @@
 ---
 title: Using .NET Core Tools to Create Reusable and Shareable Tools & Apps
-featuredImageUrl: https://jekyll.west-wind.com/assets/2020-08-05-Using-NET-Core-Tools-to-Create-Reusable-and-Shareable-Tools-&-Apps/banner.png
 abstract: Dotnet Tools offer a simple way to create, publish and consume what are essentially .NET Core applications that can be published and shared using the existing NuGet infrastructure for packaging and distribution. It's y quick and easy to build tools that you can share either publicly or privately.  In this article I make a case for why you might use or build a Dotnet Tool and show how create, build, publish and consume Dotnet tools as well as showing some examples of useful tools I've build and published.
-keywords: Dotnet Tool
 categories: .NET Core, ASP.NET Core
-weblogName: West Wind Web Log
+keywords: Dotnet Tool
+weblogName: Local Jekyll Blog
 postId: 1900072
+featuredImageUrl: https://weblog.west-wind.com/images/2020/DotnetTools/banner.png
 permalink: https://weblog.west-wind.com/posts/2020/Aug/05/Using-NET-Core-Tools-to-Create-Reusable-and-Shareable-Tools-Apps
 postDate: 2020-08-05T00:14:17.5009200-10:00
 customFields:

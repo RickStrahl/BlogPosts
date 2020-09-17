@@ -7,6 +7,10 @@ weblogName: West Wind Web Log
 postId: 1988467
 permalink: https://weblog.west-wind.com/posts/2020/Sep/14/Dont-get-burned-by-missing-await-Calls-for-Async-Code-in-ASPNET-Core-Middleware
 postDate: 2020-09-14T15:04:12.3348388-10:00
+customFields:
+  mt_githuburl:
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2020-04/Dont-get-bitten-by-missing-await-for-Response.Write()-Code-in-Middleware/DonTGetBittenByMissingAwaitForResponseWriteCodeInMiddleware.md
 ---
 # Don't get burned by missing await Calls for Async Code in ASP.NET Core Middleware
 
@@ -111,3 +115,12 @@ And that's precisely where this error above was introduced. As I went through an
 The moral of this story is this: Make sure your Async methods are actually called asynchronously especially if it deals with ASP.NET Core Response output. Without it, the code might work - or, it might not! It depending on timing of the async code running making for some really crazy inconsistent errors. Chances are if you screw this up, your IDE will catch this as a warning and hopefully you won't have the error clusterf*ck that I had to obscure the error.
 
 The second moral is directed at myself: Clean up your code, even if it's ported legacy code. I ended up doing this in this project after I figured out the problem and realized that a little housekeeping would have probably saved me a few hours of troubleshooting trying to track down exactly what was happening... well, next time I'll be wiser, right? <small>*(maybe)*</small>
+
+<div style="margin-top: 30px;font-size: 0.8em;
+            border-top: 1px solid #eee;padding-top: 8px;">
+    <img src="https://markdownmonster.west-wind.com/favicon.png"
+         style="height: 20px;float: left; margin-right: 10px;"/>
+    this post created and published with the 
+    <a href="https://markdownmonster.west-wind.com" 
+       target="top">Markdown Monster Editor</a> 
+</div>
