@@ -5,7 +5,6 @@ categories: WPF, .NET
 keywords: Clipboard, WPF, Bitmap, SetImage
 weblogName: West Wind Web Log
 postId: 1991843
-featuredImageUrl: https://jekyll.west-wind.com/assets/2020-09-16-Retrieving-Images-from-the-Clipboard-and-WPF-Image-Control-Woes/CutPaste.png
 permalink: https://weblog.west-wind.com/posts/2020/Sep/16/Retrieving-Images-from-the-Clipboard-and-WPF-Image-Control-Woes
 postDate: 2020-09-16T00:48:18.6897325-10:00
 ---
@@ -219,7 +218,7 @@ As mentioned earlier, the key to perhaps somewhat better support might be bypass
 
 It's also possible to query all the supported image formats with `Clipboard.GetFormats()` which I used to retrieve the list of all the supported image formats and then attempt to glean some patterns from the formats. Using the 'patterns' I can selectively use different ways to pull things from the clipboard. It's hacky as hell to do this, but this has solved at least some of my Clipboard image issues.
 
-To do this I captur the image formats for a number of image types from different apps using this code:
+To do this I capture the image formats for a number of image types from different apps using this code:
 
 ```cs
 var dataObject = Clipboard.GetDataObject();

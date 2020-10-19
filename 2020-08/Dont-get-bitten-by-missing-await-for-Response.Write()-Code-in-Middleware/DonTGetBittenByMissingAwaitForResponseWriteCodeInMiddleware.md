@@ -41,7 +41,7 @@ It turns out that in this application I failed to call an output generation meth
 
 The response writing method in question looks like this:
 
-```cs
+```text
  public async Task SendResponse()
  {  
      // pick up response data, add headers, re-route file transfers etc.
