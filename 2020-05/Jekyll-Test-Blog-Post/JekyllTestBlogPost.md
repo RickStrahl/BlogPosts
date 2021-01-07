@@ -1,16 +1,15 @@
 ---
-title: Jekyll Test Post
-abstract: ''
-categories: .NET, Weblog, Markdown-Monster
-keywords: .NET, Jekyll, WebLog, Markdown, Markdown Monster
-weblogName: Local Jekyll Blog
-postId: 1991683
-featuredImageUrl: https://jekyll.west-wind.com/assets/2020-05-20-Jekyll-Test-Post/MarkdownMonster.jpg
-permalink: https://weblog.west-wind.com/posts/2020/May/21/Jekyll-Test-Post
-postDate: 2020-05-21T12:09:51.7229429-10:00
-custom1: Green Maniishi
-custom2: Red Manilishi
+layout: post
+title: Generic MRKT2 Extension Service Inspector for MRKT 2.5
+date: 2020-10-25T00:00:00.0000000+02:00
+categories: []
+tags:
+- HoloLens2
+- MRKT2
+- Unity3d
+- Windows Mixed Reality
 ---
+
 # Jekyll Test Post
 
 This is a Jekyll Test Post - no really:

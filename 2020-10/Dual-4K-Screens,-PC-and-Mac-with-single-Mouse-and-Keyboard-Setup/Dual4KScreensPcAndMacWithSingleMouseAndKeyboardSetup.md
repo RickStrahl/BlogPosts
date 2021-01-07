@@ -5,6 +5,7 @@ categories: WFH, Office
 keywords: WFH,PC,Mac,Flow,4k
 weblogName: West Wind Web Log
 postId: 2067740
+featuredImageUrl: https://weblog.west-wind.com/images/2020/Dual-4K-Screens,-PC-and-Mac-with-single-Mouse-and-Keyboard-Setup/Banner.jpg
 permalink: https://weblog.west-wind.com/posts/2020/Oct/15/PC-and-Mac-with-single-Mouse-and-Keyboard-Setup-on-Dual-4k-Screens
 postDate: 2020-10-15T15:15:58.5434584-10:00
 ---

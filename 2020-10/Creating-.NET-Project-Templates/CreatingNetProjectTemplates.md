@@ -1,5 +1,5 @@
 ---
-title: Creating Custom .NET Project Types with dotnet new Project Templates
+title: Creating Custom .NET Project Types with .NET CLI Project Templates
 abstract: Custom project templates can be extremely useful in quickly creating new projects especially for extensible applications. They're also great for creating specialized setups to make it quicker to hit the ground running. With the .NET SDK tooling new project templates are now easy to create and this post takes you through the process.
 categories: .NET, .NET Core
 keywords: project,template,dotnet new
@@ -13,7 +13,7 @@ customFields:
     key: wp_post_thumbnail
     value: https://weblog.west-wind.com/images/2020/Creating-.NET-Project-Templates/ProjectTemplateLayout.png
 ---
-# Creating Custom .NET Project Types with dotnet new Project Templates
+# Creating Custom .NET Project Types with .NET CLI Project Templates
 
 ![](DotnetNewTemplateCommandLine.png)
 
@@ -33,7 +33,7 @@ The new project system also supports a straight forward mechanism for creating y
 
 You can also create your own templates and easily publish and share them via NuGet. They are easy to create: You create a template project that contains all the files you want to be contained in your template, and wrap around a project folder hierarchy and add a small metadata file that describes your template.
 
-The wrapped - or several of them - can then be bundled up into a NuGet package that can be published and shared on NuGet and can be installed via `dotnet new -i <package-name>`.
+The wrapped template - or several of them - can then be bundled up into a NuGet package that can be published and shared on the NuGet Repository and can be installed via `dotnet new -i <package-name>`.
 
 While this is process is not vastly different from the process for Visual Studio Templates, the syntax and metadata used, plus the debug and run cycle is much more manageable. For example, you can simply update your template by reinstalling it and re-running the template. Templates can be installed from online NuGet packages, local NuGet packages, or a local folder. This makes it quick and easy to make changes to a template, test it out again and get it perfect.  When done publishing to NuGet for sharing your template with the world is just a few more simple commands away.
 
@@ -72,12 +72,12 @@ The root folder holds only the package project and associated icon. The nested `
 The actual template folder then contains a `.template.config` folder with a `template.json` file that contains the specific template's meta data.
 
 ### Creating the Folder Structure
-The best way to start is to create the folder structure. I'm going to go through this with my MarkdownMonster addin so the naming reflects that.
+The best way to start is to create the folder structure. To demonstrate, I'm going to go through this with my MarkdownMonster addin so the naming reflects that.
 
-At the top level create a folder that matches your template name - think of that as your 'solution' folder: A container for your template project.  I used `MarkdownMonsterAddinTemplate` for the name. This folder only contains the `.csproj` file and optionally an icon that's linked with the NuGet package.
+At the top level create a folder that matches your template name - think of that as your 'solution' folder: A container for your template project.  I used `MarkdownMonsterAddinTemplate` for the name. This folder only contains the `.csproj` file and an optional icon for the NuGet package.
 
 ### The top level Container Project File
-Next we'll need to set up the container project file. This file is fairly generic and it's sole purpose is to act as a container for the NuGet package. This project doesn't have specific information about any of the contained templates.
+Next we'll need to set up the container project file. This file is mostly generic and can just be copied as it with a few replacements. Its sole purpose is to act as a container of meta data for the NuGet package. This project doesn't have specific information about any of the contained templates.
 
 The content project is a standard SDK project with a `<PackageType>Template</PackageType>` and looks like this:
 
@@ -170,7 +170,8 @@ Here's what my `templates.json` looks like:
     "language": "C#",
     "type": "project"
   },
-  "sourceName": "$safeprojectname$",    // replace w/ project name or -n val
+  "sourceName": "$safeprojectname$",      // replace w/ project name or -n val
+  "defaultName": "MarkdownMonsterAddin"   // Visual Studio default display name
 }
 ```
 
@@ -439,10 +440,11 @@ I think going forward, the .NET Template system is going to be the way to go, bu
 
 ## Resources
 
-* [Official Microsoft Project Template Documentation](https://docs.microsoft.com/en-us/dotnet/core/tutorials/cli-templates-create-project-template)
-* [Markdown Monster Addin Project on GitHub](https://github.com/RickStrahl/MarkdownMonsterAddinProjectTemplate/tree/master/DotnetNewTemplate)
-* [Markdown Monster Addin project Template on NuGet](https://www.nuget.org/packages/MarkdownMonster.AddinProject.Template/)
-* [Creating Markdown Monster Addins](https://markdownmonster.west-wind.com/docs/_4ne0s0qoi.htm)
+* [Official Microsoft .NET CLI Project Template Documentation](https://docs.microsoft.com/en-us/dotnet/core/tutorials/cli-templates-create-project-template)
+* [.NET CLI Project Guidelines for Visual Studio display](https://github.com/sayedihashimi/template-sample)
+* [Markdown Monster Addin Project Template on GitHub](https://github.com/RickStrahl/MarkdownMonsterAddinProjectTemplate/tree/master/DotnetNewTemplate)
+* [Markdown Monster Addin .NET CLI Project Template on NuGet](https://www.nuget.org/packages/MarkdownMonster.AddinProject.Template/)
+* [Creating Markdown Monster Addins Documentation](https://markdownmonster.west-wind.com/docs/_4ne0s0qoi.htm)
 
 
 <div style="margin-top: 30px;font-size: 0.8em;
