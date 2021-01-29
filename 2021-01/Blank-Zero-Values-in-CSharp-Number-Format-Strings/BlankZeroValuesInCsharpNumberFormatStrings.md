@@ -66,7 +66,7 @@ int number = 0;
 number.ToString(";;' '");  // blank
 ```
 
-This postive/negative/zero format feature is not well known, nor well documented - it's mentioned in passing in the [Custom Numeric Format String documentation in the .NET docs](https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-numeric-format-strings#the-0-custom-specifier).
+This positive/negative/zero format feature is not well known, nor well documented - it's mentioned in passing in the [Custom Numeric Format String documentation in the .NET docs](https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-numeric-format-strings#the-0-custom-specifier).
 
 ### The "0" Custom Format Specifier
 You can use the `0` format string to specify custom formatting for numbers, including the ability to specify explicit **positive**, **negative** and **zero** values by separating each expression with the `;`.
