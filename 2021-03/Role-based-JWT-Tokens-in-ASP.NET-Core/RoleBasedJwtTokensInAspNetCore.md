@@ -11,18 +11,28 @@ postStatus: publish
 featuredImageUrl: https://weblog.west-wind.com/images/2021/Role-based-JWT-Tokens-in-ASP.NET-Core/Banner.jpg
 permalink: https://weblog.west-wind.com/posts/2021/Mar/09/Role-based-JWT-Tokens-in-ASPNET-Core
 postDate: 2021-03-09T20:52:36.5613821-10:00
+customFields:
+  mt_githuburl:
+    id: 
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2021-03/Role-based-JWT-Tokens-in-ASP.NET-Core/RoleBasedJwtTokensInAspNetCore.md
 ---
 # Role based JWT Tokens in ASP.NET Core
 
 ![](Banner.jpg)
 
-Authentication and Authorization in ASP.NET Core continues to be the most fiddly component for configuration  and it seems almost on every app I run into some sort of sticking point with Auth. Four versions in have brought three different authentication implementations and this change has also left a wave of out of date information in its wake. Today I got stuck in one of those Groundhog Day loops looking at outdated information with JWT Tokens for a Web API with Role based authorization. Mostly due to impatience and not find the right up to date documentation right away (yes I'm too impatient sometimes - aren't we all?)
+Authentication and Authorization in ASP.NET Core continues to be the most fiddly component for configuration  and it seems almost on every app I run into some sort of sticking point with Auth. Four versions in have brought three different authentication implementations and this change has also left a wave of out of date information in its wake. Today I got stuck in one of those Groundhog Day loops looking at outdated information with JWT Tokens for a Web API with Role based authorization. Mostly due to impatience and not finding the right up to date documentation right away, 'cause - yes I'm too impatient sometimes - aren't we all?
 
-To be clear the current iteration of JWT token setup works well, if you can get the right combinations of commands strung together. I've not found this information all in one place, and today I barked up the wrong tree for a couple of hours. So, now that I managed to get it working I'm writing it down so I can find it next time around.
+The current iteration of JWT Token setup in ASP.NET Core actually works very well, as long as you get the right combinations of config settings strung together. Part of the problem with Auth configuration is that most of settings have nothing to do with the problem at hand and deal with ceremony. For example, setting Issuer and Audience seems totally arcane but it's part of the requirements for JWT Tokens and do need to be configured. Luckily there are only a few of those settings that are actually required.
 
-In this post I specifically talk about setting an Authentication endpoint for a Web API using a JWT Token, returning the token for use as a bearer token and securing various endpoints with general and role based access restrictions.
+I've not found this information all in one place, and today I barked up the wrong tree for a couple of hours in regards to Role authorization with JWT Tokens where my app would validate non-role Authorizations, but not role based ones. So, now that I managed to get it working I'm writing it down so I can find it next time around.
 
-Note: **I'm not using ASP.NET Core Identity** and am just accessing the raw JWT token generation with custom account lookups as part of an application. I'm specifically **not using the built-in Identity system** because it's overly complex and adds unneeded complexity for many small applications, and especially for API applications.
+In this post I specifically talk about:
+
+* Authentication for an ASP.NET Core Web API
+* Using JWT Tokens
+* Using Role Based Authorization
+* Using only low level features - not using ASP.NET Core Identity
 
 ## Setting up JWT Authentication and Authorization
 First step is to configure Authentication in `ConfigureServices()`. This is used to configure the JWT Token set up and add the required components to ASP.NET's processing pipeline:
