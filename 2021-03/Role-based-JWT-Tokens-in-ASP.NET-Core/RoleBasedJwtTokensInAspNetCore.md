@@ -32,10 +32,13 @@ In this post I specifically talk about:
 * Authentication for an ASP.NET Core Web API
 * Using JWT Tokens
 * Using Role Based Authorization
-* Using only low level features - not using ASP.NET Core Identity
+* Using only low level features - **not** using ASP.NET Core Identity
 
-## Setting up JWT Authentication and Authorization
-First step is to configure Authentication in `ConfigureServices()`. This is used to configure the JWT Token set up and add the required components to ASP.NET's processing pipeline:
+## Configuration
+Authentication and Authorization are provided as Middleware in ASP.NET Core and is traditional, you have to configure them in `.ConfigureServices()` and connect the middleware in `.Configure`  - go figure on the backwardation of those terms :smile:
+
+### Setting up JWT Authentication and Authorization
+First step is to configure Authentication in `Startup.ConfigureServices()`. This is used to configure the JWT Token set up and add the required components to ASP.NET's processing pipeline:
 
 ```cs
 // in ConfigureServices()
@@ -72,6 +75,7 @@ Note **there's nothing Role specific** in this global configuration. All the rol
 
 The values here configure the token's common values and key used to sign the token. The key is the most important part as it determines how the token can be unpacked and read by ASP.NET Core to authorize requests when requests come in.
 
+### Adding the Auth Middleware
 Next we need to add the actual middleware for `.UseAuthentication()` and `app.UseAuthorization()` in `Startup.Configure`:
 
 ```cs
@@ -95,10 +99,10 @@ app.UseEndpoints(endpoints =>
 
 Note that order matters for Authentication and Authorization. These two need to be injected **after Routing** but before any **HTTP output generating middleware**, most importantly before `app.UseEndpoints()`.
 
-## Authenticating Users in an API App
+## Authenticating Users using an Web API Endpoint
 Next we need to authenticate a user within the application, and then generate a token and return it to the API client. 
 
-This likely happens a Controller Action method or Middleware Endpoint Handler. I'm using a controller method here:
+This likely happens a **Controller Action Method** or **Middleware Endpoint Handler**. I'm using a Controller Action Method here:
 
 ```cs
 [AllowAnonymous]
@@ -156,21 +160,21 @@ Note that your authentication method needs to be anonymously accessible so be if
 ### Claims and Roles, Roles, Roles
 ASP.NET Core uses Claims for authentication. Claims are pieces of data that you can store in the token that are carried with it and can be read from the token. For authorization Roles can be applied as Claims.
 
-The reason I'm writing this post today is because I had a heck of a time getting the role Claims to work properly.  Not because it didn't work, but because I didn't find the correct syntax to use.   Maddeningly general `[Authentication]` without roles worked fine, but any attempt to get roles to work failed for me. **There is a lot of outdated information regarding JWT Authentication out there** and I was misled by outdated syntax using a single `roles` key with a comma delimited list of roles - which does not work!
-
 The correct syntax for adding rows that ASP.NET Core recognizes for Authorization is in .NET Core 3.1 and 5.x is by adding multiple claims for each role:
 
 ```cs
 // Add roles as multiple claims
 foreach(var role in user.Roles) 
 {
-	claims.Add(new Claim(ClaimTypes.Role, role.Name));  // "roles" or "role" keys work too
+	claims.Add(new Claim(ClaimTypes.Role, role.Name));
+	
+	// these also work - and reduce token size
+	// claims.Add(new Claim("roles", role.Name));
+	// claims.Add(new Claim("role", role.Name));
 }
 ```
 
-And that works. It seems bloody obvious now, but I was tripped up by dated examples...
-
-## Accessing the JWT Token Generation API
+### Accessing the JWT Token Generation API
 So at this point I have an `authenticate` API endpoint that I can retrieve a token from. Here's what this specific request looks like:
 
 ![](WebSurgeAuthenticate.png)
@@ -219,7 +223,7 @@ public async Task<SaveResponseModel> SaveCustomer(IdvCustomer model)
 
 Now only those that are part of the `Administrator` group have access. The List can use multiple roles using a comma delimited list ie. `"Administrator, ReportUser"`.
  
-## Sending Requests with the Bearer Token
+## Accessing Secured Endpoints with the Bearer Token
 Now that the API is secured we have to pass the Bearer token with each request to authenticate. It looks like this:
 
 ![](WebSurgeWithBearerToken.png)
@@ -229,9 +233,9 @@ And voila - I can now access the Administrator group protected POST operation.
 And that completes the circle...
 
 ## Summary
-Authentication and Authorization in ASP.NET Core has gotten a lot simpler in recent versions, but finding the right documentation for setting all the dials for JWT Token Authentication is still not very obvious. There's a lot of information about authentication and it's easy to get lost in the docs and end up on outdated information, because the behavior of Authentication has changed significantly throughout ASP.NET Core versions.
+Authentication and Authorization in ASP.NET Core has gotten a lot simpler in recent versions, but finding the right documentation for setting all the dials for JWT Token Authentication is still not very obvious. There's a lot of information about authentication and it's easy to get lost in the docs and end up on outdated information, because the behavior of Authentication has changed significantly throughout ASP.NET Core versions. If you're looking up additional information make sure it's for version 3.1 and later which is the latest as of now.
 
-In this post I've addressed what works for 3.1 and 5.0 (so far). Mercifully 5.0 saw no further breaking changes to the Authentication/Authorization APIs.
+In this post I've addressed what works for 3.1 and 5.0. Mercifully 5.0 saw no further breaking changes to the Authentication/Authorization APIs.
 
 As is often the case I'm writing this down for my own peace of mind so I have all the information in one place. Hopefully some of you'll find this useful as well.
 
