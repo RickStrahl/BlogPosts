@@ -9,7 +9,7 @@ postId: 2223681
 permalink: https://weblog.west-wind.com/posts/2021/Jan/14/Taking-the-new-Chromium-WebView2-Control-for-a-Spin-in-NET-Part-1
 postDate: 2021-01-14T22:21:22.0824034-10:00
 postStatus: publish
-dontInferFeaturedImage: false
+dontInferFeaturedImage: false 
 dontStripH1Header: false
 ---
 # Taking the new Chromium WebView2 Control for a Spin in .NET - Part 1

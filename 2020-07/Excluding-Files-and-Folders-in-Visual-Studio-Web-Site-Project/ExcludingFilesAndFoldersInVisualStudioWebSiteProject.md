@@ -5,6 +5,10 @@ categories: ASP.NET, Visual Studio
 keywords: WebDeploy, ExcludeFilesFromDeploy, Exclude Files, Publish, Visual Studio
 weblogName: West Wind Web Log
 postId: 1880107
+dontInferFeaturedImage: false
+dontStripH1Header: false
+postStatus: publish
+featuredImageUrl: https://weblog.west-wind.com/images/2021/Excluding-Files-and-Folders-in-Visual-Studio-Web-Site-Project/ExcludingFilesBanner.png
 permalink: https://weblog.west-wind.com/posts/2020/Jul/25/Excluding-Files-and-Folders-in-Visual-Studio-Web-Site-Project
 postDate: 2020-07-25T21:43:04.6727800-10:00
 ---
@@ -42,7 +46,7 @@ The specific `.pubxml` file settings that can be used to exclude files and folde
         <ExcludeFilesFromDeployment>appConfiguration.json;*.pubxml</ExcludeFilesFromDeployment>
         
         <!-- Exclude Folders -->
-        <ExcludeFoldersFromDeployment>temp;otherfolder</ExcludeFilesFromDeployment>
+        <ExcludeFoldersFromDeployment>temp;otherfolder</ExcludeFoldersFromDeployment>
     </ProjectGroup>
 </Project>
 ```

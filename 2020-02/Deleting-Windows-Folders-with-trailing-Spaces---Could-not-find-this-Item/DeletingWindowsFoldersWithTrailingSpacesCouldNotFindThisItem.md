@@ -1,18 +1,20 @@
 ---
 title: 'Deleting Problem Folders and Files on Windows: Could not find this Item Error'
 abstract: Ever have a problem not being able to delete a file or folder because the filename is invalid? You see it in Explorer, but you can't delete or move the file? Well I just ran into this issue and after some digging figured out that you use extended path syntax `\\?\` to get around some interesting naming and sizing issue with Windows path operations.
-keywords: Windows, Explorer, Not Deleting, Could not find
 categories: Windows
+keywords: Windows, Explorer, Not Deleting, Could not find
 weblogName: West Wind Web Log
 postId: 1543402
+dontInferFeaturedImage: false
+dontStripH1Header: false
+postStatus: publish
+featuredImageUrl: https://weblog.west-wind.com/images/2021/Deleting-Windows-Folders-with-trailing-Spaces---Could-not-find-this-Item/banner.jpg
 permalink: https://weblog.west-wind.com/posts/2020/Feb/10/Deleting-Problem-Windows-Folders-and-Files-Could-not-find-this-Item-Error
 postDate: 2020-02-10T16:00:28.2403131-10:00
 ---
 # Deleting Problem Folders and Files on Windows: Could not find this Item Error
 
 ![](banner.jpg) 
-
-[asdasd](https://west-wind.com/This%20is%20a%20test)
 
 I ran into a nasty folder naming issue recently where I was unable to delete a number of folders on my server. 
 
@@ -25,7 +27,8 @@ The problem is that Explorer can see the files, but can't delete them. Some appl
 ![](CouldNotFindItem.png)
 
 
-> Could not Find Item  
+> **Could not Find Item**  
+>
 > This no longer located in <folder/file location>. Verify the item's location and try again.
 
 The file is obviously there and I'm pointing at the folder to delete, but alas... the folder won't delete. Welcome to Windows using multiple **different** APIs to work with file information.
@@ -61,7 +64,10 @@ This behavior is similar to files that have full paths longer than the old 256 c
 ### Deleting the Folders with Extended Path Format
 The solution to deleting the files is to use the Windows **Extended Path Format** (`\\?\` path prefix) when deleting the folder from the command line. Windows since version 7 has long path and extra characters in file names support via a special extended path syntax that uses a path-like prefix.
 
-So rather than using just a simple path like the following , which **doesn't work**:
+> #### @icon-warning File Deletions are Permanent!
+> The following commands will delete files on your system and you won't be able to restore them. So be very, very careful and if possible run non-destructive commands like listings first before deleting files. Use the following commands **at your own risk**.
+
+Rather than using just a simple path like the following , which **does not work**:
 
 ```dos
 rd /s "C:\Web Sites\docs.west-wind.com\faq                           "

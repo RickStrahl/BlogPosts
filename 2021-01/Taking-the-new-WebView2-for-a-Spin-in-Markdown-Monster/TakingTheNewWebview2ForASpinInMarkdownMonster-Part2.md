@@ -1,18 +1,18 @@
 ---
 title: Chromium WebView2 Control and .NET to JavaScript Interop - Part 2
+featuredImageUrl: https://weblog.west-wind.com/images/2021/Taking-the-new-WebView2-for-a-Spin-in-Markdown-Monster/Part2Banner.jpg
 abstract: In part 2 of this post series I take a look at how to use the new Chromium WebView2 to interact with the DOM document and interoperate between .NET and JavaScript, both calling into JavaScript from .NET, and calling into .NET from Javascript
-categories: .NET, WPF, Windows
 keywords: WebView2, WPF, JavaScript, Interop, WebBrowser, Chromium, .NET
+categories: .NET, WPF, Windows
 weblogName: West Wind Web Log
 postId: 2248999
-dontInferFeaturedImage: false
-dontStripH1Header: false
-postStatus: publish
-featuredImageUrl: https://weblog.west-wind.com/images/2021/Taking-the-new-WebView2-for-a-Spin-in-Markdown-Monster/Part2Banner.png
 permalink: https://weblog.west-wind.com/posts/2021/Jan/26/Chromium-WebView2-Control-and-NET-to-JavaScript-Interop-Part-2
 postDate: 2021-01-26T22:01:52.4881296-10:00
+postStatus: publish
+dontInferFeaturedImage: false
+dontStripH1Header: false
 ---
-# Chromium WebView2 Control and .NET to JavaScript Interop - Part 2
+# [Chromium WebView2 Control](https://docs.microsoft.com/en-us/microsoft-edge/webview2/) and .NET to JavaScript Interop - Part 2
 
 ![](Part2Banner.jpg)
 
@@ -484,20 +484,22 @@ alert(msg);
 > #### @icon-warning Don't Cache Host Objects
 > In current previews it's not recommended to cache a host objects beyond a single JavaScript closure context. Caching the objects caused me various problems where the host object would fail and disconnect with very weird behavior when there were overlapping calls to the host object. Make sure you always reload from the base `hostObjects` instance which ensures a safe instance. 
 
-There are two 'versions' of the exposed host object: An async and sync one. The recommendation is to use async whenever possible, but you can also make sync calls. Unfortunately **there are currently problems with async calls into .NET that return values**, so that puts a crimp in using async for everything right now. Sync calls work fine though.
+There are two 'versions' of the exposed host object: An async and sync one. The recommendation is to use async whenever possible, but you can also make sync calls. 
+
+Unfortunately **there are currently problems with async calls into .NET that return values**. Basically if you call a .NET `async` method that returns a value, the value returned is not passed back to JavaScript. However, you can create a sync method in .NET and return a value fine, and you can call the sync method from JavaScript asynchronously (use `async/await` or a `Promise`). Currently this is a known issue, but not clear whether this will get fixed in the future or be marked as 'by design'.
 
 > #### @icon-warning Async Result Problems
-> In the current version there [seem to be problems with async calls that return values](https://github.com/MicrosoftEdge/WebView2Feedback/issues/822) - I've not been able to get JavaScript `await` or Promise results to return me a value. I can get the .NET code to fire, but the results don't seem to make it back into JavaScript.
+> In the current version there [seem to be problems with async calls that return values](https://github.com/MicrosoftEdge/WebView2Feedback/issues/822) - I've not been able to get JavaScript `await` or Promise results to return me a value. I can get the .NET code to fire, but the results don't seem to make it back into JavaScript. 
 
 Due to these problems I've been using the following approach:
 
 * **Async signatures for any methods that don't return a value**  
-This works for fire and forget requests as well as async requests where you need to `await` for completion, but not a for a result value.
+This works for fire and forget requests as well as async requests where you need to `await` for completion, but not a for a result value. Whether you use `async` should be dictated whether the method does anything that requires async operation.
 
 * **Sync signatures for any methods that return a value**  
 Sync signatures always work both for sync and async calls from JavaScript. Only sync methods work for returning a value back to JavaScript.
 
-For now this is by design (see issue), but this may get fixed in the future. For now it's probably best to implement all JavaScript called methods in .NET as sync methods although you can get away with Async if you don't return a value.
+For now this is by design, but this may get fixed in the future. For now it's probably best to implement all JavaScript called methods in .NET as sync methods unless it doesn't return a value or it explicitly needs async access.
 
 #### Passing Objects to JavaScript
 The good news is that you can pass simple objects back from .NET into JavaScript and access those objects in JavaScript code. If the object values can serialize you should be able to access the properties directly in JavaScript.
@@ -658,3 +660,12 @@ This concludes part 2 of this post series about the WebView2 control about Inter
 * [WebView2 Runtime Installation Page](https://developer.microsoft.com/en-us/microsoft-edge/webview2/)
 * [Edge Canary Installs](https://www.microsoftedgeinsider.com/en-us/download)
 * [WebView2 Feedback Repo on GitHub](https://github.com/MicrosoftEdge/WebView2Feedback/issues/)
+
+<div style="margin-top: 30px;font-size: 0.8em;
+            border-top: 1px solid #eee;padding-top: 8px;">
+    <img src="https://markdownmonster.west-wind.com/favicon.png"
+         style="height: 20px;float: left; margin-right: 10px;"/>
+    this post created and published with the 
+    <a href="https://markdownmonster.west-wind.com" 
+       target="top">Markdown Monster Editor</a> 
+</div>

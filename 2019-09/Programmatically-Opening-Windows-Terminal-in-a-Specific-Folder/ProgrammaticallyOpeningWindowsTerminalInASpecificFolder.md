@@ -1,18 +1,32 @@
 ---
 title: Programmatically Opening Windows Terminal in a Specific Folder
 abstract: The new Windows Terminal provides many cool new features and much improved Terminal performance which makes it very desirable to use even in its current preview state. However, unfortunately the Terminal currently lacks a command line interface to control startup, do if you want to externally launch a shell some workarounds are required to get it to start out of a specific folder.
-keywords: Windows, Windows Terminal, Terminal,.NET
 categories: Windows, .NET
+keywords: Windows, Windows Terminal, Terminal,.NET
 weblogName: West Wind Web Log
 postId: 1378839
+dontInferFeaturedImage: false
+dontStripH1Header: false
+postStatus: publish
+featuredImageUrl: https://weblog.west-wind.com/images/2021/Programmatically-Opening-Windows-Terminal-in-a-Specific-Folder/WindowsTerminal.png
 permalink: https://weblog.west-wind.com/posts/2019/Sep/03/Programmatically-Opening-Windows-Terminal-in-a-Specific-Folder
 postDate: 2019-09-03T14:06:58.8783960-10:00
 customFields:
   mt_githuburl:
+    id: 
     key: mt_githuburl
     value: https://github.com/RickStrahl/BlogPosts/blob/master/2019-09/Programmatically-Opening-Windows-Terminal-in-a-Specific-Folder/ProgrammaticallyOpeningWindowsTerminalInASpecificFolder.md
 ---
 # Programmatically Opening Windows Terminal in a Specific Folder
+
+> <small style="color: firebrick">This post is mostly obsolete, as Windows Terminal now supports a `-d` parameter for specifying a startup folder: `wt.exe -d "c:\temp"`. Leaving this post in place for archival purposes only.</small>
+>
+> <small> A related and more recent post that talks about launching from other applications can be found here:  
+[Opening an Admin Windows Terminal from Visual Studio](https://weblog.west-wind.com/posts/2021/Feb/04/Opening-an-Admin-Windows-Terminal-from-Visual-Studio)
+</small>
+
+---
+
 I've been using Windows Terminal for a while now since it was announced and made available [in the Windows Store](https://www.microsoft.com/en-us/p/windows-terminal-preview/9n0dx20hk701?activetab=pivot:overviewtab) a few months back.
 
 ![](WindowsTerminal.png) 

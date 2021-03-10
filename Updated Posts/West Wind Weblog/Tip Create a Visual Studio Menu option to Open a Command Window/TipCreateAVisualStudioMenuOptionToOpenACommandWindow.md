@@ -1,20 +1,24 @@
 ---
 title: 'Tip: Create a Visual Studio Menu option to Open a Terminal (and other things)'
 abstract: I'm finding myself using the command line more and more, especially with ASP.NET vNext for running Web apps from the command line, accessing git and JavaScript build tools. Here's a real easy way to pop open a Command Window in the active project directory from Visual Studio.
-keywords: Visual Studio,External Tools,Terminal,Command Line
 categories: Visual Studio
+keywords: Visual Studio,External Tools,Terminal,Command Line
 weblogName: West Wind Web Log
 postId: 922728
+dontInferFeaturedImage: false
+dontStripH1Header: false
+postStatus: publish
+featuredImageUrl: https://weblog.west-wind.com/images/2021/Tip-Create-a-Visual-Studio-Menu-option-to-Open-a-Command-Window/Console2_thumb.png
 permalink: https://weblog.west-wind.com/posts/2015/Jan/09/Tip-Create-a-Visual-Studio-Menu-option-to-Open-a-Command-Window
 postDate: 2015-01-09T02:35:49.0000000
 ---
 # Tip: Create a Visual Studio Menu option to Open a Terminal (and other things)
 
-<small style="color: firebrick"><i>updated January 5th, 2020</i></small>
+<small style="color: firebrick"><i>updated February 5th, 2021</i></small>
 
 This isn’t exactly news, but I’ve been doing a lot more work with the command line these days from using build tools, file monitors, local Web servers, running Git, to doing Cordova builds and so on. My typical workflow for this has been to click on my [ConEmu](https://conemu.github.io/) shortcut on the Windows shortcut menu and then copy and paste the path to my project that’s buried 5 levels down from the root usually. This works, but gets tedious after a while.
 
-BTW, if you need any convincing on using a console host other than the command or powershell terminals directly  check out [Scott Hanselman’s blog post](http://www.hanselman.com/blog/Console2ABetterWindowsCommandPrompt.aspx) from a few years back (he has several actually) – he talks about Console2 which was a popular shell replacement at the time, if for nothing else than the easier cut and paste features, but you also get multiple tabbed command shells and support for pre-configured shells of Command Prompts, PowerShell, Bash etc.. You can basically create custom shells for anything that has a CLI. These days other tools like [Windows Terminal](https://github.com/microsoft/terminal) and [ConEmu](https://conemu.github.io/) are more popular than Console2 at the time when this post was originally written.
+BTW, if you need any convincing on using a console host other than the Command or Powershell terminals directly  check out [Scott Hanselman’s blog post](http://www.hanselman.com/blog/Console2ABetterWindowsCommandPrompt.aspx) from a few years back (he has several actually) – he talks about Console2 which was a popular shell replacement at the time, if for nothing else than the easier cut and paste features, but you also get multiple tabbed command shells and support for pre-configured shells of Command Prompts, PowerShell, Bash etc.. You can basically create custom shells for anything that has a CLI. These days other tools like [Windows Terminal](https://github.com/microsoft/terminal) and [ConEmu](https://conemu.github.io/) are more popular than Console2 at the time when this post was originally written.
 
 Regardless of which terminal tool you use, it's very useful to add a few links to external shells, and other tools onto your Tools menu via the **External Tools** feature in Visual Studio.
 
@@ -36,7 +40,7 @@ The manual way to do this is:
 
 This is pretty tedious. 
 
-If you do this everytime you open a Terminal take a few minutes to set up an External Command and save yourself a 30 seconds every time you do this.
+If you do this every time you open a Terminal take a few minutes to set up an External Command and save yourself a 30 seconds every time you do this.
 
 ##AD##
 
@@ -51,6 +55,8 @@ To add a terminal as a tool click the **External Tools...** button then **Add** 
 
 Click add to add a new Command, then type in name and point at your EXE file. You can use environment variables if necessary (`%localappdata%` for example) in the path. Otherwise provide a full path.
 
+> Executables have to exist, so you can't use aliases. For example, you can't launch Windows Terminal with `wt` or `wt.exe` or VS Code with `code` without a path. Full path qualification is required.
+
 For the Arguments you can then customize the command line that is fired to the tool. There are a number of expansions you can use with commands to specify the current item's full path `$(ItemPath)` or the current folder `$(ItemDir)` the active item lives in. You can also find the `$(ProjectDir)` and `$(SolutionDir)` for higher level folders. The dropdown buttons provide access to the long list of replacement macros available, but the above are the most likely candidates you'll use.
 
 Once you click OK the new menu option is immediately available in the Tools menu.
@@ -63,6 +69,9 @@ Here are a few variations:
 #### Windows Command Prompt
 Creating a Command shell is very simple:
 
+**Title**  
+`Co&mmand`
+
 **Command:**  
 `cmd.exe`
 
@@ -73,7 +82,7 @@ Creating a Command shell is very simple:
 Creating a Powershell terminal is also very simple:
 
 **Title:**  
-&Powershell
+`&Powershell`
 
 **Command:**  
 `C:\windows\system32\windowspowershell\v1.0\powershell.exe`
@@ -81,46 +90,48 @@ Creating a Powershell terminal is also very simple:
 **Initial Directory:**  
 `$(ItemDir)`
 
-#### Powershell Admin
-Firing up Powershell in admin mode is a little more complicated - you have to use double invokation to force the shell to elevate the prompt.
+#### Explorer 
 
-**Title:**  
-Powershell &Admin
+**Title**:   
+`E&xplorer`
 
 **Command:**  
-`C:\windows\system32\windowspowershell\v1.0\powershell.exe`
-
-**Arguments:**  
-`-Command “Start-Process PowerShell -Verb RunAs”`
+`explorer.exe`
 
 **Initial Directory:**  
-`$(ItemDir)`
+`"$(ItemDir)"`
+
 
 #### Windows Terminal 
-Windows Terminal is a pain to run from Visual Studio and you can really only start up the default shell. It also requires some custom configuration if you want Windows Terminal to open in a specific folder as by default profiles set a hard coded path for the startup folder.
+Windows Terminal uses an alias and EXE in some nasty store buried folder. To keep this generic calling `cmd.exe` which handles the alias invocation can be used:
 
-First to use Windows Terminal use the this startup config:
+**Title**  
+`&Windows Terminal`
 
-**Title:**  
-Windows &Terminal
-
-**Command:**
+**Command:**  
 `cmd.exe`
 
-**Arguments:**
-`/c start wt`
+**Initial Directory:**  
+`/c wt.exe -d "$(ItemDir)"`
 
-**Initial Directory:**
-`$(ItemDir)`
+#### Windows Terminal Admin 
+This one is even trickier - it requires an external launcher to elevate - I was unable to just make this works with `CMD` or `PowerShell`, so I'm using [GSudo from Chocolatey](https://chocolatey.org/packages/gsudo):
 
-> Note: in order for the directory selection to work you need to change the start folder of the default profile in the configuration to `"startingDirectory" : "%__CD__%"`.
-[more info](https://weblog.west-wind.com/posts/2019/Sep/03/Programmatically-Opening-Windows-Terminal-in-a-Specific-Folder#forcing-the-startup-path)
+**Title**   
+`&Admin Windows Terminal`
+
+**Command:**  
+`cmd.exe`
+
+**Initial Directory:**  
+`/c wt.exe -d "$(ItemDir)"`
+
 
 #### ConEmu with Powershell
 ConEmu is a popular shell host that lets you run multiple instances of command shells in a single window which makes it easier to manage multiple terminal Windows. I tend to use Powershell with ConEmu so I provide this info here as well.
 
 **Title:**  
-ConEmu &Powershell
+`ConEmu &Powershell`
 
 **Command:**  
 `C:\Program Files\ConEmu\ConEmu64.exe`
@@ -131,7 +142,7 @@ ConEmu &Powershell
 Where `{Powershell}` is the name of one of the predefined consoles in the ConEmu Settings. If you'd rather run an **elevated prompt** you can use this instead:
 
 **Title:**  
-ConEmu Powershell &Admin
+`ConEmu Powershell &Admin`
 
 **Arguments:**  
 `/dir $(ItemDir) /cmd {Powershell:Admin}`
@@ -147,33 +158,33 @@ Here are a couple of others I use all the time. As with the shell you :
 Visual Studio code has a better editing experience for Web files so often when I'm dealing with large JavaScript, CSS or HTML files I want to open them in VS code rather than Visual Studio. To do this:
 
 **Title:**  
-&VS Code 
+`&VS Code`
 
 **Command:**  
-%localappdata%\Programs\Microsoft VS Code\Code.exe
+`C:\Program Files\Microsoft VS Code\Code.exe`
 
 **Arguments**  
-$(ItemPath)
+`$(ItemPath)`
 
-Note this opens the individual document. If you'd rather want to open the entire folder use `$(ItemDir)` instead.
+> Note this opens the individual document. If you'd rather want to open the entire folder use `$(ItemDir)` instead.
 
 #### Open in SmartGit (Git Gui)
 Another really useful tool for me to access is my external GUI Git client. I use [SmartGit](https://www.syntevo.com/smartgit/) but this will work just as well with the Github Windows client, GitKraken or Fork.
 
 **Title:**  
-Smart&Git
+`Smart&Git`
 
 **Command:**  
-C:\Program Files\SmartGit\bin\smartgit.exe
+`C:\Program Files\SmartGit\bin\smartgit.exe`
 
 **Arguments:**  
-$(ItemDir)
+`$(ItemDir)`
 
 
 ### Using Menu Shortcut Keys
 You may have noticed that I used the `&` in some of the **Title** of several of the tool commands, which provides a menu shortcut key for the command when they are added to the tools menu. This is quite useful as it allows you to access your tools via keyboard short cuts via Tool Menu access. 
 
-For example **PowerShell &Admin** is available as `alt-t-a` and **E&xplorer** as `alt-t-a`. Et Voila: simple keyboard access to your tools.
+For example **&Admin Windows Terminal** is available as `alt-t-a` and **E&xplorer** as `alt-t-x`. Et Voila: simple keyboard access to your tools. The nice thing is this is quick and easy to set up with just the prompts.
 
 ### Setting a Keyboard ShortCut
 If you want something more permanent that also backs up with your Visual Studio Settings you can assign hotkeys to specific commands by command number. This depends on the order of the commands unfortunately but it's global and doesn't rely on the tools menu.
