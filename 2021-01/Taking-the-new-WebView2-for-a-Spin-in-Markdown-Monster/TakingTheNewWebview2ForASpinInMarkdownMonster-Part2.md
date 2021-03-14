@@ -79,7 +79,11 @@ public DomManipulation()
 async void InitializeAsync()
 {
     // must create a data folder if running out of a secured folder that can't write like Program Files
-    var env = await  CoreWebView2Environment.CreateAsync(userDataFolder: System.IO.Path.Combine(System.IO.Path.GetTempPath(),"MarkdownMonster_Browser"));
+    var path = System.IO.Path.Combine(System.IO.Path.GetTempPath(),"MarkdownMonster_Browser");
+    var env = await  CoreWebView2Environment.CreateAsync(userDataFolder: path);
+    
+    // NOTE: this waits until the first page is navigated - then continues
+    //       executing the next line of code!
     await webView.EnsureCoreWebView2Async(env);
 
     // Optional: Map a folder from the Executable Folder to a virtual domain

@@ -1,16 +1,16 @@
 ---
 title: Taking the new Chromium WebView2 Control for a Spin in .NET - Part 1
-featuredImageUrl: https://weblog.west-wind.com/images/2021/Taking-the-new-WebView2-for-a-Spin-in-Markdown-Monster/WebViewWpfControl.png
 abstract: This is Part 1 of a two part article that gives an overview of the new WebView2 Web browser control that is based on Edge Chromium. In Part 1 I look at the basics of what's needed to run the control using the WebView runtime, and how to get the control embedded and configured to use for basic HTML tasks. In Part 2 I look at interaction between the .NET application and WebBrowser and Javascript.
-keywords: WebView2, WPF, JavaScript, Interop, WebBrowser, Chromium, .NET
 categories: .NET, WPF, Windows
+keywords: WebView2, WPF, JavaScript, Interop, WebBrowser, Chromium, .NET
 weblogName: West Wind Web Log
 postId: 2223681
+dontInferFeaturedImage: false
+dontStripH1Header: false
+postStatus: publish
+featuredImageUrl: https://weblog.west-wind.com/images/2021/Taking-the-new-WebView2-for-a-Spin-in-Markdown-Monster/WebViewWpfControl.png
 permalink: https://weblog.west-wind.com/posts/2021/Jan/14/Taking-the-new-Chromium-WebView2-Control-for-a-Spin-in-NET-Part-1
 postDate: 2021-01-14T22:21:22.0824034-10:00
-postStatus: publish
-dontInferFeaturedImage: false 
-dontStripH1Header: false
 ---
 # Taking the new Chromium WebView2 Control for a Spin in .NET - Part 1
 
@@ -180,7 +180,10 @@ async void InitializeAsync()
 {
    // must create a data folder if running out of a secured folder that can't write like Program Files
    var env = await  CoreWebView2Environment.CreateAsync(userDataFolder: 	Path.Combine(Path.GetTempPath(),"MarkdownMonster_Browser"));
-   await webView.EnsureCoreWebView2Async(env);
+   
+    // NOTE: this waits until the first page is navigated - then continues
+    //       executing the next line of code!
+    await webView.EnsureCoreWebView2Async(env);
 
    if (Model.Options.AutoOpenDevTools)
        webView.CoreWebView2.OpenDevToolsWindow();
@@ -212,9 +215,17 @@ This `InitializeAsync()` method is a method I created and call from the non-asyn
 _ = InitializeAsync()
 ```
 
-This gives me a method with an async signature even though the method is actually not initiated of an initial async request, but rather is of the fire and forget variety. But it gives me
+This gives me a method with an async signature even though the method is actually not initiated of an initial async request, but rather is of the fire and forget variety.  This is kind of an odd method - the call to:
 
-- so during initial startup. I have other code in there to interact with the environment, like creating interop objects, setting up message events to send data back and forth and so on.
+```csharp
+// NOTE: this waits until the first page is navigated - then continues
+//       executing the next line of code!
+await webView.EnsureCoreWebView2Async(env);
+```
+
+waits until the first page is navigated before continuing execution. IOW, this code is truly non-sequential so when debugging you get what feels like strange behavior where the code doesn't execute the next line but continues on another thread **until the WebView is internally navigated** and the WebView is 'ready'.
+
+This behavior is to ensure you can safely configure server settings that rely on the browser having properly initialized and that the `CoreWebView2` property is available to be accessed. Use this method to set any environment settings like the render path, or a virtual local folder mapping (more on that later).
 
 ### Common Navigation and Content Events
 As you'd expect the WebView2 browser has a full compliment of events, but I want to highlight 3 of the more common events that you need to work with, especially if you interact with the content inside of the browser control:

@@ -11,9 +11,6 @@ postDate: 2019-05-04T14:46:47.7757997-10:00
 
 ![Look 'ma - no hands](NoHands.jpg)
 
-“What are these characters? faith-take” This is really. asddasdasd So what the fuck is going on 
-
-
 Look Ma! No hands... I love shaving off time in my development cycle. A lot of what we do during Web Development is highly repetitive and by removing some of the steps in the typical process even making small adjustments that save time, can end up saving a lot of time over the course of a day, and especially over the lifetime of a project. This post is about saving time in the build, debug, run cycle.
 
 A few months ago I wrote about how you can [use Browser-Sync with Web Connection](https://west-wind.com/wconnect/weblog/ShowEntry.blog?id=943) to automatically reload your browser when you make changes to HTML and other Web related resources in your projects. The idea is that you run a command line utility that acts as a Web Request proxy that detects changes on disk, and when it finds a change it automatically causes the browser to reload. It's incredibly useful and productive to work that way as you can make changes and you can literally see the changes you make in-real time changing as soon as you save to disk - the browser automatically refreshes the page you are already on without having to manually reload. 
