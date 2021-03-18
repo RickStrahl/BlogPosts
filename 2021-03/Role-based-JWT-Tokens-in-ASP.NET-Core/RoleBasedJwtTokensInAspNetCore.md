@@ -1,16 +1,16 @@
 ---
 title: Role based JWT Tokens in ASP.NET Core
-featuredImageUrl: https://weblog.west-wind.com/images/2021/Role-based-JWT-Tokens-in-ASP.NET-Core/Banner.jpg
 abstract: ASP.NET Core Authentication and Authorization continues to be the most filddly part of the ASP.NET Core eco system and today I ran into a problem to properly configure JWT Tokens with Roles. As I had a hard time finding the information I needed in one place and instead ended up with some outdated information, I'm writing up a post to hopefully put all the basic bits into this single post.
-keywords: JWT, Token, Security, ASP.NET Core, Authentication, Authorization
 categories: ASP.NET Core, Security
+keywords: JWT, Token, Security, ASP.NET Core, Authentication, Authorization
 weblogName: West Wind Web Log
 postId: 2326847
-permalink: https://weblog.west-wind.com/posts/2021/Mar/09/Role-based-JWT-Tokens-in-ASPNET-Core
-postDate: 2021-03-09T20:52:36.5613821-10:00
-postStatus: publish
 dontInferFeaturedImage: false
 dontStripH1Header: false
+postStatus: publish
+featuredImageUrl: https://weblog.west-wind.com/images/2021/Role-based-JWT-Tokens-in-ASP.NET-Core/Banner.jpg
+permalink: https://weblog.west-wind.com/posts/2021/Mar/09/Role-based-JWT-Tokens-in-ASPNET-Core
+postDate: 2021-03-09T20:52:36.5613821-10:00
 customFields:
   mt_githuburl:
     id: 
@@ -21,7 +21,7 @@ customFields:
 
 ![](Banner.jpg)
 
-Authentication and Authorization in ASP.NET Core continues to be the most fiddly component for configuration. It seems almost on every app I run into some sort of sticking point with Auth. Four versions in have brought three different authentication implementations and feature churn has also left a wave of out of date information in its wake. Today I got stuck in one of those Groundhog Day loops looking at outdated information with JWT Tokens for a Web API with Role based authorization. Mostly due to impatience and not finding the right up-to-date documentation right away, because - yeah - I'm too impatient sometimes; aren't we all these days?
+Authentication and Authorization in ASP.NET Core continues to be the most fiddly component for configuration. It seems almost on every app I run into some sort of sticking point with Auth. Four versions in have brought three different authentication implementations and feature churn has also left a wave of out of date information in its wake. Today I got stuck in one of those Groundhog Day loops looking at outdated information with JWT Tokens for a Web API with Role based authorization. 
 
 The current iteration of JWT Token setup in ASP.NET Core actually works very well, as long as you get the right incantations of config settings strung together. Part of the problem with Auth configuration is that most of settings have nothing to do with the problem at hand and deal with **protocol ceremony**. For example, setting Issuer and Audience seems totally arcane but it's part of the requirements for JWT Tokens and do need to be configured. Luckily there are only a few of those settings that are actually required and most of it is boilerplate.
 
@@ -29,13 +29,13 @@ I've not found this information all in one place, and today I barked up the wron
 
 In this post I specifically talk about:
 
-* Authentication for an ASP.NET Core Web API
+* Authentication for an ASP.NET Core **Web API**
 * Using JWT Tokens
 * Using Role Based Authorization
-* Using only low level features - **not** using ASP.NET Core Identity
+* Using only low level features - **not using ASP.NET Core Identity**
 
 ## Configuration
-Authentication and Authorization are provided as Middleware in ASP.NET Core and is traditional, you have to configure them in `.ConfigureServices()` and connect the middleware in `.Configure`  - go figure on the backwardation of those terms :smile:
+Authentication and Authorization are provided as Middleware in ASP.NET Core and is traditional, you have to configure them in `.ConfigureServices()` and connect the middleware in `.Configure()`.
 
 ### Setting up JWT Authentication and Authorization
 First step is to configure Authentication in `Startup.ConfigureServices()`. This is used to configure the JWT Token set up and add the required components to ASP.NET's processing pipeline:
@@ -69,11 +69,18 @@ services.AddAuthentication( auth=>
 }
 ```
 
-JWT Authentication has a ton of settings, most of which are sufficiently cryptic that I'm pretty much just going to cut and paste them. Suffice it to say most of these concern setting up the protocol, and token wrapper.  
+JWT Authentication has a ton of settings, most of which are sufficiently cryptic that I'm pretty much just going to cut and paste them and fill in the values. Suffice it to say most of these concern setting up the protocol, and token wrapper.  Typically I store those values in my app's configuration settings so it gets pulled in via .NET's configuration provider and `.config` is that particular configuration instance.
 
-Note **there's nothing Role specific** in this global configuration. All the role based related configuration happens when creating a token later on in the `Authenticate` endpoint.
+**There's nothing Role specific** in this global configuration. All the role based related configuration happens when creating a token later on in the `Authenticate` endpoint.
 
-The values here configure the token's common values and key used to sign the token. The key is the most important part as it determines how the token can be unpacked and read by ASP.NET Core to authorize requests when requests come in.
+### How Tokens are used
+Before moving on here, let's review how token based authentication works and how these setup values fit into this scheme. 
+
+The setup values above configure the token's common values and key used to sign the token. They provide identification markers to ensure that the token generated is unique. I consider these values a **base token wrapper**, and when you create a token you'll add your custom, **application specific claims** to the token typically right after you authenticate a user and provide the token back to the user or auth flow as part of a Web request.
+
+The `IssuerSigningKey` is the most important part of this configuration, and it's used to hash the final token with the wrapper plus any claims added. The hash is used to validate the token's authenticity. Note while the generated token is encoded as base64, it is not by itself secure and the content can be decoded even on the client. To wit, you can take any JWT token and paste it into [JWT.io](https://jwt.io/) and decode the token's content.
+
+The hash ensures that the token cannot be changed without breaking the token validity. When the token is sent with a request, it's validated by ASP.NET Core's JWToken middleware which first validates the hash against the token data and then applies the authentication/authorization based on the contained well-known authorization values. If the token has been changed by the client or some other entity in any way the hash won't validate and it's rejected outright. After that the username and role matching is applied in the authorization part of the middleware pipeline.
 
 ### Adding the Auth Middleware
 Next we need to add the actual middleware for `.UseAuthentication()` and `app.UseAuthorization()` in `Startup.Configure`:
@@ -111,6 +118,7 @@ This likely happens a **Controller Action Method** or **Middleware Endpoint Hand
 public object Authenticate(AuthenticateRequestModel loginUser)
 {
 	// My application logic to validate the user
+	// returns a user entity with Roles collection
     var bus = new AccountBusiness();
     var user = bus.AuthenticateUser(loginUser.Username, loginUser.Password);
     if (user == null)
@@ -129,6 +137,7 @@ public object Authenticate(AuthenticateRequestModel loginUser)
     claims.Add(new Claim("UserState", UserState.ToString()));
 
     // create a new token with token helper and add our claim
+    // from `Westwind.AspNetCore`  NuGet Package
     var token = JwtHelper.GetJwtToken(
         loginUser.Username,
         Configuration.JwtToken.SigningKey,
@@ -142,6 +151,47 @@ public object Authenticate(AuthenticateRequestModel loginUser)
         token = new JwtSecurityTokenHandler().WriteToken(token),
         expires = token.ValidTo
     };
+}
+```
+
+The relevant code from the  [JwtHelper class dependency](https://github.com/RickStrahl/Westwind.AspNetCore/blob/master/Westwind.AspNetCore/Security/JwtHelper.cs) to create the token and extract a string from it:
+
+```cs
+public class JwtHelper
+{
+    public static JwtSecurityToken GetJwtToken(
+        string username,
+        string signingKey,
+        string issuer,
+        string audience,
+        TimeSpan expiration,
+        Claim[] additionalClaims = null)
+    {
+        var claims = new[]
+        {
+            new Claim(JwtRegisteredClaimNames.Sub,username),
+            // this guarantees the token is unique
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        };
+
+        if (additionalClaims is object)
+        {
+            var claimList = new List<Claim>(claims);
+            claimList.AddRange(additionalClaims);
+            claims = claimList.ToArray();
+        }
+
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(uniqueKey));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        return new JwtSecurityToken(
+            issuer: issuer,
+            audience: audience,
+            expires: DateTime.UtcNow.Add(expiration),
+            claims: claims,
+            signingCredentials: creds
+        );
+    }
 }
 ```
 
