@@ -73,7 +73,7 @@ JWT Authentication has a ton of settings, most of which are sufficiently cryptic
 
 **There's nothing Role specific** in this global configuration. All the role based related configuration happens when creating a token later on in the `Authenticate` endpoint.
 
-### How Tokens are used
+### How Tokens and Hashing work
 Before moving on here, let's review how token based authentication works and how these setup values fit into this scheme. 
 
 The setup values above configure the token's common values and key used to sign the token. They provide identification markers to ensure that the token generated is unique. I consider these values a **base token wrapper**, and when you create a token you'll add your custom, **application specific claims** to the token typically right after you authenticate a user and provide the token back to the user or auth flow as part of a Web request.
@@ -107,9 +107,9 @@ app.UseEndpoints(endpoints =>
 Note that order matters for Authentication and Authorization. These two need to be injected **after Routing** but before any **HTTP output generating middleware**, most importantly before `app.UseEndpoints()`.
 
 ## Authenticating Users using an Web API Endpoint
-Next we need to authenticate a user within the application, and then generate a token and return it to the API client. 
+Next we need to authenticate a user within the application by asking for credentials, and then generating a token and returning it to the API client. 
 
-This likely happens a **Controller Action Method** or **Middleware Endpoint Handler**. I'm using a Controller Action Method here:
+This likely happens a **Controller Action Method** or **Middleware Endpoint Handler**. Here's what this looks like using a Controller Action Method:
 
 ```cs
 [AllowAnonymous]
@@ -154,7 +154,7 @@ public object Authenticate(AuthenticateRequestModel loginUser)
 }
 ```
 
-The relevant code from the  [JwtHelper class dependency](https://github.com/RickStrahl/Westwind.AspNetCore/blob/master/Westwind.AspNetCore/Security/JwtHelper.cs) to create the token and extract a string from it:
+I'm using a `JWTHelper class` to actually generate a token so I don't have to remember this repetitive 'ceremony' in each application from the  [JwtHelper class dependency](https://github.com/RickStrahl/Westwind.AspNetCore/blob/master/Westwind.AspNetCore/Security/JwtHelper.cs). The code creates the token and extracts a string from it that's ready to be returned as a bearer token value. Here's the relevant code:
 
 ```cs
 public class JwtHelper
@@ -195,7 +195,9 @@ public class JwtHelper
 }
 ```
 
-This code first uses an application specific business object to validate the user passed in as part of the API call (or Login form if you're doing HTML forms). If the user is valid, I create a new claims that are packaged into the token. These claims travel with the token and can be retrieved later without having to access a backend. It's useful for common things that display in the UI like display name, email address, as well as the user Id so a full user can be retrieved.
+The `Authenticate()` controller code first uses an application specific business object to validate the user passed in as part of the API call (or Login form if you're doing HTML forms). If the user is valid, I create new claims that are packaged into the token. 
+
+The tokens include the username and roles which is what's required for ASP.NET Core's authorization to work. I then can add some additional application specific claims if necessary like the display name and a custom `UserState` object in the example above. These claims travel with the token and can be retrieved later without having to access a backend to retrieve them again.
 
 Finally the token is generated using `JwtHelper.GetJwtToken()` with the user id as the key a signing key, some site specific state and the actual claims. Finally you can turn the token into a string:
 
@@ -205,12 +207,12 @@ var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
 which can then be used by the client as a `Bearer ` token.
 
-Note that your authentication method needs to be anonymously accessible so be if the `AccountController` is otherwise set to `[Authorize]` make sure that the `Authenticate()` method has an `[AllowAnonymous]` attribute so it can be accessed without being authenticated.
+> Note that the `Authentication` method needs to be anonymously accessible if the `AccountController` is otherwise set to `[Authorize]`. make sure that the `Authenticate()` method has an `[AllowAnonymous]` attribute.
 
 ### Claims and Roles, Roles, Roles
 ASP.NET Core uses Claims for authentication. Claims are pieces of data that you can store in the token that are carried with it and can be read from the token. For authorization Roles can be applied as Claims.
 
-The correct syntax for adding rows that ASP.NET Core recognizes for Authorization is in .NET Core 3.1 and 5.x is by adding multiple claims for each role:
+The correct syntax for adding Roles that ASP.NET Core recognizes for Authorization is in .NET Core 3.1 and 5.x is by adding multiple claims for each role:
 
 ```cs
 // Add roles as multiple claims
@@ -224,8 +226,11 @@ foreach(var role in user.Roles)
 }
 ```
 
+### Invalidating a Token
+
+
 ### Accessing the JWT Token Generation API
-So at this point I have an `authenticate` API endpoint that I can retrieve a token from. Here's what this specific request looks like:
+So at this point I have an `Authenticate` API endpoint that I can retrieve a token from. Here's what this specific request looks like:
 
 ![](WebSurgeAuthenticate.png)
 
@@ -233,16 +238,18 @@ Username and password are passed in, and the token along with an expiration time
 
 ![](TokenDisplay.png)
 
-The client can now pick up the token and create the appropriate
+> Notice that the token is easily decoded by an external tool, totally unrelated to my application. This means the contained token data is not secure from prying eyes. However, the values in that token can't be changed and provided to the server application **unless the data is signed by the original Signing Key**. This prevents the token from being tampered with.
+
+Once the token's been generated and sent to the client, the client can now use it in subsequent requests to add the appropriate `Authorization` header:
 
 ```http
 Authorization: Bearer 1235*53213...
 ```
 
-header into the header of subsequent HTTP requests. Nice.
+to outgoing requests.
 
 ## Securing the API
-What's left now is to selectively or restrictively limit access to the API(s) by adding `[Authorize]` attributes. 
+What's left now is to selectively or restrictively limit access to the API(s) by adding `[Authorize]` attributes either on controllers or endpoint methods. 
 
 I can use one of the following or no attributes at all (for open access):
 
@@ -250,7 +257,7 @@ I can use one of the following or no attributes at all (for open access):
 * Role based `[Authorize(Roles = "Administrator,ReportUser")]`
 * Anonymous `[AllowAnonymous]` 
 
-Note the attributes can be set on a Controller class, or Action method and they work top down, so a class attribute applies to all action methods. This is where `[AllowAnonymous]` comes in handy to override the one or two requests that might need open access (like authentication and logging out for example).
+Note the attributes can be set on a Controller class, or Action method and they work hierarchically from the top down, so a class attribute applies to all action methods. This is where `[AllowAnonymous]` comes in handy to override the one or two requests that might need open access (like `Authenticate()` or `Logout()`).
 
 To set up authorization for any authorized user, just use `[Authorize]`:
 
