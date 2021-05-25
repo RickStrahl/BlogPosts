@@ -1,5 +1,5 @@
 ---
-title: LiveReloadServer - A Generic Local Static Web Server with Live Reload based on .NET
+title: LiveReloadServer - A Generic Static Web Server with Live Reload based on .NET
 abstract: I've released v1.0 of my LiveReload Web Server which is a local static file Web server that includes support for LiveReload, plus some optional dynamic features for rendering self-contained RazorPages and Markdown content. This Dotnet Tool is fast, easy to use and includes a host of convenience features that try to make the process of working with local Web content quicker and easier.
 categories: ASP.NET Core, Web Development
 keywords: LiveReload, Web Server, Local, Web SIte, Testing, Publishing
@@ -17,13 +17,13 @@ customFields:
     key: mt_githuburl
     value: https://github.com/RickStrahl/BlogPosts/blob/master/2021-03/LiveReloadServer--A-.NET-Core-Based-Generic-Static-Web-Server-with-Live-Reload/LivereloadserverANetCoreBasedGenericStaticWebServerWithLiveReload.md
 ---
-# LiveReloadServer - A Generic Local Static Web Server with Live Reload based on .NET
+# LiveReloadServer - A Generic Static Web Server with Live Reload based on .NET
 
 ![](BannerLaunch.png)
 
-I've released an official `v1.0` of my [Live Reload Web Server](https://github.com/RickStrahl/LiveReloadServer) last week. It's a self-contained, command line executable, local Web Server that allows you to run arbitrary local folders as a static or optionally semi-dynamic Web site. Point it at a folder and go! The server comes with built-in Live Reload functionality, and also offers dynamic features for Markdown rendering and loose Razor Pages support very useful for content Web sites. 
+I've released an official `v1.0` of my [Live Reload Web Server](https://github.com/RickStrahl/LiveReloadServer) last week. It's a self-contained, command line executable, local Web Server that allows you to run arbitrary local folders as a static or optionally semi-dynamic Web site. The server comes with built-in Live Reload functionality, and also offers dynamic features for Markdown rendering and loose Razor Pages support very useful for content Web sites. 
 
-LiveReload server is [open source with all code on Github](https://github.com/RickStrahl/LiveReloadServer) as are the components that drive much of its functionality. It's installable as a [Dotnet Tool](https://www.nuget.org/packages/LiveReloadServer/), [Chocolatey package](https://chocolatey.org/packages/LiveReloadWebServer) and [standalone Windows installer](https://github.com/RickStrahl/LiveReloadServer/raw/master/LiveReloadWebServer-SelfContained.zip). For cross-platform usage on Windows, Mac or Linux the Dotnet Tool can be used.
+LiveReload server is [open source with all code on Github](https://github.com/RickStrahl/LiveReloadServer) as are the components that drive much of its functionality. It's installable as a [Dotnet Tool](https://www.nuget.org/packages/LiveReloadServer/), [Chocolatey package](https://chocolatey.org/packages/LiveReloadWebServer) and [standalone Windows installer](https://github.com/RickStrahl/Westwind.AspnetCore.LiveReload/raw/master/LiveReloadServer/LiveReloadWebServer-SelfContained.zip). For cross-platform usage on Windows, Mac or Linux the Dotnet Tool can be used.
 
 Although this command line tool has been around for nearly 2 years now, I just realized I've never actually posted about it before, only a few mentions as part of other posts. In light of the `v1.0` release, it's as good a time as any for an official post. 
 
@@ -34,18 +34,10 @@ To give you an idea here an example of me using the `LiveReloadServer` to make c
 
 ![Live Reload With Razor anti-trust site](https://github.com/RickStrahl/LiveReloadServer/raw/master/Assets/LiveReloadAntiTrustSite.gif)
 
-This sample demonstrates:
-
-* Point at a folder and go
-* Serving static content
-* Serving RazorPages dynamic content
-* Editing with Live Reload on changes (Html, CSS, Razor)
-* Fixing errors in Razor Code with live reload
-
 ## What is LiveReloadServer?
 **LiveReloadServer** is a practical, easy to install, easy to use, local, command line based Web Server geared to Web development tasks for static Web content. 
 
-The server also includes some dynamic features like built-in themed Markdown rendering and standalone RazorPages support, but these dynamic features require runtime support when deployed, provided by a .NET Core based server runtime.
+The server also includes some dynamic features like built-in themed Markdown rendering and standalone RazorPages support, but these dynamic features require runtime support when deployed, provided by .NET Core based server runtime.
 
 Here's a highlight list of some of the features:
 
@@ -64,7 +56,7 @@ Here's a highlight list of some of the features:
 So while it's yet another local Web Server you can see that it has a few unique features that might make it attractive for a number of different scenarios some of which I cover in this post.
 
 ## Installation
-**LiveReloadServer** is provided in a few different installable formats:
+This tool is provided in a few different installable formats:
 
 * **Dotnet Tool** <small>(cross platform)</small>  
   ```ps
@@ -106,9 +98,11 @@ Here's what the running server looks like:
 
 There are quite a few command line switches you can set to enable or disable features like enabling and configuring RazorPages and Markdown execution, as well as some operational features that open the browser and an editor at the specified locations.
 
-Here's a the command line syntax:
+Here's a the command syntax:
 
 ```text
+Static, Markdown and Razor Files Web Server with Live Reload for changed content.
+
 Syntax:
 -------
 LiveReloadServer <webRootPath> <options>
@@ -166,14 +160,14 @@ You can look at the [GitHub landing page](https://github.com/RickStrahl/LiveRelo
 In this post I want to spend some time talking about the why and some use cases that I use LiveReloadServer for.
 
 ## What is a Local Web Server For?
-So why another local Web Server? A local Web Server isn't new and there are other local Web Servers and Live Reload tools that I've used for some time and while they work they have some limitations that I wanted to improve upon. 
+So why another local Web Server? A local Web Server isn't anything new. There are other local Web Servers and Live Reload tools that I've used for some time and while they work they have some limitations that I wanted to improve upon. 
 
 ### A better Mousetrap
-This is quite subjective, but I've used both [http-server](https://github.com/http-party/http-server#readme) (and a few others) and [browsersync](https://www.browsersync.io/) for quite some time before I ended up creating my own tool. While both of these tools (and others) worked I was never happy with the operation of them. `http-server` works fine, but it's only a Web server - and has no support for live reload. `browsersync` has Live Reload and can also serve as a plain Web Server, but I found it to be a bit on the flaky side for the Live Reload functionality.
+This is quite subjective, but I've used both [http-server](https://github.com/http-party/http-server#readme) (and a few others) and [browsersync](https://www.browsersync.io/) for quite some time before I decided to create my own tool. `http-server` works fine, but it's only a Web server - and has no support for live reload. `browsersync` has Live Reload and can also serve as a plain Web Server, but I found it to be a bit on the flaky side for the Live Reload functionality.
 
 Part of the reason for bitching about these inconveniences is that I've been spoiled by the Live Reload features in full CLI environments for the various SPA frameworks, as these work very well and consistently. But - those tools are tied to specific frameworks and are slow to start as they have to build the projects usually and don't just run but do a lot more. 
 
-For example where a standalone server comes in handy: I have quite a few VueJs 2.x applications that predate the Vue CLI. They are plain JavaScript applications that link `vue.js` as a library and that don't use a build process, so they don't need (and can't even use) the Vue CLI. These work great with this Live Reload server and it makes it easy to iterate changes without using a CLI Web server. Even today, I often use VueJs as a plain library - without a build process - or simple pages and in many of my static content sites.
+For example where a standalone server comes in handy I have quite a few VueJs 2.x applications that predate the Vue CLI. They are plain JavaScript applications that don't use a build process and so don't need (and can't even use) the Vue CLI. These work great with this Live Reload server and it makes it easy to iterate changes without using a CLI Web server.
 
 ### Fill an ASP.NET Core Hole
 I also wanted a server with some **extra features** that picks up the slack that ASP.NET Core doesn't fill. I call this use case **Static Web Sites with Benefits** and it is similar to what classic ASP.NET ASPX pages or even more so ASP.NET WebPages filled. Namely the idea that you can just drop some files - Razor pages, or Markdown files - into a folder and get basic .NET functionality in your otherwise static HTML content. You can access all of .NET features out of the box, and optionally load additional assemblies to extend with external functionality.
@@ -186,14 +180,9 @@ To give a specific example, in my business I have about 15 separate content site
 * Retrieving version information
 * Handling page routing
 * Pulling other information from various services (stock quantity & prices/availability)
-* Adding Dates and Counters
 * Doing some simple calculations
 
-You might say - you can do most of those things with client side code, and that's definitely true. I can use plain JavaScript or a framework like VueJs, plus some remote XHR calls to do similar things, but you do run into issues with CORS for example. 
-
-To me it's much cleaner and more importantly - more SEO friendly - to use server generated pages that crawlers can find without any special fuss and ceremony required for client side apps.
-
-In short, for these things I've found this generic server very useful as a replacement for ASPX pages or WebPages I was using previously. So far I've migrated 3 of the old classic sites and recently added a new one using this new server. All 4 of these sites use a single generic server installation and I now basically have content sites where I can just publish content files without updating any binaries. 
+For these things I've found this generic server very useful as a replacement for ASPX pages or WebPages before. So far I've migrated 3 of the sites and recently added a new one using this new server. All 4 of these sites now use a single generic server installation and I now basically have content sites where I can just push files up individually or in bulk.
 
 #### Not meant to replace an Application!
 To be clear, I'm not trying to position this as a feature replacement for ASP.NET Core applications, or even for what ASP.NET WebPages provided. The goal **is not** to provide a generic Web site engine that can replace a real application. 

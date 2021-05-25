@@ -1,5 +1,5 @@
 ---
-title: Role based JWT Tokens in ASP.NET Core APIs
+title: Role based JWT Tokens in ASP.NET Core
 abstract: ASP.NET Core Authentication and Authorization continues to be the most filddly part of the ASP.NET Core eco system and today I ran into a problem to properly configure JWT Tokens with Roles. As I had a hard time finding the information I needed in one place and instead ended up with some outdated information, I'm writing up a post to hopefully put all the basic bits into this single post.
 categories: ASP.NET Core, Security
 keywords: JWT, Token, Security, ASP.NET Core, Authentication, Authorization
@@ -17,7 +17,7 @@ customFields:
     key: mt_githuburl
     value: https://github.com/RickStrahl/BlogPosts/blob/master/2021-03/Role-based-JWT-Tokens-in-ASP.NET-Core/RoleBasedJwtTokensInAspNetCore.md
 ---
-# Role based JWT Tokens in ASP.NET Core APIs
+# Role based JWT Tokens in ASP.NET Core
 
 ![](Banner.jpg)
 
@@ -32,7 +32,7 @@ In this post I specifically talk about:
 * Authentication for an ASP.NET Core **Web API**
 * Using JWT Tokens
 * Using Role Based Authorization
-* Using only ASP.NET's low level Auth features - **not using ASP.NET Core Identity**
+* Using only low level features - **not using ASP.NET Core Identity**
 
 ## Configuration
 Authentication and Authorization are provided as Middleware in ASP.NET Core and is traditional, you have to configure them in `.ConfigureServices()` and connect the middleware in `.Configure()`.
@@ -288,27 +288,6 @@ Now that the API is secured we have to pass the Bearer token with each request t
 And voila - I can now access the Administrator group protected POST operation.
 
 And that completes the circle...
-
-## Logging Out JWT Tokens: Fogettaboutit!
-I got several questions regarding out with a JWT token and the short answer to that is: 
-
-* **You can't 'log out' with a JWT Token**
-* **A token once generated is valid until it expires**
-* **The only thing that expires a JWT token is its expiration time**
-
-**You can't log out with only a JWT token**.  Unlike a cookie or session there's nothing to kill or remove because **JWT tokens are stateless**. 
-
-JWTs are self contained and there's nothing backing them but the data they contain. So the server has no idea beyond the validity of the token and its expiration time whether its valid or not.
-
-Note that if you're writing HTML based applications, you can use a cookie or some local storage to hold the Token and log out the user by removing it. You can clear the cookie or client side API applications can remove the token from the client, and that effectively logs out the application. But even though these 'wrappers' may clear the token for the application, the actual token remains valid until expiration, if the token is somehow peeled out of the application wrapper or cookie.
-
-### Have to log out anyway: A secondary layer
-If you really, really need to be able to log out, **you can wrap a secondary layer around the JWT token** in your token validation logic. For example, you could add a record into a DB or other storage that holds the token and access status. When the token is validated, you then also check for the access status in the DB. To 'log out' you can remove the record or mark it as logged out to disallow access even if the token has not expired. It's ugly and requires some stateful storage, which kind of defeats the whole idea of JWT Tokens in the first place, but it works and is not that difficult to set up.
-
-### Keep the Timeout Short
-If you are concerned about Token lifetime, the key is to keep the token timeout short. This means tokens have a limited lifespan and are unlikely to be useful to anything but live attacks.
-
-Timeouts can be a pain for client applications since they now have to check for the token timeouts. You can ease that pain by having returning useful error information on a timeout (instead of just a 401), and have an easy way to create a new token so that client applications can automate that process.
 
 ## Summary
 Authentication and Authorization in ASP.NET Core has gotten a lot simpler in recent versions, but finding the right documentation for setting all the dials for JWT Token Authentication is still not very obvious. There's a lot of information about authentication and it's easy to get lost in the docs and end up on outdated information, because the behavior of Authentication has changed significantly throughout ASP.NET Core versions. If you're looking up additional information make sure it's for version 3.1 and later which is the latest as of now.
