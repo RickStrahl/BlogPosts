@@ -14,7 +14,7 @@ postDate: 2021-05-15T13:49:46.0382033-07:00
 ---
 # Async/Await Calls Gotcha with the CSharp ? Null Propagator
 
-![](AwaitNullExceptionBanner.png)xzcvxcvzxczxc
+![](AwaitNullExceptionBanner.png)
 
 So I ran into a bug in one of my projects this weekend.  I've been working on updating [Markdown Monster Editor](https://markdownmonster.west-wind.com) to use the Chromium WebView Control. As part of that update I ended up going through an `async`/`await` Async Cascade scenario where a lot of code had to be converted from sync to async to accommodate the WebView's completely async-only interop APIs. This ended up touching a lot of methods just to get runnable code again. Eeek.
 
@@ -61,7 +61,7 @@ await EditorHandler?.JsEditorInterop?.SetFocus();  // boom
 ```
 So why the tears with the `await` call here?
 
-### Why does this fail?
+## Why does this fail?
 I didn't catch it right away and took to Twitter wondering why this failed with `await` vs. plain sync code,  when [@ssefaccan](https://twitter.com/ssefaccan) quickly picked up on what I missed:
 
 [![](TweetAndResponse.png)](https://twitter.com/ssefaccan/status/1393668819877613571)
@@ -83,7 +83,7 @@ When you break it down like this the error makes perfect sense. But it's easy to
 Logical? Yes. But also very unintuitive!
 
 
-### Read the Signs!
+## Read the Signs!
 Incidentally if I had paid better attention, Visual Studio (or Resharper really) would have been like: *"Told you so!"*
 
 The IDE's Code Analysis is smart enough to actually catch the async null reference as invalid:
@@ -92,7 +92,7 @@ The IDE's Code Analysis is smart enough to actually catch the async null referen
 
 Then again... **even if** I had seen the warning before tracking the runtime error I would have probably ignored it as a false positive, and almost certainly wouldn't have drawn the right conclusion all the way to the `null` `Task` reference. 
 
-### How to fix this?
+## How to fix this?
 The [Twitter Thread](https://twitter.com/RickStrahl/status/1393667788296777728) has a bunch of different responses for approaches that can be used for this, but for me it seems simplest to use just an old school pre-checking for `null`:
 
 ```csharp
@@ -118,7 +118,7 @@ The downside with this is that it's not very obvious on why the extra code is ne
 
 The sad part for me is that this code has just been bulk updated from sync code to async just in order to even get it to compile and I updated roughly 50 functions that all use a similar pattern. I now get to go back and hunt all of those down and adjust each method. I can hear the buzz of the Yak shavings in the distance...
 
-### Another Suggestion
+## Another Suggestion
 Another suggestion that came up in the thread and perhaps an easier code fix is too double down on Elvis! 
 
 This code works too:
@@ -131,7 +131,7 @@ Note that the parenthesis are required in order to keep the scope to the entire 
 
 This code explicitly checks for a null value of the first expression and if so returns a completed `Task` instance. This works too, and it's a shorter implementation. It's more explicit too, as it effectively points at the reasoning why `null` can't be returned here - ie. a `Task` is required. Not a huge fan due to the required parenthesis, but that's more of a personal preference.
 
-### Summary
+## Summary
 It's a bummer that null propagation doesn't work with `Task` only (no result) results on `await` calls in the same it does with synchronous calls.
 
 Looks like there's a [proposal in the CSharp language repository](https://github.com/dotnet/csharplang/blob/main/proposals/null-conditional-await.md) for a feature request that would make `await` calls behave similar to sync calls, which certainly seems like a good idea. I can't think of a downside to this. But regardless even if this comes to pass, it's likely a few versions off and certainly wouldn't help me in my full framework C#7 code.

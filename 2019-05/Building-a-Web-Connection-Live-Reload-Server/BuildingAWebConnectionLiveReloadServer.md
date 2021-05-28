@@ -1,15 +1,19 @@
 ---
 title: Building a Web Connection Live Reload Server
 abstract: Live Reload is usually a client side only feature that provides the ability to make changes to client side web code - HTML, CSS and JavaScript - and have those changes immediately reflected in the browser. Web Connection provides a Browser Sync based implementation, but until v7.05 server based changes still required manual refreshes. In this post I'll describe a new 7.05 and later feature that allows you to automatically restart your Web Connection server when a code change is made and - if combined with Browser Sync - also refreshes the currently active browser page.
-keywords: Live Reload, Browser Sync, Web Connection, FoxPro
 categories: Web Connection, FoxPro
+keywords: Live Reload, Browser Sync, Web Connection, FoxPro
 weblogName: Web Connection Weblog
 postId: 950
-postDate: 2019-05-04T14:46:47.7757997-10:00
+dontInferFeaturedImage: false
+dontStripH1Header: false
+postStatus: publish
+featuredImageUrl: https://west-wind.com/wconnect/weblog/imageContent/2021/Building-a-Web-Connection-Live-Reload-Server/reloaded.jpg
+postDate: 2019-05-04T17:46:47.7757997-07:00
 ---
 # Building a Web Connection Live Reload Server
 
-![Look 'ma - no hands](NoHands.jpg)
+![](reloaded.jpg)
 
 Look Ma! No hands... I love shaving off time in my development cycle. A lot of what we do during Web Development is highly repetitive and by removing some of the steps in the typical process even making small adjustments that save time, can end up saving a lot of time over the course of a day, and especially over the lifetime of a project. This post is about saving time in the build, debug, run cycle.
 

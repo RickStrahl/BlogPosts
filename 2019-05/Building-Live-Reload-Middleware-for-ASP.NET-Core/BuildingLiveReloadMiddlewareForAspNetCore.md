@@ -5,12 +5,16 @@ categories: ASP.NET Core
 keywords: Live Reload,LiveReload,Middleware,Development,Debugging,AspNetCore
 weblogName: West Wind Web Log
 postId: 1283920
+dontInferFeaturedImage: false
+dontStripH1Header: false
+postStatus: publish
+featuredImageUrl: https://weblog.west-wind.com/images/2021/Building-Live-Reload-Middleware-for-ASP.NET-Core/Reloaded.jpg
 permalink: https://weblog.west-wind.com/posts/2019/Jun/03/Building-Live-Reload-Middleware-for-ASPNET-Core
-postDate: 2019-06-03T10:17:45.8069309-10:00
+postDate: 2019-06-03T13:17:45.8069309-07:00
 ---
 # Building a Live Reload Middleware Component for ASP.NET Core
 
-![](Refresh.jpg)
+![](Reloaded.jpg)
 
 In [my last post](https://weblog.west-wind.com/posts/2019/May/18/Live-Reloading-Server-Side-ASPNET-Core-Apps) I discussed how to integrate Live Reload in ASP.NET Core using a third party NodeJs application loaded from NPM called [BrowserSync](https://browsersync.io). While that works just fine, having to run yet another command line utility on top of `dotnet watch run` **just to provide Live Reload functionality** is a bit of a pain. 
 
