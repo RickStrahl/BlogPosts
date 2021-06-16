@@ -12,9 +12,9 @@ featuredImageUrl: https://weblog.west-wind.com/images/2021/Running-.NET-Core-App
 permalink: https://weblog.west-wind.com/posts/2021/Jun/15/Running-NET-Core-Apps-on-a-Framework-other-than-Compiled-Version
 postDate: 2021-06-15T10:05:43.4596062-07:00
 customFields:
-  mt_githuburl:
+  mt_github:
     id: 
-    key: mt_githuburl
+    key: mt_github
     value: https://github.com/RickStrahl/BlogPosts/blob/master/2021-06/Running-.NET-Core-Apps-on-a-Framework-other-than-Compiled-Version/RunningNetCoreAppsOnAFrameworkOtherThanCompiledVersion.md
 ---
 # Running .NET Core Apps on a Framework other than Compiled Version?
@@ -48,12 +48,12 @@ So what works and what doesn't?
 
 Here are what I think are the most common scenarios:
 
-| Scenario               | Application Version       | Works?   | Runtime Version       |
-|------------------------|---------------------------|:--------:|-----------------------|
-| Versions Match         | .NET Core 5.0 Application | ✔        | .NET Core 5.0 Runtime |
-| Higher Runtime Version | .NET Core 3.0 Application | ❌        | .NET Core 5.0 Runtime |
-| Lower Minor Version    | .NET Core 3.0 Application | ✔        | .NET Core 3.1 Runtime |
-| Higher Minor Version   | .NET Core 3.1 Application | ❌        | .NET Core 3.0 Runtime |
+| Scenario                   | Application Version       | Works?   | Runtime Version       |
+|----------------------------|---------------------------|:--------:|-----------------------|
+| Versions Match             | .NET Core 5.0 Application | ✔        | .NET Core 5.0 Runtime |
+| Major Version Roll Forward | .NET Core 3.0 Application | ❌        | .NET Core 5.0 Runtime |
+| Minor Version Roll Forward | .NET Core 3.0 Application | ✔        | .NET Core 3.1 Runtime |
+| Minor Version Roll Back    | .NET Core 3.1 Application | ❌        | .NET Core 3.0 Runtime |
 
 In short:
 
