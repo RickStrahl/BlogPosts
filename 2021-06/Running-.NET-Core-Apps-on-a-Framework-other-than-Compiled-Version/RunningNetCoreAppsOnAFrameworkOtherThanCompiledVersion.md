@@ -11,6 +11,11 @@ postStatus: publish
 featuredImageUrl: https://weblog.west-wind.com/images/2021/Running-.NET-Core-Apps-on-a-Framework-other-than-Compiled-Version/banner.jpg
 permalink: https://weblog.west-wind.com/posts/2021/Jun/15/Running-NET-Core-Apps-on-a-Framework-other-than-Compiled-Version
 postDate: 2021-06-15T10:05:43.4596062-07:00
+customFields:
+  mt_githuburl:
+    id: 
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2021-06/Running-.NET-Core-Apps-on-a-Framework-other-than-Compiled-Version/RunningNetCoreAppsOnAFrameworkOtherThanCompiledVersion.md
 ---
 # Running .NET Core Apps on a Framework other than Compiled Version?
 
