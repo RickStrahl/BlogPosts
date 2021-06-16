@@ -19,7 +19,11 @@ This is Part 3 of a 3 part post series:
 </small>
 
 
-[In Part 1 of this article](https://weblog.west-wind.com/posts/2021/Jan/14/Taking-the-new-Chromium-WebView2-Control-for-a-Spin-in-NET-Part-1) I talked about the basics of using the `WebView2` control in a WPF application by dropping the control on a form, setting the browser environment and using the `.Source` property or `.NavigateToString()` to set the content of the browser. In [Part 2 ](https://weblog.west-wind.com/posts/2021/Jan/26/Chromium-WebView2-Control-and-NET-to-JavaScript-Interop-Part-2) I talked about how to interact with content in the control and interop between .NET and JavaScript. In this installment I discuss a real world integration in the Markdown Monster previewer to specifically show some integration strategies and some issues that you're like to have to deal with.
+[In Part 1 of this article](https://weblog.west-wind.com/posts/2021/Jan/14/Taking-the-new-Chromium-WebView2-Control-for-a-Spin-in-NET-Part-1) I talked about the basics of using the `WebView2` control in a WPF application by dropping the control on a form, setting the browser environment and using the `.Source` property or `.NavigateToString()` to set the content of the browser. In [Part 2 ](https://weblog.west-wind.com/posts/2021/Jan/26/Chromium-WebView2-Control-and-NET-to-JavaScript-Interop-Part-2) I talked about how to interact with content in the control and interop between .NET and JavaScript using `ExecuteScriptAsync()` to call into JavaScript code from .NET, and using **HostObjects** into .NET from JavaScript. 
+
+In Part 3 I want to talk about a few best practices and some real world issues that I encountered when using the Web Browser control in [Markdown Monster](https://markdownmonster.west-wind.com). I'm writing this article quite a bit after the previous ones, and since then I've migrated Markdown Monster now completely over to use WebView2 control from the IE WebBrowser control, which has isolated a few common patterns and dos and donts.
+
+Let's jump in.
 
 ## Markdown Monster and HTML Content
 For background, Markdown Monster is a Windows WPF application. It's a Markdown editor which includes a live preview, and it heavily uses Web content both for the actual editor interface as well as the Previewer. For the initial WebView2 integration I'll talk about in this post, I started with the previewer interface (the right panel in banner figure) which is a live preview of the rendered Markdown. 

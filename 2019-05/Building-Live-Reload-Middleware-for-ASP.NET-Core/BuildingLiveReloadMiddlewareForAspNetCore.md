@@ -16,6 +16,10 @@ postDate: 2019-06-03T13:17:45.8069309-07:00
 
 ![](Reloaded.jpg)
 
+
+
+I can tell you that I think this text processing is not really doing it for me. I can't see this improving or getting any worse than it was previously. Here we now can see how the text is not really keeping up with what we're doing in this environment. A failure to compute can be quite dramatic	
+
 In [my last post](https://weblog.west-wind.com/posts/2019/May/18/Live-Reloading-Server-Side-ASPNET-Core-Apps) I discussed how to integrate Live Reload in ASP.NET Core using a third party NodeJs application loaded from NPM called [BrowserSync](https://browsersync.io). While that works just fine, having to run yet another command line utility on top of `dotnet watch run` **just to provide Live Reload functionality** is a bit of a pain. 
 
 Also in the last post I mentioned that it would be nice to build some middleware to provide the live client reloading functionality...  well, I got that itch to sit down and take a stab at it and the result is this [ASP.NET Core Live Reload Middleware Component](https://github.com/RickStrahl/Westwind.AspnetCore.LiveReload). 

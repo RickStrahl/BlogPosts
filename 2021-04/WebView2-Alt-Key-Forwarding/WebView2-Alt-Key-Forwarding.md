@@ -1,16 +1,16 @@
 ---
 title: 'WebView2: Forwarding Alt Keys to a Host WPF Window'
-featuredImageUrl: https://weblog.west-wind.com/images/2021/Stupid-Pet-Tricks-Sending-Keystrokes-to-the-current-WPF-Application/Banner.png
 abstract: I've been puzzling over how to reliably integrate keyboard forwarding from the WebView2 control into WPF host forms. Unlike the IE WebBrowser control the WebView2 doesn't automatically forward Alt keys to the host form so special handling is required. In this post I describe why this is a problem and show the workaround to make this work.
-keywords: WebView2, WPF, Alt, Keyboard, Key, Forwarding
 categories: WPF, Windows
+keywords: WebView2, WPF, Alt, Keyboard, Key, Forwarding
 weblogName: West Wind Web Log
 postId: 2399239
-permalink: https://weblog.west-wind.com/posts/2021/Apr/15/WebView2-Forwarding-Alt-Keys-to-a-Host-WPF-Window
-postDate: 2021-04-15T17:51:56.5452150-10:00
-postStatus: publish
 dontInferFeaturedImage: false
 dontStripH1Header: false
+postStatus: publish
+featuredImageUrl: https://weblog.west-wind.com/images/2021/Stupid-Pet-Tricks-Sending-Keystrokes-to-the-current-WPF-Application/Banner.png
+permalink: https://weblog.west-wind.com/posts/2021/Apr/15/WebView2-Forwarding-Alt-Keys-to-a-Host-WPF-Window
+postDate: 2021-04-15T20:51:56.5452150-07:00
 ---
 # WebView2: Forwarding Alt Keys to a Host WPF Window
 
@@ -43,9 +43,9 @@ private void WebBrowser_KeyDown(object sender, System.Windows.Input.KeyEventArgs
     // Handle Alt-Key forward to form so menus work
     if (e.Key == System.Windows.Input.Key.LeftAlt)
     {
-		Model.Window.Focus();
+        Model.Window.Focus();
 		
-		// must be out of band
+        // must be out of band
         Model.Window.InvokeAsync( () => SendKeys.SendWait("%"));
     }
 }
@@ -98,7 +98,68 @@ And if I press `alt-t`:
 
 In other words you pretty much get the expected behavior for menu shortcuts. The same works for toolbar buttons, or buttons with mnemonic shortcut keys on the active form.
 
-## Some Thoughts
+## More Control needed for Alt-Key Combos inside of WebView
+So the above solution works great for my Markdown Monster Previewer since it's a mostly passive control that displays content, but needs to handle standard key strokes - including the menu activation keys as well.
+
+Howerver, for the Markdown Monster editor, which is a full text editor entry control that has lots of key input including other alt key combinations, this is not perfect. It sort of works, but not perfectly. The Alt key now triggers the WPF menu and changes the focus. But Alt-Key combinations (like Alt-Z to trigger word-wrap or Alt-I to pop up the image embedding dialog) don't consistently work and often require multiple tries to trigger. This is because the `KeyPress` event above immediately fires and depending on whether the DOM code fires before the WPF handler, or not.
+
+For an editor application that's not a good look. I know it bugs me from a **user perspective** to have key inconsistencies where you press a key or key combo and have it not work or stutter. 
+
+So... to fix this alt key timing issue, I went one step further by pushing the key handling down into the editor and removing .NET out of the event handling loop altogether. 
+
+This approach works by:
+
+* Intercepting `alt` keys in JavaScript
+* Delaying the Window Menu behavior by 500ms
+* Processing Alt-Key combos immediately
+* Sending the delayed alt-key to .NET via Interop
+
+
+Here's what this looks like in Markdown Monster's key interception:
+
+```javascript
+// keep track of last alt key press time
+te.lastAltkeyTime = 0;
+
+$("pre[lang]").on("keyup", function (event) {
+        // check for Windows Alt-Menu behavior
+        // delay trigger menu so native alt- key processing can work
+        if (te.mm && event.key == "Alt") {   // ACE Editor: otherwise check for `event.altKey`
+            te.lastAltkeyTime = new Date().getTime();
+            setTimeout(function () {
+                if (te.lastAltkeyTime == 0) return;
+                
+                // Call .NET Code here
+                te.mm.TriggerWindowAltMenu();
+            }, 500);
+        } else
+        	// if another key was pressed invalidate
+        	te.lastAltKeyTime = 0;
+```
+
+This code basically debounces the `alt` press and delays the menu activation by a half a second, which should give other key combinations a chance to process first. So when `alt-z` is pressed it's a key combo that happens quicker than 500ms and so takes precendence. If there's a slight delay after the `alt` key press then the menu is activated and Windows menu behavior works as you'd expect - with focus on the Window.
+
+The .NET Code called is an Interop method in `WebViewDotnetEditorInterop` that does what the KeyPress handler previously did:
+
+```csharp
+/// <summary>
+/// Call this to trigger the Alt-Window command to show underlines
+/// and activate the Window to navigate the shortcut menus.
+///
+/// Client code calls this after short alt-key delay from
+/// keyup handler in editor.js
+/// </summary>
+public async Task TriggerWindowAltMenu()
+{
+    Model.Window.Focus();
+    Model.Window.Dispatcher.InvokeAsync(() =>
+    {
+        SendKeys.SendWait("%");
+    });
+}
+```
+
+And that provides pretty close to 'native' behavior similar to what worked with the IE based Web Browser control. Yay!
 
 ### A ShowStopper Overcome
 I hate to admit it but this silly little problem has been a showstopper for me to using the WebView2 in Markdown Monster more extensively. Currently Markdown Monster uses the WebView for the preview as an **optional add-in**. The preview is a passive display control that displays rendered HTML output only. However, the main editor is also an HTML/JavaScript based interface, but it requires very close interaction with the user interface - including activating menu and shortcut commands. 
@@ -111,7 +172,10 @@ Coming back to my Markdown Monster Editor example, one thing that's important in
 As a workaround to this it might be useful to capture the `alt` key in the editor's JavaScript key events and only forward the alt key operation from JavaScript to .NET when the `alt` key is pressed, to avoid all the extra Interop overhead for every key pressed. I haven't gotten to this part just yet, but I'm pretty sure that's how I will have to handle the `alt` key processing rather than using the .NET `keydown` event. 
 
 ## Summary
-It's a bummer that the WebView2 control doesn't forward `alt` key combinations natively as the Web Browser control did. With this keyforwarding trick though it looks like we can forward keys and get past this limitation. It's a funky workaround, but it gets the job done...
+Holy shit, this was a lot of work and trial and error to find a solution that works well. It's a bummer that the WebView2 control doesn't forward `alt` key combinations natively as the Web Browser control did. 
+
+
+With this keyforwarding trick though it looks like we can forward keys and get past this limitation. It's a funky workaround, but it gets the job done...
 
 <div style="margin-top: 30px;font-size: 0.8em;
             border-top: 1px solid #eee;padding-top: 8px;">
