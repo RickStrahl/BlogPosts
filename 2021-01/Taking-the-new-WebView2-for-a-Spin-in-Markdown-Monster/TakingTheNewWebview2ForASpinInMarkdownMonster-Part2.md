@@ -1,16 +1,16 @@
 ---
 title: Chromium WebView2 Control and .NET to JavaScript Interop - Part 2
-featuredImageUrl: https://weblog.west-wind.com/images/2021/Taking-the-new-WebView2-for-a-Spin-in-Markdown-Monster/Part2Banner.jpg
 abstract: In part 2 of this post series I take a look at how to use the new Chromium WebView2 to interact with the DOM document and interoperate between .NET and JavaScript, both calling into JavaScript from .NET, and calling into .NET from Javascript
+categories: WebView,.NET, WPF, Windows
 keywords: WebView2, WPF, JavaScript, Interop, WebBrowser, Chromium, .NET
-categories: .NET, WPF, Windows
 weblogName: West Wind Web Log
 postId: 2248999
-permalink: https://weblog.west-wind.com/posts/2021/Jan/26/Chromium-WebView2-Control-and-NET-to-JavaScript-Interop-Part-2
-postDate: 2021-01-26T22:01:52.4881296-10:00
-postStatus: publish
 dontInferFeaturedImage: false
 dontStripH1Header: false
+postStatus: publish
+featuredImageUrl: https://weblog.west-wind.com/images/2021/Taking-the-new-WebView2-for-a-Spin-in-Markdown-Monster/Part2Banner.jpg
+permalink: https://weblog.west-wind.com/posts/2021/Jan/26/Chromium-WebView2-Control-and-NET-to-JavaScript-Interop-Part-2
+postDate: 2021-01-27T00:01:52.4881296-08:00
 ---
 # [Chromium WebView2 Control](https://docs.microsoft.com/en-us/microsoft-edge/webview2/) and .NET to JavaScript Interop - Part 2
 

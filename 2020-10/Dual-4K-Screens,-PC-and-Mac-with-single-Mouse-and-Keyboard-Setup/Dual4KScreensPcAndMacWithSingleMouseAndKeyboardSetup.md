@@ -5,9 +5,12 @@ categories: WFH, Office
 keywords: WFH,PC,Mac,Flow,4k
 weblogName: West Wind Web Log
 postId: 2067740
+dontInferFeaturedImage: false
+dontStripH1Header: false
+postStatus: publish
 featuredImageUrl: https://weblog.west-wind.com/images/2020/Dual-4K-Screens,-PC-and-Mac-with-single-Mouse-and-Keyboard-Setup/Banner.jpg
 permalink: https://weblog.west-wind.com/posts/2020/Oct/15/PC-and-Mac-with-single-Mouse-and-Keyboard-Setup-on-Dual-4k-Screens
-postDate: 2020-10-15T15:15:58.5434584-10:00
+postDate: 2020-10-15T18:15:58.5434584-07:00
 ---
 # PC and Mac with single Mouse and Keyboard Setup on Dual 4k Screens
 
@@ -142,7 +145,7 @@ Note: while the keyboard and mouse works on Ubuntu, the flow software doesn't ex
 ## Hardware
 
 * [LG 32" 4K screen](https://amzn.to/3iX7IYg)
-* [MX Master Mouse]()
+* [MX Master Mouse](https://amzn.to/3D3Nh74)
 * [Logitech Ergo K860](https://amzn.to/353KHOj)
 * [Dell NUC (NUC8i5BEH)](https://amzn.to/2H9c7tQ)
 * [Synergy](https://symless.com/synergy)

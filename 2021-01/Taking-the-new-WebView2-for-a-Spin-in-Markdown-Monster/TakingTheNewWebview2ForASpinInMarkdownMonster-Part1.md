@@ -1,7 +1,7 @@
 ---
 title: Taking the new Chromium WebView2 Control for a Spin in .NET - Part 1
 abstract: This is Part 1 of a two part article that gives an overview of the new WebView2 Web browser control that is based on Edge Chromium. In Part 1 I look at the basics of what's needed to run the control using the WebView runtime, and how to get the control embedded and configured to use for basic HTML tasks. In Part 2 I look at interaction between the .NET application and WebBrowser and Javascript.
-categories: .NET, WPF, Windows
+categories: Webview, .NET, WPF, Windows
 keywords: WebView2, WPF, JavaScript, Interop, WebBrowser, Chromium, .NET
 weblogName: West Wind Web Log
 postId: 2223681
@@ -10,7 +10,7 @@ dontStripH1Header: false
 postStatus: publish
 featuredImageUrl: https://weblog.west-wind.com/images/2021/Taking-the-new-WebView2-for-a-Spin-in-Markdown-Monster/WebViewWpfControl.png
 permalink: https://weblog.west-wind.com/posts/2021/Jan/14/Taking-the-new-Chromium-WebView2-Control-for-a-Spin-in-NET-Part-1
-postDate: 2021-01-14T22:21:22.0824034-10:00
+postDate: 2021-01-15T00:21:22.0824034-08:00
 ---
 # Taking the new Chromium WebView2 Control for a Spin in .NET - Part 1
 

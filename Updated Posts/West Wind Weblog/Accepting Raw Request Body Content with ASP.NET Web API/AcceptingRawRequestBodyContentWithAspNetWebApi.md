@@ -5,12 +5,16 @@ categories: Web Api
 keywords: POST,Raw,Content,Body,WebAPI,
 weblogName: West Wind Web Log
 postId: 161059
+dontInferFeaturedImage: false
+dontStripH1Header: false
+postStatus: publish
+permalink: https://weblog.west-wind.com/posts/2013/Dec/13/Accepting-Raw-Request-Body-Content-with-ASPNET-Web-API
+postDate: 2021-07-12T10:17:27.3075752-07:00
 ---
 # Accepting Raw Request Body Content with ASP.NET Web API
 
-
->If you're looking for an **ASP.NET Core version** of this post you can find it here: [Accepting Raw Request Body Content in ASP.NET Core API Controllers](https://weblog.west-wind.com/posts/2017/Sep/14/Accepting-Raw-Request-Body-Content-in-ASPNET-Core-API-Controllers).
-
+> <small>If you're looking for an **ASP.NET Core version** of this post you can find it here: [Accepting Raw Request Body Content in ASP.NET Core API Controllers](https://weblog.west-wind.com/posts/2017/Sep/14/Accepting-Raw-Request-Body-Content-in-ASPNET-Core-API-Controllers).  
+> This post only covers classic ASP.NET Web API on the Full .NET Framework.</small>
 
 [ASP.NET Web API](http://www.asp.net/web-api) is a great tool for building HTTP services with ASP.NET. It makes many things HTTP, that used to be ill defined in .NET easy and allows you to build a variety of services very easily. Like other complex abstraction frameworks it makes complex scenarios super easy, while some very simple and common operations are not quite as straight forward or as transparent as they should be.
 

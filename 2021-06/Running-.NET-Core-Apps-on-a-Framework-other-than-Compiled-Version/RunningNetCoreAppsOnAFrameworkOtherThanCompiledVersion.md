@@ -63,13 +63,15 @@ You can run an application on the same exact runtime version (major.minor) that 
 
 You can also run an application that is compiled with a lower version on a higher minor of the same major version of the runtime (ie. compiled for 3.0 and run on 3.1).
 
-(Haven't verified: Patch version differences don't matter even if the patch version of the build is higher, it'll run on a lower patch version of the same major.minor) 
-
 **Doesn't**
 
-You cannot run an application on a different major version than what it was compiled for. 
+You cannot run an application on a different major version than what it was compiled for.
 
-An application compiled to a higher minor version running on a lower minor version (ie. compiled for 3.1 but running on 3.0) does not work.
+Any application's runtime target version that is higher than the installed runtime version (major, minor or patch) does not run. 
+
+---
+
+In simpler terms: There's no runtime rollback, and only minor version runtime roll forward by default.
 
 ## Explicit Runtime Override with `dotnet --fxversion`
 You can however override the runtime version **explicitly** by specifying a runtime version either on the `dotnet` command line or via a runtime configuration file.
@@ -173,7 +175,7 @@ Still it definitely sucks that you end up with a bunch of runtimes installed on 
 If runtime availability is a major issue for your application, there's always the option of shipping the runtime as part of the application, in a self-contained application. It's great that this option exists, and it works just fine. But it will bloat the size of the unpacked application in the 70mb range at minimum, which is not ideal to say the least. 
 
 ## Summary
-Runtime availability is a complex topic, and I'm greatly oversimplifying in this post. In fact, https://github.com/dotnet/runtime/blob/main/docs/design/features/framework-version-resolution.md[Microsoft has a huge document](https://github.com/dotnet/runtime/blob/main/docs/design/features/framework-version-resolution.md) that goes into all the details of this, and while it has everything you need to know in there, it's not exactly easy to figure out when you're in a hurry. In this post, I've addressed a few common scenarios and hopefully this makes it easier at a glance to see what will work and what won't. And if your use case is more complex, there's the Microsoft document.
+Runtime availability is a complex topic, and I'm greatly oversimplifying in this post. In fact, [Microsoft has a huge document](https://github.com/dotnet/runtime/blob/main/docs/design/features/framework-version-resolution.md) that goes into all the details of this, and while it has everything you need to know in there, it's not exactly easy to figure out when you're in a hurry. In this post, I've addressed a few common scenarios and hopefully this makes it easier at a glance to see what will work and what won't. And if your use case is more complex, there's the Microsoft document.
 
 ## References
 
