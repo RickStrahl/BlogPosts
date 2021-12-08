@@ -83,7 +83,7 @@ rd /s "\\?\C:\Web Sites\docs.west-wind.com\faq                           "
 
 ![](DeleteWithRdSlashS.png)
 
-The `\\?\` relates to **Extended Path Syntax** that supports long filenames as well as apparently being more lax with spaces in path names. The paths I use above still need to be fully qualified and  must include the trailing spaces! To capture those trailing spaces I go into Explorer and copy the path from the address bar and paste it into the command line surrounded by quotes.
+The `\\?\` relates to **Extended Path Syntax** that supports long filenames as well as apparently being more lax with spaces in path names. The paths I use above still needs to be fully qualified and  must include the trailing spaces! To capture those trailing spaces I go into Explorer and copy the path from the address bar and paste it into the command line surrounded by quotes.
 
 There's more info on the extended path syntax in the Microsoft Docs:
 
