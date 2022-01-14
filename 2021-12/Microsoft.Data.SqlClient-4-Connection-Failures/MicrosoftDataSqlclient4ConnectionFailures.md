@@ -11,6 +11,11 @@ postStatus: publish
 featuredImageUrl: https://weblog.west-wind.com/images/2021/Microsoft.Data.SqlClient-4-Connection-Failures/BrokenConnection.jpg
 permalink: https://weblog.west-wind.com/posts/2021/Dec/07/Connection-Failures-with-MicrosoftDataSqlClient-4-and-later
 postDate: 2021-12-07T14:02:15.7854568-10:00
+customFields:
+  mt_githuburl:
+    id: 
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2021-12/Microsoft.Data.SqlClient-4-Connection-Failures/MicrosoftDataSqlclient4ConnectionFailures.md
 ---
 # Connection Failures with Microsoft.Data.SqlClient 4 and later
 
@@ -60,3 +65,17 @@ It took me a while of figuring out that the problem was the `Microsoft.Data.SqlC
 And hence this post: As I often do, I'm leaving this here as a note to self along with a blog title that's searchable, as I am almost certain to forget that `Encrypt=True` connection string flag in the future.
 
 Hopefully this will help a few other souls to avoid the hour of back and forth I've wasted...
+
+## Resources
+
+* [Microsoft.Data.SqlClient 4.0 Release Notes](https://github.com/dotnet/SqlClient/blob/main/release-notes/4.0/4.0.0.md)
+* [Microsoft.Data.SqlClient 4.0 Release Discussion](https://techcommunity.microsoft.com/t5/sql-server-blog/released-general-availability-of-microsoft-data-sqlclient-4-0/ba-p/2983346)
+
+<div style="margin-top: 30px;font-size: 0.8em;
+            border-top: 1px solid #eee;padding-top: 8px;">
+    <img src="https://markdownmonster.west-wind.com/favicon.png"
+         style="height: 20px;float: left; margin-right: 10px;"/>
+    this post created and published with the 
+    <a href="https://markdownmonster.west-wind.com" 
+       target="top">Markdown Monster Editor</a>
+</div>

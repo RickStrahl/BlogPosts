@@ -1,10 +1,14 @@
 ---
 title: 'Back to Basics: Rewriting a URL in ASP.NET Core'
 abstract: Sometimes in an application you need to take over the routing process with some custom processing that acts on an incoming URL and actually has to go to another URL. This can be a simple relinking task from old content to new, or it can be more complex where you access a specific URL on the public site that actually needs to be processed by another URL altogether.
-keywords: UrlRewrite,Redirect,Rewrite
 categories: ASP.NET Core
+keywords: UrlRewrite,Redirect,Rewrite
 weblogName: West Wind Web Log
 postId: 1603425
+dontInferFeaturedImage: false
+dontStripH1Header: false
+postStatus: publish
+featuredImageUrl: https://weblog.west-wind.com/images/2021/Rewriting-a-URL-in-ASP-NET-Core/RewriteHistory.jpg
 permalink: https://weblog.west-wind.com/posts/2020/Mar/13/Back-to-Basics-Rewriting-a-URL-in-ASPNET-Core
 postDate: 2020-03-13T18:11:56.4843833-10:00
 ---
@@ -41,29 +45,33 @@ As the above examples are meant to show there are two different ways to change t
 The two tasks are similar but yet different in their execution:
 
 * **Rewriting**  
-Rewriting actually **changes the current request's path** and continues processing the current request with all of it's existing state through the middleware pipeline. Any middleware registered after the rewrite sees the new URL and processes the remainder of the request with the new path. All of this happens as a part single server request. The URL of the request **stays the same** - it doesn't change to the rewritten URL.  
-*Uses `context.Request.Path`*
+Rewriting actually **changes the current request's path internally** and continues processing the current request with all of it's existing state through the middleware pipeline. Any middleware registered after the rewrite sees the new URL and processes the remainder of the request with the new path. All of this happens as a part single server request. 
+
+  The URL of the request displayed in the address bar **stays the same** - the browser location doesn't change to the rewritten URL.  
+  *Uses `context.Request.Path`*
 
 * **Redirecting**  
-Redirecting actually **fires a new request on the server** by triggering a new HTTP request in the browser via an `302 Moved` or `301 Moved Permanently` HTTP Response header. A redirect is an HTTP header response to the client that instructs the client to: *Go to the URL I specify in this response header*.
+Redirecting actually **fires a new request on the server** by triggering a new HTTP request in the browser via an `302 Moved` or `301 Moved Permanently` HTTP Response header that contains the redirection URL. A redirect is an HTTP header response to the client that instructs the client to:   
+	*Go to the URL specified in this response header*.
 
     ```http
     HTTP/1.1 302 Moved
-    Content-Type: text/html; charset=UTF-8
     Location: https://west-wind.com/wwhelp
     ```
 
-    Redirects can also use `301 Moved Permanently` to let search engines know that the old URL is essentially deprecated.  
+    Redirects can also use `301 Moved Permanently` to let search engines know that the old URL is deprecated and the new URL should be used instead.  
     *Uses `context.Response.Redirect()`*
 
-As you can imagine, if you have a choice between re-writing and a redirect, the rewrite tends to be more efficient as it avoids a server round trip.
+As you can imagine, if you have a choice between re-writing and a redirect, the rewrite tends to be more efficient as it avoids a server round trip by simply re-writing the URL as part of the current request. The caveat is that the browser's location/address bar does not reflect the new rewritten URL - if that's important (and often it is) then a redirect is required.
 
-A rewrite can also keep request information, so if you have `POST` or `PUT` operation that has data associated with it, that data stays intact. A `Redirect()` is always reissued as an `HTTP GET` operation by the browser so you can't redirect form input.
+A rewrite can also keep request information, so if you have `POST` or `PUT` operation that has data associated with it, that data stays intact. 
+
+A `Redirect()` on the other hand is always reissued as an `HTTP GET` operation by the browser so you can't redirect form input.
 
 ## Intercepting URLS in ASP.NET Core
 If you plan to intercept requests and rewrite them , the most likely place you'd want to do this is in ASP.NET Core is in Middleware. Rewrite components tend to look at incoming request paths or headers and determine whether they need to re-write the URL to something else.
 
-If you want to do this in ASP.NET Core the easiest way to do this is to use `app.Use()` inline middleware which you can add to your `Startup.Configure()` method.
+  If you want to do this in ASP.NET Core the easiest way to do this is to use `app.Use()` inline middleware which you can add to your `Startup.Configure()` method.
 
 ### Re-Writing a URL
 Here's how to handle a **Rewrite** operation in `app.Use()` middleware:

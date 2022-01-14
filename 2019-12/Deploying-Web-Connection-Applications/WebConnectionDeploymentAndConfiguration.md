@@ -1,10 +1,14 @@
 ---
 title: Deploying and Configuring West Wind Web Connection Applications
 abstract: Need to know how to publish a Web Connection application to a new Web Server? This article takes you end to end through all the steps from setting a new Virtual Machine Server, to installing the Web Server, configuring the machine and setting up your Web application. If you're coming from an older version of Web Connection pre-7.0 you'll find that the process is a lot more automated than it has been in the past.
-keywords: Deployment, Web Connection, Vultr, Hosting, LetsEncrypt, FoxPro
 categories: West Wind Web Connection
+keywords: Deployment, Web Connection, Vultr, Hosting, LetsEncrypt, FoxPro
 weblogName: Web Connection Weblog
 postId: 956
+dontInferFeaturedImage: false
+dontStripH1Header: false
+postStatus: publish
+featuredImageUrl: https://west-wind.com/wconnect/weblog/imageContent/2022/Deploying-Web-Connection-Applications/Shipping.jpg
 postDate: 2019-12-05T18:45:17.0566758-10:00
 ---
 # Deploying and Configuring West Wind Web Connection Applications
@@ -139,8 +143,10 @@ Once that works next run your application using the EXE or the COM object. In th
 
 Switching to COM can be done on the Admin Page.
 
-* Admin Page at [http://localhost:7000/admin/admin.aspx](http://localhost:7000/admin/admin.aspx)
+* Admin Page at [http://localhost:7000/admin/Administration.wc](http://localhost:7000/admin/administration.wc)
 * Then click on the **Web Connection Module Administration**
+
+<small>* the admin Url was changed in v7.20 and later to use  `administration.wc` instead of `admin.aspx`</small>
 
 On this page you can toggle Web Connection between File and COM Mode. Here I've switched into COM mode:
 
@@ -606,7 +612,7 @@ Alright - there you have it. We've gone from creating a new application, creatin
 
 You've seen:
 
-* Setting up a Server 2012
+* Setting up a Server 2016
 * Installing System Applications
 * Setting up IIS
 * Setting up a Web Site and Application Pool
@@ -619,18 +625,12 @@ You've seen:
 * Updating your Application Web files
 * Updating your Application Executable
 
-Full circle. :white_circle: 
+Full circle. @icon-refresh
 
 You now have all you need to know to publish your Web Connection applications successfully.
-
-```foxpro
-*** Server Update Urls - fix these to point at your production Server/Virtual
-
-HTTP_UPDATEURL 	  =         "http://publishing.west-wind.com/UpdateExe.wc"
-```
 
 
 ## Resources
 * [Session Materials](https://github.com/RickStrahl/SWFOX2019_WebConnectionDeployment)
-* [Vultr deal: $50 credit](https://www.vultr.com/?ref=7800880-4F)
+* [Vultr deal: $100 credit](https://www.vultr.com/?ref=9022652-8H)
 * [Win-Acme LetsEncrypt SSL Installation](https://pkisharp.github.io/win-acme/)
