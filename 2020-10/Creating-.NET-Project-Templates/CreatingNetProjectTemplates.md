@@ -6,16 +6,19 @@ keywords: project,template,dotnet new
 weblogName: West Wind Web Log
 postId: 2036743
 dontInferFeaturedImage: true
+dontStripH1Header: false
+postStatus: publish
 permalink: https://weblog.west-wind.com/posts/2020/Oct/05/Creating-a-dotnet-new-Project-Template
 postDate: 2020-10-05T20:05:11.5235085-10:00
 customFields:
   wp_post_thumbnail:
+    id: 
     key: wp_post_thumbnail
     value: https://weblog.west-wind.com/images/2020/Creating-.NET-Project-Templates/ProjectTemplateLayout.png
 ---
 # Creating Custom .NET Project Types with .NET CLI Project Templates
 
-![](DotnetNewTemplateCommandLine.png)
+
 
 I recently updated my [Visual Studio template for creating Markdown Monster addins](https://marketplace.visualstudio.com/items?itemname=rickstrahl.markdownmonsteraddinproject) in order to support the newer .NET SDK style projects, which are easier to work with and provide a 'ready-to-run' [Markdown Monster Addin project](https://markdownmonster.west-wind.com/docs/_4ne0s0qoi.htm) which was not quite possible with the older project type and a project template.
 
@@ -60,6 +63,7 @@ Here are the specific steps in summary
 (you can create multiple templates into a single template pack)
 * Inside of the custom template folder add a `.template.config` folder
 * Create a `template.json` that provides template metadata
+* Optionally add a square `icon.png` for the icon to display in Visual Studio
 * Optionally use `sourceName` to replace file and class names and namespaces
 
 The project structure is always the same save for your custom project files. To make this easier to visualize here's what a typical project layout looks like in this case for my `MarkdownMonsterAddinProject` template:
@@ -142,6 +146,7 @@ MarkdownMonsterAddinTemplate
    -- MarkdownMonsterAddinProject
       -- templates
          -- template.json
+         -- icon.png
       -- $safeprojectname$.csproj          
       -- Addin.cs
       -- ... more files
@@ -414,20 +419,18 @@ For example, [JetBrains Rider](https://www.jetbrains.com/rider/) picks up my new
 ![](RiderNewProjectDialogWithMarkdownMonsterTemplate.png)  
 <small>**Figure 7** - JetBrains Rider shows `dotnet new` templates in its *New Solution* dialog</small>
 
-### Dotnet New Templates in Visual Studio Preview
-Visual Studio 16.8 Preview now also has Preview feature that allows you to see `dotnet new` templates via **Tools-> Options-> Configuration-> Preview Features**:
-
-![](PreviewForTemplateProjectsInVs.png)  
-<small>**Figure 7** - You can enable dotnet new Templates in Visual Studio in Preview</small>
-
-And here's what this looks like to select the project:
+### Dotnet New Templates in Visual Studio
+`dotnet new` installed templates are also available in Visual Studio, but they don't show up in the Extensions Manager, so you have to know what you're looking for to use it by searching for the project type.
 
 ![](DotnetTemplateInVisualStudio.png)  
-<small>**Figure 8** - Selecting a dotnet new template is still a bit rough in the Preview</small>
+<small>**Figure 8** - Selecting a dotnet new template is still a bit rough</small>
 
-As you can see my Markdown Monster Addin template shows up but it's kinda rough and doesn't use the package icon. You also can't provide any custom parameters to the template (ie. the `company` parameter in the example). But still this gives basically the same functionality as a Visual Studio extension and it gives you the option to still just invoke the template from Visual Studio using the familiar **New Project** menu option.
+This dialog has seen a lot of improvements since I originally wrote this post. Now you can:
 
-I suspect going forward, Microsoft is going to shift most if not all project templates to use `dotnet new` style templates for projects and items, but for now this is a preview feature. You need to use the current *Visual Studio 16.8 Preview*  and enable the explicit feature flag.
+* Add an icon `icon.png` in the `templates.config` folder to show an icon
+* Parameters are now prompted for
+
+In short you can easily use the template in Visual Studio, but you have to know how it's there as there's no UI to discover installed templates.
 
 ## Summary
 Creating project templates can be very productive for certain scenarios. In my scenario of allowing users to easily create new Addins for Markdown Monster, I certainly want to make that process as easy as possible. Nothing sucks more than trying to get stuck before you ever get your first bit of code to run. Project templates make it possible to create a new project that's ready to run with just a few dotnet CLI commands which is awesome.
@@ -445,7 +448,7 @@ I think going forward, the .NET Template system is going to be the way to go, bu
 * [Markdown Monster Addin Project Template on GitHub](https://github.com/RickStrahl/MarkdownMonsterAddinProjectTemplate/tree/master/DotnetNewTemplate)
 * [Markdown Monster Addin .NET CLI Project Template on NuGet](https://www.nuget.org/packages/MarkdownMonster.AddinProject.Template/)
 * [Creating Markdown Monster Addins Documentation](https://markdownmonster.west-wind.com/docs/_4ne0s0qoi.htm)
-
+* [Sayed Hasimi's updated dotnet tool Guidance](https://github.com/sayedihashimi/template-sample)
 
 <div style="margin-top: 30px;font-size: 0.8em;
             border-top: 1px solid #eee;padding-top: 8px;">

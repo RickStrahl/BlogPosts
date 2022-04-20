@@ -16,14 +16,16 @@ postDate: 2020-10-15T15:15:58.5434584-10:00
 
 ![](Banner.jpg)
 
-<small style="color: firebrick">updated December 16th, 2021</small>
+<small style="color: firebrick">updated January 2022</small>
 
 A little while back I posted a couple of pictures of my new desk setup using both a Windows Laptop (a 2019 Dell XPS) and a Mac Mini (2020) along with two 4k displays. I'm also using a single Logitech Mouse and Keyboard combination to control both machines and quite a few people were asking about how this works. So I decided to write a quick review of my setup here to give a few more details that are hard to give in a Twitter conversation.
 
 ## Living in Windows and Mac
-I have several machines that I use including my main [Dell XPS Laptop](https://amzn.to/3ywshEp) and a [Mac Mini (Intel)](https://amzn.to/33CyBPe). There's another low end Windows Laptop and a [Dell NUC device](https://amzn.to/2H9c7tQ) I run a dedicated Linux instance on.
+I have several machines that I use including my main [Dell XPS Laptop](https://amzn.to/3ywshEp) and a [Mac Mini (Intel)](https://amzn.to/33CyBPe) and also an older 2015 MacBook Pro. There's another low end Windows Laptop and a [Dell NUC device](https://amzn.to/2H9c7tQ) I run a dedicated Linux instance on.
 
-I use the Mac Mini for a few things on a regular basis. I record music frequently so I often use Logic Pro X on the Mac. I also use the Mac for any mobile development that involves iOS, since it's simply easier to do that natively on the Mac than using some sort of Windows to Mac or iOS bridge. And more recently just to get out of the comfort zone I've decided to just use the Mac for regular .NET development as well, just to do something a little different.
+I use the Mac Mini for a few things on a regular basis: I record music frequently so I often use Logic Pro X on the Mac. I also use the Mac for any mobile development that involves iOS, since it's simply easier to do that natively on the Mac than using some sort of Windows to Mac or iOS bridge. And more recently I've decided to just use the Mac for regular .NET development as well, just to do something a little different. It all works well, but in the past the switch between these different environments has been pretty jarring. 
+
+Not anymore.
 
 ## One Screen for each Machine 
 A few weeks ago I decided that between all of these machines that I have and use it's probably a good idea to have a second monitor for these other non-primary devices. While the Mac certainly has a decent laptop screen, switching from my Windows 40" 4K display to a MacBook screen is quite a shock. And the Linux NUC of course doesn't have a screen at all so in the past I had to swap cables which is a pain in the ass.
@@ -141,9 +143,9 @@ The only beef I have really is that the various key sections are too close toget
 But otherwise I think this keyboard is pretty much perfect for me, and especially  Flow software or even just the ability to manually switch between connected machines is awesome. Even without the flow across functionality on Linux - manually pressing the device buttons on the keyboard and mouse is easy enough.
 
 ## Update: Screen Synchronization with two 32" LGs, Monitor Arms and Desk Organization
-*Here's an update to this setup in December of 2021.* 
+*<span style="color: firebrick">Here's an update to this setup in January of 2022.</span>* 
 
-It's now late 2021 and I've recently switched out the 40" Phillips monitor for another 32" LG (32UL500-W). Both the PC and Mac monitors are now exactly the same, which is both more visually appealing and also more consistent for configuration. It also helps when I occasionally rig both monitors to the my Windows Laptop for development.
+It's now late 2021 and I've recently switched out the 40" Phillips monitor for another [32" LG (32UL500-W)](https://amzn.to/3iX7IYg). Both the PC and Mac monitors are now exactly the same, which is both more visually appealing and also more consistent for configuration. It also helps when I occasionally rig both monitors to the my Windows Laptop for development.
 
 ![](Updated-ScreenSetup.jpg)
 

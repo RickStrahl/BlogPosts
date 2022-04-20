@@ -1,0 +1,149 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8"/>
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <link href="file:///c:\projects\MarkdownMonsterCode\MarkdownMonster\PreviewThemes\Pdf Output\..\Scripts\fontawesome\css\font-awesome.min.css" rel="stylesheet"/>
+    <link href="file:///c:\projects\MarkdownMonsterCode\MarkdownMonster\PreviewThemes\Pdf Output\Theme.css" rel="stylesheet"/>
+
+
+    <script src="file:///c:\projects\MarkdownMonsterCode\MarkdownMonster\PreviewThemes\Pdf Output\..\Scripts\jquery.min.js"></script>
+    <!--<link href="file:///c:\projects\MarkdownMonsterCode\MarkdownMonster\PreviewThemes\Pdf Output\..\Scripts\highlightjs\styles\vs.css" rel="stylesheet"/>-->
+    <!--<script src="file:///c:\projects\MarkdownMonsterCode\MarkdownMonster\PreviewThemes\Pdf Output\..\Scripts\highlightjs\highlight.pack.js"></script>-->
+    <script src="file:///c:\projects\MarkdownMonsterCode\MarkdownMonster\PreviewThemes\Pdf Output\..\Scripts\preview.js" id="PreviewScript"></script>
+
+    
+
+</head>
+<body>
+<div id="MainContent">
+  <!-- Markdown Monster Content -->
+  <h1 id="use-cssescape-to-escape-queryselectorall">Use CSS.escape() to escape QuerySelectorAll()</h1>
+<p><img src="Escape.jpg" alt="" /></p>
+<ul>
+<li><a href="#åäöÅÄÖ">Link with Extended Character</a></li>
+<li><a href="#selector-encoding---use-cssencode">Plain Link</a></li>
+</ul>
+<p>I ran into a <a href="https://github.com/RickStrahl/MarkdownMonster/issues/937">nasty little bug</a> in <a href="https://markdownmonster.west-wind.com/">Markdown Monster</a> today, where Markdown FootNote links which use <code>#hash</code> links on Urls, weren't properly navigating in the HTML Previewer.</p>
+<p>Markdown Monster is a Markdown editor and it has a live previewer that lets you see a preview of the generated HTML as you type. The previewer does custom link handling, that forwards the links to the host application which decides how to handle them. Some links are handled by opening new documents, or externally navigating, others are passed along to be processed 'as is' or fixed up to navigate in the same document - such as <code>#hash</code> links.</p>
+<h2 id="hash-handling-in-the-webview-and-chromium">Hash Handling in the WebView and Chromium</h2>
+<p>Normally hash handling is totally automatic in the browser - if you add a named hash to the current URL of the page, the page will find the matching <code>id</code> in the page and scrolls to it.</p>
+<p>Simple right?</p>
+<p><strong>Well, not always.</strong></p>
+<p>MM uses local file paths in the document's current folder to render HTML so that it can correctly manage dependencies like images, scripts, css etc. Because a set of files (a project or just folders) may have a common root that can be specified, MM always uses a <code>&lt;base&gt;</code> tag in the generated HTML to point at a root folder. Most of the time that <code>&lt;base&gt;</code> path is the same as current document, but in a project setting that folder may be several levels up the hierarchy to point at the project root so paths like <code>/images/wave.png</code> can work from down the hierarchy.</p>
+<p>The problem with this is that if you have a <code>&lt;base&gt;</code> tag in your header, even a simple hash link like this:</p>
+<pre><code class="language-html">&lt;a href=&quot;#header1&quot;&gt;Header 1&lt;/a&gt;
+</code></pre>
+<p>actually resolves to the base path plus the hash, which is <strong>not the same page as the host page</strong> and results in a bad link display.</p>
+<p>The following demonstrates the behavior when:</p>
+<pre><code class="language-html">&lt;html&gt;
+&lt;head&gt;
+	&lt;!-- this messes with #hash nav --&gt;
+	&lt;base href=&quot;file:///c:/temp/&quot; /&gt;
+&lt;/head&gt;
+&lt;body&gt;
+	&lt;a href=&quot;#header2&quot;&gt;header 2&lt;/a&gt;
+	
+	...
+	
+	&lt;h3 id=&quot;header2&quot;&gt;Header 2&lt;/h3&gt;
+&lt;/body&gt;
+</code></pre>
+<p>The <code>#header2</code> hash now resolves to:</p>
+<pre><code class="language-text">file:///c:/temp/#header2
+</code></pre>
+<p>which at best is not a valid URL, or at worst navigates to an unrelated document. In the case of the previewer the link fails by opening an OS file view which also is very wrong.</p>
+<p>##AD##</p>
+<p>Here's what this looks like:</p>
+<p><img src="https://github.com/RickStrahl/ImageDrop/raw/master/BlogPosts/2022/April/FootNotesBug.gif" alt="Hash navigation errors" /></p>
+<h2 id="åäöÅÄÖ">Growth über Alles</h2>
+<h2 id="explicit-link-handling-required">Explicit Link Handling Required</h2>
+<p>Because of this MM handles <code>#hash</code> links explicitly via a page level link click handler with a section that handles the hashes.</p>
+<p>This is my initially - <em>mostly working</em> - code:</p>
+<pre><code class="language-js">// ... additional logic for external links, docs, and images omitted
+
+// hash = &quot;#header2&quot;
+if (hash) {
+    var safeHash = decodeURIComponent(hash).substr(1);
+    var sel = &quot;a[name='&quot; + safeHash + &quot;'],#&quot; + safeHash;
+
+    var els = document.querySelectorAll(sel);
+    if (els &amp;&amp; els.length &gt; 0) {
+        window.scrollTo(0, els[0].offsetTop - 100);
+        return false;
+    }
+
+    return true;  // navigate native
+}
+</code></pre>
+<p>This works better! The above link works just fine when navigating a simple clean hash like <code>#header2</code>.</p>
+<p>But - remember the beginning of the discussion where I mentioned Markdown Footnotes? Footnote links in Markdown are rendered like this:</p>
+<pre><code class="language-html">&lt;!-- footnote references in the text --&gt;
+This is footnote &lt;a id=&quot;fnref:1&quot; href=&quot;#fn:1&quot; class=&quot;footnote-ref&quot;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/a&gt;. 
+
+More text here. 
+
+This is another footnote &lt;a id=&quot;fnref:2&quot; href=&quot;#fn:2&quot; class=&quot;footnote-ref&quot;&gt;&lt;sup&gt;2&lt;/sup&gt;&lt;/a&gt;. 
+
+
+&lt;!-- Footnote definitions at the bottom of document --&gt;
+&lt;hr /&gt;
+&lt;ol&gt;
+&lt;li id=&quot;fn:1&quot;&gt;
+&lt;p&gt;This is a footnote&lt;a href=&quot;#fnref:1&quot; class=&quot;footnote-back-ref&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&quot;fn:2&quot;&gt;
+&lt;p&gt;This is #2&lt;a href=&quot;#fnref:2&quot; class=&quot;footnote-back-ref&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</code></pre>
+<p>Notice that there two sets of links that let you jump back and forth between them using <code>#hash</code> links.</p>
+<p>Using the handler above, the <code>#header2</code> links work, but the <code>#fn:1</code> links do not.</p>
+<p>Experimenting with the JavaScript console I checked <code>getElementById(&quot;fn:1&quot;)</code> and that worked fine, but <code>querySelectorAll(&quot;#fn:1&quot;)</code> would fail.</p>
+<p><em>What the heck?</em></p>
+<h2 id="selector-encoding---use-cssencode">Selector Encoding - use CSS.Encode()</h2>
+<p>It took me a bit to realize that the problem wasn't some application logic problem, but rather the fact that the hash contains a <code>:</code> which is a <strong>special character for CSS Selectors</strong>. Duh - of course!</p>
+<p>The <code>:</code> in the <code>fn:1</code> Footnote reference is interpreted as a (invalid) <strong>CSS Filter Condition</strong>. A filter condition is something like  <code>a.link:visited</code> where <code>:visited</code> is a filter condition for any visited links. So <code>fn:1</code> in <code>querySelectorAll()</code> considers <code>:1</code> a filter condition, <strong>which of course is invalid</strong>. The selector operation fails, causes an exception and the click handler method then exits without a result value, which in turn causes the default navigation to kin in with the broken <code>&lt;base&gt;</code> link. In short, <strong>the navigation now fails</strong>.</p>
+<p>To fix this is simple enough: You can use the <code>CSS.escape()</code> function to escape a literal string and encodes any Selector specific characters. This includes encoding the <code>:</code> character which is escaped with as <code>:\</code>.</p>
+<p>With that in mind here's the updated code:</p>
+<pre><code class="language-js">if (hash) {
+    hash = decodeURIComponent(hash).substr(1);
+    
+    // THIS
+    var safeHash = CSS.escape(hash);  // replaces : with \'
+    
+    var sel = &quot;a[name='&quot; + safeHash + &quot;'],#&quot; + safeHash;
+
+    var els = document.querySelectorAll(sel);
+    if (els &amp;&amp; els.length &gt; 0) {
+        window.scrollTo(0, els[0].offsetTop - 100);
+        return false;  // handled
+    }
+
+    // let browser navigate 
+}
+</code></pre>
+<p>Now all hash link clicks, regardless of special characters work as expected.</p>
+<p>The moral of the story is: Remember that querySelectors require escaped values for literals and dynamically provided values that are used in the query, to ensure there's no accidental conflict with a query operator.</p>
+<p><code>CSS.escape()</code> is a quick, albeit easy to forget solution.</p>
+<h2 id="summary">Summary</h2>
+<p>Query Selector encoding is one of those sneaky bugs that you don't anticipate until they bite you in the butt, because things work just fine if you do it one way (<code>document.gelElementById()</code>) but not if you do it another (<code>document.querySelectorAll()</code>). And that is if you even think about testing for special cases like a provided or literal value that includes a query operator.</p>
+<p>BTW, the same rules apply with query selector wrapper libraries like jQuery which also failed with the the raw <code>#fn:1</code> tag navigation, for the same reasons.</p>
+<p>You can go a long time before you run into a need of <code>CSS.escape()</code> - I've certainly <strong>never</strong> had to use it before this particular scenario although I'm certain there are places in much of my Web code where this could become a potential problem.</p>
+<div style="margin-top: 30px;font-size: 0.8em;
+            border-top: 1px solid #eee;padding-top: 8px;">
+    <img src="https://markdownmonster.west-wind.com/favicon.png"
+         style="height: 20px;float: left; margin-right: 10px;"/>
+    this post created and published with the 
+    <a href="https://markdownmonster.west-wind.com" 
+       target="top">Markdown Monster Editor</a> 
+</div>
+
+  <!-- End Markdown Monster Content -->
+</div>
+
+</body> 
+</html>

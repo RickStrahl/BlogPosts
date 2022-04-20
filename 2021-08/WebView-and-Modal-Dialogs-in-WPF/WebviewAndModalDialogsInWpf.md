@@ -1,16 +1,16 @@
 ---
 title: WebView and Modal Dialogs in WPF Async Code
-featuredImageUrl: https://weblog.west-wind.com/images/2021/WebView-and-Modal-Dialogs-in-WPF/WebViewUndesponsive.png
 abstract: Another day another problem with the WebView control - this time dealing with certain Windows dialogs crashing the WebView control and making it unresponsive so that the control has to be reloaded or - more commonly the application has to be restarted.
-keywords: WPF, Windows
 categories: WPF, WebView,Windows
+keywords: WPF, Windows
 weblogName: West Wind Web Log
 postId: 2633478
-permalink: https://weblog.west-wind.com/posts/2021/Aug/16/WebView-and-Modal-Dialogs-in-WPF-Async-Code
-postDate: 2021-08-16T12:48:38.5490818-07:00
-postStatus: publish
 dontInferFeaturedImage: false
 dontStripH1Header: false
+postStatus: publish
+featuredImageUrl: https://weblog.west-wind.com/images/2021/WebView-and-Modal-Dialogs-in-WPF/WebViewUndesponsive.png
+permalink: https://weblog.west-wind.com/posts/2021/Aug/16/WebView-and-Modal-Dialogs-in-WPF-Async-Code
+postDate: 2021-08-16T09:48:38.5490818-10:00
 ---
 # WebView and Modal Dialogs in WPF Async Code
 
@@ -202,9 +202,9 @@ at Microsoft.Web.WebView2.Core.Raw.ICoreWebView2Controller.MoveFocus(COREWEBVIEW
 at Microsoft.Web.WebView2.Core.CoreWebView2Controller.MoveFocus(CoreWebView2MoveFocusReason reason)
 ```
 
-which are always the same. It appears this happens when focus returns to the form/webview after the modal dialog has been deactivated, but that's just a guess.
+which are always the same. It appears this happens when focus returns to the form/Webview after the modal dialog has been deactivated, but that's just a guess.
 
-I see quite a few of these errors in my analytics error logs.
+I see quite a few of these errors in my Analytics error logs.
 
 Note that nothing in the code that actually blows up touches the WebView, but the WebView is active in the background of course and apparently it's the focus change that's starting this failure sequence. In MM there's other logic that fires to handle focus but based on the error trace it doesn't look like that form activation code is actually firing in this failure sequence.
 
