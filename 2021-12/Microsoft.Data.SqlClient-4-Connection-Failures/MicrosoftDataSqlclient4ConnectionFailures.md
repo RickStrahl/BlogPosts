@@ -1,16 +1,16 @@
 ---
 title: Connection Failures with Microsoft.Data.SqlClient 4 and later
+featuredImageUrl: https://weblog.west-wind.com/images/2021/Microsoft.Data.SqlClient-4-Connection-Failures/BrokenConnection.jpg
 abstract: After a recent update to `Microsoft.Data.SqlClient` version `4.0.0.0` I ended up not being able to connect to any of my SQL Server databases. Turns out Microsoft has made some default settings changes in the updated provider and these settings are likely going to break connections.
-categories: .NET,Sql Server
 keywords: Connection Failure,Sql Server,.NET
+categories: .NET,Sql Server
 weblogName: West Wind Web Log
 postId: 2849288
-dontInferFeaturedImage: false
-dontStripH1Header: false
-postStatus: publish
-featuredImageUrl: https://weblog.west-wind.com/images/2021/Microsoft.Data.SqlClient-4-Connection-Failures/BrokenConnection.jpg
 permalink: https://weblog.west-wind.com/posts/2021/Dec/07/Connection-Failures-with-MicrosoftDataSqlClient-4-and-later
 postDate: 2021-12-07T14:02:15.7854568-10:00
+postStatus: publish
+dontInferFeaturedImage: false
+dontStripH1Header: false
 customFields:
   mt_githuburl:
     id: 
@@ -51,6 +51,8 @@ server=.;database=LicenseManager;integrated security=True;Encrypt=False"
 ```
 
 Et voila - now the connection works correctly again with `4.0.0.0`.
+
+##AD##
 
 ## Le Sigh
 Seriously this is a head scratcher. I get the secure by default thinking, but [setting up SQL Server for Encryption](https://docs.microsoft.com/en-us/sql/database-engine/configure-windows/enable-encrypted-connections-to-the-database-engine?view=sql-server-ver15) is not one of those features that you just enable flipping a configuration switch. You have to create and install a certificate and then propagate that certificate out to clients and configure SQL clients. In short, this is far from something that 'just works out of the box'. There's a bunch of set up that needs to happen for a server to run with encryption enabled and for a client to use the certificate the server is set up with.
