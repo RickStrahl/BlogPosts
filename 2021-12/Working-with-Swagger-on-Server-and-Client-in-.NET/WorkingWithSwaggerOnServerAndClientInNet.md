@@ -18,9 +18,10 @@ The end result in WebSurge looks like this:
 
 ![](https://github.com/RickStrahl/ImageDrop/raw/master/WebSurge/SwaggerImport.gif)
 
-When I started this journey though, it took a bit of time to get the pieces together for both the client and server sides with Swagger and OpenAPI integration in .NET. In fact in the past I had issues with even setting up Swagger support in ASP.NET Core applications.
+When I started this journey I hadn't done much with Swagger even on the server side, so i figured I take the built-in ASP.NET support for a spin, which I'll cover in the first part of this post series. In the past I had some issues getting Swagger to work in new project, so it's time to give it another run.
 
-This post isn't meant to be a comprehensive introduction or review, but rather talk about some of the fundamental things you need to know to use these tools in .NET both on client and server since the documentation and information on all of this are scattered all over the place and hard to piece together. This is my attempt to make this a little more organized and - where appropriate - point at the relevant resources.
+This post isn't meant to be a comprehensive introduction or review, but rather talk about some of the fundamental things you need to know to use these tools in .NET both on server in ASP.NET and on the client if you want to consume the API documentation for some sort of tool. In my case this is for WebSurge and essentially creating mock requests for the API service to test. Other scenarios might include generating code for proxies that can call the service and return results automatically.
+
 
 ## Swagger and OpenAPI 
 **Swagger** and **OpenAPI** are an evolution of the the same tooling. **Swagger** was the original name of a tool that produced API documentation, and it eventually evolved into a more formal name of **OpenAPI** that is now in much more wide use for many tools and different platforms. Think of **Swagger** as an early adopter brand while **OpenAPI** is a public standard.
@@ -278,8 +279,6 @@ var app = builder.Build();
 app.UseAuthentication();
 app.UseAuthorization
 ```
-
-> It's vitally important that you **set up Cookie Authentication as the default authentication scheme**! Using JWT as the default scheme does not work!
 
 #### Authenticating both Cookies and JWT
 In order for authentication to work both for the Swagger Url and the SPA requests both a token needs to be returned to the client and an Auth cookie set which is then applied to the browser that eventually needs to access the `/swagger/` URL that is to be protected.

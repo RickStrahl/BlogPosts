@@ -73,6 +73,8 @@ JWT Authentication has a ton of settings, most of which are sufficiently cryptic
 
 **There's nothing Role specific** in this global configuration. All the role based related configuration happens when creating a token later on in the `Authenticate` endpoint.
 
+##AD##
+
 ### How Tokens and Hashing work
 Before moving on here, let's review how token based authentication works and how these setup values fit into this scheme. 
 
@@ -280,6 +282,8 @@ public async Task<SaveResponseModel> SaveCustomer(IdvCustomer model)
 
 Now only those that are part of the `Administrator` group have access. The List can use multiple roles using a comma delimited list ie. `"Administrator, ReportUser"`.
  
+##AD## 
+
 ## Accessing Secured Endpoints with the Bearer Token
 Now that the API is secured we have to pass the Bearer token with each request to authenticate. It looks like this:
 

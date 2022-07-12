@@ -1,16 +1,16 @@
 ---
 title: Async and Async Void Event Handling in WPF
+featuredImageUrl: https://weblog.west-wind.com/images/2022/Async-Void-Event-Handling-in-WPF/AsyncFiring.jpg
 abstract: When running WPF and WinForms applications with async operations, I've run into a number of issues with event handling 'hanging' the UI thread in unexpected ways, where the UI hangs until the mouse is moved or a key is pressed. A lot of times these issues are associated with events that fire async code, and in this post I take closer look at one scenario that can cause these hang ups along with a workaround that has proven useful in a number of occasions for me.
-categories: WPF, CSharp, .NET
 keywords: async,await,async void,Dispatcher,WPF,
+categories: WPF, CSharp, .NET
 weblogName: West Wind Web Log
 postId: 3114844
-dontInferFeaturedImage: false
-dontStripH1Header: false
-postStatus: publish
-featuredImageUrl: https://weblog.west-wind.com/images/2022/Async-Void-Event-Handling-in-WPF/AsyncFiring.jpg
 permalink: https://weblog.west-wind.com/posts/2022/Apr/22/Async-and-Async-Void-Event-Handling-in-WPF
 postDate: 2022-04-22T13:05:13.5687317-10:00
+postStatus: publish
+dontInferFeaturedImage: false
+dontStripH1Header: false
 ---
 # Async and Async Void Event Handling in WPF
 
@@ -69,7 +69,7 @@ Behind the scenes, the `async` `await` pattern is essentially a compiler generat
 
 As nice as `async` and `await` is, the underlying complexity of nested `Task.ContinueWith()`  blocks remains, and this shows up when you need to debug async code. When you do, the code often can't show the entire call stack in an easy to read, linear code sequence, but rather shows a bunch of nested anonymous, compiler generated closures that are difficult to decipher and read in the call stack. It can be a mess especially if the you are many calls deep already. For this reason  async code can be a real bitch to debug. 
 
-> #### @icon-warning Captain Obvious Alert
+> #### @icon-info-circle Captain Obvious Alert
 > There are big differences between async and sync code, and you should **never assume** that `await` called code is in any way similar to purely synchronous code, even though the way you write the code is not all that different.
 
 To wit:
@@ -84,7 +84,7 @@ does not have the same semantics as:
 bool result = SyncMethodWithResult();
 ```
 
-[There are pitfalls here](https://weblog.west-wind.com/posts/2021/May/15/Async-Await-with-the-Null-Propagator), because the result of the first method call is actually `Task<bool>` rather than `bool` and only the unwrapping of the Task - invisibly handled by the compiler - yields the final `bool` value result. There are actually multiple code steps between the the method call and the result being assigned and that can trip you up in a number of ways the compiler will not flag.
+[There are pitfalls here](https://weblog.west-wind.com/posts/2021/May/15/Async-Await-with-the-Null-Propagator), because the result of the first method call is actually `Task<bool>` rather than `bool` and only the unwrapping of the Task - invisibly handled by the compiler - yields the final `bool` value result. There are actually multiple code steps between the method call and the result being assigned and that can trip you up in a number of ways the compiler will not flag.
 
 This isn't in any way meant to discourage use of `async` methods, but rather as a reminder to be extra aware of the differences between sync and async code. **It's easy to forget**! 
 
@@ -187,8 +187,7 @@ private async void TreeFavorites_MouseMove(object sender, MouseEventArgs e)
 }
 ```
 
-This event handler uses `async void` to handle Mouse 
-
+This event handler uses `async void` to handle `MouseMove`, checks for a drag scenario, then initiates the actual drag operation using `DoDragDrop()`. This is where the code hangs until a UI transition (in this case clicking out of the WebView) occurs. At that point the events backed up fire all at once causing the irregular and out of sync behavior.
 
 ## A better way to Handle `async void` Events
 So what does work reliably in this scenario? Turns out that using a `Dispatcher.IncokeAsync()` call and `await`ing the call is the only way this works without hang ups and weird context switches:

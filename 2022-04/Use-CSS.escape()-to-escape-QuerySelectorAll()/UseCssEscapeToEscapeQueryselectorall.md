@@ -1,22 +1,22 @@
 ---
 title: Use CSS.escape() to escape QuerySelectorAll()
-featuredImageUrl: https://weblog.west-wind.com/images/2022/Use-CSS.escape()-to-escape-QuerySelectorAll()/Escape.png
 abstract: Ran into an issue recently where a querySelector operation was failing in document link navigation when navigating hashes. There are a few issues at work when using Hash navigation but one issue i didn't expect to run into was a naming conflict of a hash tag that interfered with CSS operators. Turns out there's an easy solution around with with CSS.escape - if you can make the connection. In this post I talk about the problem how it might show up and how to fix it.
-keywords: CSS.escape, querySelectorAll, CSS, HTML
 categories: CSS, HTML
+keywords: CSS.escape, querySelectorAll, CSS, HTML
 weblogName: West Wind Web Log
 postId: 3086951
-permalink: https://weblog.west-wind.com/posts/2022/Apr/10/Use-CSSescape-to-escape-QuerySelectorAll
-postDate: 2022-04-10T14:26:17.4491874-10:00
-postStatus: publish
 dontInferFeaturedImage: false
 dontStripH1Header: false
+postStatus: publish
+featuredImageUrl: https://weblog.west-wind.com/images/2022/Use-CSS.escape()-to-escape-QuerySelectorAll()/Escape.png
+permalink: https://weblog.west-wind.com/posts/2022/Apr/10/Use-CSSescape-to-escape-QuerySelectorAll
+postDate: 2022-04-10T17:26:17.4491874-07:00
 ---
 # Use CSS.escape() to escape QuerySelectorAll()
 
 ![](Escape.jpg)
 
-I ran into a [nasty little bug](https://github.com/RickStrahl/MarkdownMonster/issues/937) in [Markdown Monster](https://markdownmonster.west-wind.com/) today, where Markdown FootNote links which use `#hash` links on Urls, weren't properly navigating in the HTML Previewer. 
+I ran into a [nasty little bug](https://github.com/RickStrahl/MarkdownMonster/issues/937) in [Markdown Monster](https://markdownmonster.west-wind.com/) today, where Markdown FootNote links which use `#hash` links on Urls, weren't properly navigating in the HTML Previewer. Specifically links like `#f:1`.
 
 Markdown Monster is a Markdown editor and it has a live previewer that lets you see a preview of the generated HTML as you type. The previewer does custom link handling, that forwards the links to the host application which decides how to handle them. Some links are handled by opening new documents, or externally navigating, others are passed along to be processed 'as is' or fixed up to navigate in the same document - such as `#hash` links.
 
@@ -27,6 +27,9 @@ Simple right?
 
 **Well, not always.** 
 
+There are certain characters that you have to watch out for in CSS queries **if they are part of a literal string**. In particular, any CSS directives, have to be escaped in order to not be interpreted as query operators, but rather as literal values.
+
+### Finding Trouble: Hash Navigation
 MM uses local file paths in the document's current folder to render HTML so that it can correctly manage dependencies like images, scripts, css etc. Because a set of files (a project or just folders) may have a common root that can be specified, MM always uses a `<base>` tag in the generated HTML to point at a root folder. Most of the time that `<base>` path is the same as current document, but in a project setting that folder may be several levels up the hierarchy to point at the project root so paths like `/images/wave.png` can work from down the hierarchy.
 
 The problem with this is that if you have a `<base>` tag in your header, even a simple hash link like this:
@@ -117,20 +120,29 @@ This is another footnote <a id="fnref:2" href="#fn:2" class="footnote-ref"><sup>
 </ol>
 ```
 
-Notice that there two sets of links that let you jump back and forth between them using `#hash` links. 
+Notice that there two sets of links that let you jump back and forth between them using `#hash` links. Notice the ids are `fn:1` and `fnref:1` for example.
 
-Using the handler above, the `#header2` links work, but the `#fn:1` links do not.
+Using the handler above, the `#header2` links work, but the `#fn:1` and `#fnref:1` links do not.
 
 Experimenting with the JavaScript console I checked `getElementById("fn:1")` and that worked fine, but `querySelectorAll("#fn:1")` would fail.
 
 *What the heck?*
 
+##AD## 
+
 ## Selector Encoding - use CSS.Encode()
-It took me a bit to realize that the problem wasn't some application logic problem, but rather the fact that the hash contains a `:` which is a **special character for CSS Selectors**. Duh - of course!
+I already gave it away earlier in the post, but initially I didn't see it:
+It took me a bit to realize that the problem wasn't some application logic problem, but rather the fact that **the hash contains a `:`** which is a **special character for CSS Selectors**. Duh - of course!
 
 The `:` in the `fn:1` Footnote reference is interpreted as a (invalid) **CSS Filter Condition**. A filter condition is something like  `a.link:visited` where `:visited` is a filter condition for any visited links. So `fn:1` in `querySelectorAll()` considers `:1` a filter condition, **which of course is invalid**. The selector operation fails, causes an exception and the click handler method then exits without a result value, which in turn causes the default navigation to kin in with the broken `<base>` link. In short, **the navigation now fails**.
 
-To fix this is simple enough: You can use the `CSS.escape()` function to escape a literal string and encodes any Selector specific characters. This includes encoding the `:` character which is escaped with as `:\`. 
+To fix this is simple enough: You can use the `CSS.escape()` function to escape a literal string and encodes any Selector specific characters. This includes encoding the `:` character which is escaped with as `\:`. 
+
+`CSS.escape()` appears to escape all punctuation mark characters but leaves any other extended characters (ie. Upper Unicode characters) alone.
+
+![](CssEscapeCharacters.png)
+
+Keep in mind that if you use `CSS.escape()` you want to use it **only on the literal part of a CSS Selector**, not on any of the *navigation* parts (ie. the the `#`, `.`, `:` navigation operators).
 
 With that in mind here's the updated code:
 

@@ -1,10 +1,16 @@
 ---
 title: Accepting Raw Request Body Content in ASP.NET Core API Controllers
 abstract: When posting raw body content to ASP.NET Core the process is not very self-explanatory. There's no easy way to simply retrieve raw data to a parameter in an API method, so a few extra steps are provided using either manual handling of the raw request stream, or by creating custom formatter that can handle common 'raw' content types in your APIs via standard Controller method parameters. In this post I look at various permutations and how you can access the raw data in your code.
-keywords: Raw Content, POST, ASP.NET Core, Plain Text, Byte Array, Data
 categories: ASP.NET Core
+keywords: Raw Content, POST, ASP.NET Core, Plain Text, Byte Array, Data
 weblogName: West Wind Web Log
 postId: 398834
+dontInferFeaturedImage: false
+dontStripH1Header: false
+postStatus: publish
+featuredImageUrl: https://weblog.west-wind.com/images/2022/POSTing-Raw-Body-Text-to-ASP.NET-Core-API-Controllers/Raw-Data.jpg
+permalink: https://weblog.west-wind.com/posts/2017/Sep/14/Accepting-Raw-Request-Body-Content-in-ASPNET-Core-API-Controllers
+postDate: 2022-04-23T10:28:51.0125876-10:00
 ---
 # Accepting Raw Request Body Content in ASP.NET Core API Controllers
 
@@ -87,6 +93,8 @@ I'm essentially doing the same thing as in the first request, **except I'm not s
 It's not super obvious and I know this can trip up the unsuspecting Newbie who expects raw content to be mapped. However, this makes sense if you think about it: MVC has mappings for specific content types and if you pass data that doesn't fit those content types it can't convert the data, so it assumes there's no matching endpoint that can handle the request.
 
 So how do we get at the raw data?
+
+##AD## 
 
 #### Reading Request.Body for Raw Data
 Unfortunately ASP.NET Core doesn't let you just capture 'raw' data in any meaningful way just by way of method parameters. One way or another you need to do some custom processing of the `Request.Body` to get the raw data out and then deserialize it. 
@@ -218,6 +226,8 @@ public async Task<byte[]> RawBinaryDataManual()
     return await Request.GetRawBodyBytesAsync();
 }
 ```
+
+##AD##
 
 ### Automatically Converting Binary and Raw String Values
 If you'd rather use a more deterministic approach and accept raw data through parameters, a little more work is required by building a custom `InputFormatter`. 

@@ -31,6 +31,8 @@ It's an inherent issue in Windows because the base Windows file APIs by default 
 
 This is true of raw Windows APIs as well as high level runtimes like the .NET Runtime which use those very APIs. For Markdown Monster which is a .NET Full Framework (`net472`) application, this means it can't open or save files that are 260 characters or longer and this was the cause of the problems reported in the Bug report. Depending on the operation, files either would not open with *File not found* errors, or outright crash the application. Not cool, but not unexpected...
 
+##AD##
+
 ### 260 is not small!
 To be clear: 260 characters is not exactly small for a folder and file path. It's pretty freaking long and for manual folder creation - which is the likely use case in Markdown Monster - you have to work pretty hard to get near the 260 character limit. Just creating a repro case for the bug report took a while to actually build folders deep enough to trigger errors - I thought 260 chars would have come a lot sooner than they actually did! But apparently it happens quite a bit anyway :smile: as I see errors like this in my logs on a regular basis.
 
@@ -137,6 +139,8 @@ Most (but not all Windows and .NET APIs) work with extended path syntax. But the
 
 In short I think that extended path syntax on its own is not a solution. It's too difficult to figure out where it works and where it doesn't and then to find all the places in the application where it needs to be used. It's useful if you have a very focused scenario for using File IO, but for generic applications it's just not consistent enough to work for all use cases - it's definitely not a one size fits all solution.
 
+##AD## 
+
 ### Windows Short Path Names
 Another option that works without new Windows features and settings is to use Short Path Names as provided by the Windows API `GetShortPathName()` function. This function shortens paths to the old school DOS 8.3 length by uniquely creating shortfile paths. Here's what a very long path looks like when truncated:
 
@@ -240,6 +244,8 @@ This fixes Markdown Monster so that it can work with Long Path Files for:
 * Creating New Files for Web log etc.
 
 All of that, which uses the file operations that **directly go through Markdown Monster work just fine**.
+
+##AD##
 
 ## Dependencies, Dependencies... not so much
 But Houston hold on...  we have a problem. 
