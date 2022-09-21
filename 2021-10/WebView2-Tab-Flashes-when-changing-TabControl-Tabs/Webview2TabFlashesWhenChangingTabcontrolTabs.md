@@ -1,7 +1,7 @@
 ---
 title: WebView2 Flashing when changing TabControl Tabs
 abstract: I've been running into major issues with the WebView control and TabControls in WPF where switching between tabs that contain WebView controls causes a very annoying white flash. In this post I demonstrate the problem and provide an arcane fix that works around this frustrating issue.
-categories: WebView2 WPF
+categories: WebView, WPF
 keywords: WebView2, TabControl, Flashing, UI
 weblogName: West Wind Web Log
 postId: 2722266

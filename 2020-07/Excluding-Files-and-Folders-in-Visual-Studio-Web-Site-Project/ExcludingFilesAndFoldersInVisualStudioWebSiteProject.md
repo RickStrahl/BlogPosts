@@ -10,7 +10,7 @@ dontStripH1Header: false
 postStatus: publish
 featuredImageUrl: https://weblog.west-wind.com/images/2021/Excluding-Files-and-Folders-in-Visual-Studio-Web-Site-Project/ExcludingFilesBanner.png
 permalink: https://weblog.west-wind.com/posts/2020/Jul/25/Excluding-Files-and-Folders-in-Visual-Studio-Web-Site-Project
-postDate: 2020-07-25T21:43:04.6727800-10:00
+postDate: 2020-07-26T00:43:04.6727800-07:00
 ---
 # Excluding Files and Folders in Visual Studio Web Site Project
 
@@ -137,6 +137,7 @@ I hope that's something Microsoft will address in the future as I find myself wi
 
 ### Resources
 * [Excluding Files and Folders from Web Deploy Deployment](https://docs.microsoft.com/en-us/aspnet/web-forms/overview/deployment/advanced-enterprise-web-deployment/excluding-files-and-folders-from-deployment)
+* [Web Deploy and .pubxml reference (somewhat)](https://github.com/dotnet/sdk/tree/main/src/WebSdk)
 
 <div style="margin-top: 30px;font-size: 0.8em;
             border-top: 1px solid #eee;padding-top: 8px;">

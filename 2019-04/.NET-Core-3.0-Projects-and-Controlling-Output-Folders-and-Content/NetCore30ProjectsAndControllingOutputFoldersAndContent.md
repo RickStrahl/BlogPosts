@@ -1,20 +1,27 @@
 ---
-title: '.NET Core 3.0 SDK Projects: Controlling Output Folders and Content'
+title: '.NET Core SDK Projects: Controlling Output Folders and Dependencies Output'
 abstract: I've been upgrading Markdown Monster to run on .NET Core 3.0 and one of the biggest changes is switching to the new .NET SDK style format for all projects. I ran into some issues with the Addin projects that require that output is placed in a very specific output folder and to not include output of all references. In this post  describe a couple of ways to control where output goes and how to limit the output that goes to those folders.
-keywords: .NET Core, Desktop, WPF, .NET 3.0, .NET SDK Project, Output, PreserveNewest
 categories: .NET Core
+keywords: .NET Core, ProjectDependency, Dependency, Transient, Project, SDK, .NET SDK Project, Output, ExcludeAssets, IncludeAssets, Private, MsBuild, Package, NuGet
 weblogName: West Wind Web Log
 postId: 1244833
+dontInferFeaturedImage: false
+dontStripH1Header: false
+postStatus: publish
+featuredImageUrl: https://weblog.west-wind.com/images/2022/.NET-Core-3.0-Projects-and-Controlling-Output-Folders-and-Content/HideyHole.jpg
 permalink: https://weblog.west-wind.com/posts/2019/Apr/30/NET-Core-30-SDK-Projects-Controlling-Output-Folders-and-Content
-postDate: 2019-04-30T13:43:36.5583246-10:00
+postDate: 2019-04-30T16:43:36.5583246-07:00
 customFields:
   mt_githuburl:
+    id: 
     key: mt_githuburl
     value: https://github.com/RickStrahl/BlogPosts/blob/master/2019-04/.NET-Core-3.0-Projects-and-Controlling-Output-Folders-and-Content/NetCore30ProjectsAndControllingOutputFoldersAndContent.md
 ---
-# .NET Core 3.0 SDK Projects: Controlling Output Folders and Content
+# .NET Core SDK Projects: Controlling Output Folders and Dependencies Output
 
 ![](HideyHole.jpg)
+
+*last updated July 26th, 2022. Original post written on NetCore 3.0, updated for .NET 6.0*{style="color: red; font-size: 0.8em"}
 
 In my last post I talked about [porting my Markdown Monster WPF application to .NET Core 3.0](https://weblog.west-wind.com/posts/2019/Apr/24/First-Steps-in-porting-Markdown-Monster-to-NET-Core-30) and one of the problems I ran into was how to deal with properly handling compilation of Addins. In Markdown Monster Addins compile **into a non-standard folder** in the main EXE's output folder, so when building the project I want my Addin to be pushed right into the proper folder hierarchy inside of the parent project so that I can run **and debug** my addins along with the rest of the application.
 
@@ -29,73 +36,66 @@ In the new .NET SDK projects this is more complicated as there's no simple way t
 
 Let's take a look.
 
-##AD##
-
 ## Where does output go?
 By default .NET SDK projects push compiled output into:
 
 ```text
-<projectRoot>bin\Release\netcore3.0
+bin\Release\net60\win-x64
 ```
 
-The reason for this more complex path that includes a target framework is that SDK projects can potentially have multiple targets defined in the `<TargetFramework>` element so you can do:
+The reason for this more complex path that includes a target framework is that SDK projects can potentially have multiple targets defined using the `<TargetFrameworks>` element (note the extra `s`) so you can do:
 
 ```xml
-<TargetFrameworks>net462;netcore3.0</TargetFrameworks>
+<TargetFrameworks>net462;net60</TargetFrameworks>
 ```
 
-The separate folder structure allow for both targets to get their own respective output folders when you build the project.
+The separate folder structure allows for both targets to get their own respective output folders when you build the project.
 
 ![](SeparateTargetFolders.png)
 
-For my addins this is **not what I want** - I want to send output to a very specific folder in the 'parent' Exe project in the `Addins\AddinName` folder:
+For my addins, I don't want output to go into the standard location, but rather I need to specify a custom location in my main application's `Addins/AddinName` folder using:
 
-![](AddinOutput.png)
-
-Not only that but I also need to write out only the actual assembly for the output **plus any new dependencies** that aren't already referenced in the main project - rather than all or no dependencies which are the 'default' options.
-
-## Sending output to a Custom Folder with Dependencies
-So to send output to a non-default folder you can use `<OutDir>` and to force dependencies to be included in the output rather than the default behavior that just includes the project's assembly you can use `<CopyLocalLockFileAssemblies>`.
-
-Here's what that looks like in my project:
 
 ```xml
 <PropertyGroup>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <OutDir>$(SolutionDir)MarkdownMonster\bin\$(Configuration)\$(TargetFramework)\Addins\Weblog</OutDir>
+    <OutDir>$(SolutionDir)MarkdownMonster/bin/$(Configuration)/$(TargetFramework)/win-x64/Addins/Weblog</OutDir>
 </PropertyGroup>
 ```
 
-The `<OutDir>` element points at the Exe's project output folder and  copies files directly into the specified folder without a target folder.
+which pushes the output into the correct location:
 
-> If you want to generate output to a new folder **and get a target framework root folder**  there's the `<OutputPath>` directive.
+![](AddinOutput.png)
 
+## Controlling Dependency Output: With or Without Dependencies
+When adding a project reference to my main project from the addin I ran into a bit of a problem in regards to how dependencies are handled.
 
-> `<CopyLocalLockFileAssemblies>` is a very blunt tool. It copies **everything** related to a dependency so it can produce a boatload of assemblies and content files that you likely don't want, so you likely will need to filter the resulting output.
+##AD##
 
-
-The `<CopyLocalLockFileAssemblies>` ensures that **all** dependencies are copied, not just the one assembly generated for this project. So we need to filter the files somehow. More on that below.
-
-
-With `<OutDir>` the output goes into the main project output folder depending on the current target framework (potentially multiples) and the Configuration which is `Debug` or `Release` most likely.
-
-Ok - output's now going where it needs to go.
-
-## Controlling Output Assemblies
-The next problem is that when I now build  the project the project output includes **all** dependencies. That includes all NuGet package assemblies, all dependent assemblies, and also the dependencies for my Main EXE's reference:
-
-![](TooManyAssemblies.png)
-
-Holy crap that's a lot of assemblies and all buy 3 of them are in this case duplicated.
-
-So the next step is to NuGet packages and Assembly References from bringing in all of their dependencies.
-
-For NuGet Packages the element to use is `<IncludeAssets>` and set the value `compile`:
+I started with importing the `<ProjectReference>` via Visual Studio which produces:
 
 ```xml
 <ItemGroup>
-    <!-- Assemblies already referenced by mainline -->
+  <ProjectReference Include="../../MarkdownMonster/MarkdownMonster.csproj"  />
+</ItemGroup>
+```
+Once the project is referenced if you indirectly reference features that require dependencies for the Markdown Monster project, it'll just work as the references are passed through an available from the host application.
+
+When you do this by default all transient dependencies are pulled into the project. Also all dependency assemblies from the imported project are output into the build output folder. Most of the time that is the behavior you want.
+
+But in some cases - an addin being a common scenario - you may not want all the dependencies from the referenced project to end up in the output folder. Since I'm creating an Addin that runs in the context of the host project, there's no need to duplicate the dependencies in the output folder. 
+
+How do we prevent the transient dependencies from being output?
+
+### Referencing Transient Dependencies without Outputting them
+If you need to **explicitly reference components** from the main project either as NuGet Packages or direct binary references, it's possible to mark them as Compile Only Included Assets. Compile-only in this context means they won't get copied to the output folder.
+
+Here's what this looks like for dependent packages that **are explicitly required** by the addin project's code:
+
+```xml
+<ItemGroup>
+    <!-- Transient References explcitly accessed by the Addin Project -->
     <PackageReference Include="MahApps.Metro" version="1.6.5">
+      <!-- keeps assembly output from going into the OutDir -->
       <IncludeAssets>compile</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Dragablz" version="0.0.3.203">
@@ -103,121 +103,133 @@ For NuGet Packages the element to use is `<IncludeAssets>` and set the value `co
     </PackageReference>    
     ...
     
-    <!-- my dependencies that aren't used by main project 
-         so I'm not using `<IncludeAssets>`                 -->
+    <!-- direct project dependencies should be output into OutDir -->
     <PackageReference Include="xmlrpcnet" version="3.0.0.266" />
     <PackageReference Include="YamlDotNet" version="6.0.0" />
 </ItemGroup>
 ```
 
-The point of this to 'exclude' any of the dependencies that are already loaded by the main executable and so don't need to be redistributed again. The `<IncludeAssets>compile</IncludeAssets>`. The only packages that I actually **want** to be included in the output folder are those new assemblies that are not already loaded by the main Exe. 
+The `MahApps.Metro` and `Dragablz` package references are part of the Main Markdown Monster project so they should be available for access, but not output into the output folder. 
 
-There's more info on the various `<IncludeAssets>` and related elements values that you can provide [in the NuGet documentation](https://docs.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files#controlling-dependency-assets).
+The `XmlRpcNet` and `YamlDotNet` packages are direct references unique to this Addin project and **should output** to the `OutDir` which is the 'normal' behavior.
 
-## Project or Assembly References also Copy Files
-I'm still not done - I also have an assembly reference that points back at the main EXE project. My first try used a project reference, but this would pull in **the entire project including all related assets**. Ouch.
+> Note that `<IncludeAssets>` (and also `<ExcludeAssets>`) don't show up in the Visual Studio `.csproj` schema Intellisense, so no hints for you! You get to guess with the rest of us.
 
-So this didn't work:
+### Project Reference: Too Many Assemblies - make it stop!
+Since this works so smoothly with `<PackageReference>` you'd expect the behavior to be pretty much the same with `<ProjectReference>` but unfortunately the behavior here is a bit different and a lot less obvious.
+
+If I do a plain project reference from my Addin project to the main Markdown Monster project and then build, I get an output folder that is a mess **with every single dependency from the main project dumped into my Addin output folder**:
+
+![](TooManyAssemblies.png)
+
+Eeek. This is not what I want here.
+
+### Limiting Project Output to only the Current Project
+This should be easy: Visual Studio has an option to **Copy Local = false** which works for **References** and prevents dependencies to be copied into the output folder. Rather it just copies the actual output of the project and any direct dependencies of that project to the output folder.
+
+Unfortunately the default behavior **doesn't work for `<ProjectReference>` entries**. For projects referenced with **Copy Local**, Visual Studio creates:
 
 ```xml
 <ItemGroup>
-    <ProjectReference Include="$(SolutionDir)MarkdownMonster\MarkdownMonster.csproj" >
-     <IncludeAssets>compile</IncludeAssets>
-    </ProjectReference>
-</ItemGroup>  
-```  
-
-I couldn't find a setting for `<IncludeAssets>` or `<ExcludeAssets>` that works for the Project Reference. No matter what I did the depedencies were copied in. 
-
-So - instead of a project reference I can also use an **Assembly Reference**  instead pointing at the compiled EXE. Then I can mark it as `Private` which won't copy all of the project's content into the output folder: 
-
-```xml
-<ItemGroup>
-    <Reference Include="..\..\MarkdownMonster\bin\$(Configuration)\$(TargetFramework)\MarkdownMonster.exe">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
+    <ProjectReference Include="../../MarkdownMonster/MarkdownMonster.csproj" Private="False" />
+</ItemGroup>
 ```
 
-Success. The end result of both the package references and project reference now is:
+which **does not prevent** dependencies to be included. This produces the same massively cluttered output:
 
-![](SuccessOnlyNeededDlls.png)
+![](TooManyAssemblies.png)
 
-Just to summarize here's the complete project file for the `WeblogAddin` project:
+Well at least not all of them - it will only prevents **nested project references** from being imported and output to the Output path. But it **will not prevent nested NuGet packages** or **explicit nested references** to be excluded.
+
+### `ExcludeAssets="all"` or `IncludeAssets="compile"` keep out Transient Dependencies
+A lot of false starts later, I found the solution in the `ExcludeAssets` or `IncludeAssets` flags that determine how output is copied. These work **in combination with the Private flag** which is why I missed this solution previously.
+
+The fix requires both Private and ExcludeAssets (or IncludeAssets):
+
 
 ```xml
-<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<ItemGroup>
+    <ProjectReference Include="../../MarkdownMonster/MarkdownMonster.csproj">
+        <Private>false</Private>
+        <ExcludeAssets>all</ExcludeAssets>
+    </ProjectReference>
+</ItemGroup>
+```
 
-  <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
-    <AssemblyName>WeblogAddin</AssemblyName>
-    <UseWPF>true</UseWPF>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+Alternately you can also use `<IncludeAssets>` which produces the same result (in this case - not sure what the subtle differences are):
 
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <OutDir>$(SolutionDir)MarkdownMonster\bin\$(Configuration)\$(TargetFramework)\Addins\Weblog</OutDir>
+```xml
+<ItemGroup>
+    <ProjectReference Include="../../MarkdownMonster/MarkdownMonster.csproj">
+        <Private>false</Private>
+        <IncludeAssets>compile</IncludeAssets>
+    </ProjectReference>
+</ItemGroup>
+```
 
-    <Authors>Rick Strahl, West Wind Technologies</Authors>
-  </PropertyGroup>
+This does the right thing which is produce only the compiled output from the current project, plus any direct references from the Addin project:
 
-  <ItemGroup>
-    <!-- Assemblies already referenced by mainline -->
+![](AddinOutput.png)
+
+`WebLogAddin.dll` is the main Addin assembly, and the CookComputing and YamlDotnet DLLs are direct dependencies of the Addin project.
+
+Yay this works.
+
+### All Together Now: Addin Project References
+The key takeaway from all this is:
+
+* The Visual Studio add project **Copy Local** doesn't work as expected
+* It takes both:  
+  `<Private>false</Private>` **and**  
+  `<IncludeAssets>compile</IncludeAssets>`  
+  produce expected **Copy Local** behavior
+
+
+To put all of this Addin project import together for the addin looks something like this:
+
+* Set explicit output path
+* Reference Packages from Main Project without pulling dependencies into output
+* Reference Main Project without pulling in dependencies into output
+
+Here are the key items in the `.csproj` file:
+
+```xml
+<PropertyGroup>
+    <OutDir>$(SolutionDir)MarkdownMonster/bin/$(Configuration)/$(TargetFramework)/win-x64/Addins/Weblog</OutDir>
+</PropertyGroup>
+<ItemGroup>
+     <!-- Transient References explcitly accessed by the Addin Project -->
     <PackageReference Include="MahApps.Metro" version="1.6.5">
+      <!-- keeps assembly output from going into the OutDir -->
       <IncludeAssets>compile</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Dragablz" version="0.0.3.203">
       <IncludeAssets>compile</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" version="1.0.1">
-      <IncludeAssets>compile</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="FontAwesome.WPF" Version="4.7.0.9">
-      <IncludeAssets>compile</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="HtmlAgilityPack" version="1.11.3">
-      <IncludeAssets>compile</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" version="12.0.1">
-      <IncludeAssets>compile</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Westwind.Utilities" version="3.0.26">
-      <IncludeAssets>compile</IncludeAssets>
-    </PackageReference>
-
-    <!-- my dependencies that aren't used by main project 
-         so I'm not using `<IncludeAssets>`                 -->
+    ...
+    
+    <!-- direct project dependencies: These will output should be output into OutDir -->
     <PackageReference Include="xmlrpcnet" version="3.0.0.266" />
     <PackageReference Include="YamlDotNet" version="6.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <!--<ProjectReference Include="$(SolutionDir)MarkdownMonster\MarkdownMonster.csproj" >
-     <IncludeAssets>compile</IncludeAssets>
-    </ProjectReference>-->
-    <Reference Include="$(SolutionDir)MarkdownMonster\bin\$(Configuration)\$(TargetFramework)\MarkdownMonster.exe">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>  
-
-  <ItemGroup>
-    <Resource Include="icon.png" />
-    <Resource Include="icon_22.png" />
-    <Resource Include="MarkdownMonster_Icon_128.png" />
-  </ItemGroup>  
-
-</Project>
+    
+    <!-- Make sure to use Pivate and ExcludeAssets in combination 
+         to prevent dependency output into OutDir                        -->
+    <ProjectReference Include="../../MarkdownMonster/MarkdownMonster.csproj" 
+                      Private="false" 
+                      ExcludeAssets="all" />
+</ItemGroup>
 ```
 
 ##AD## 
 
 ## Harder than it should be
-What I'm describing here is a bit of an edge case because of the way the addins are wired up in my application, but it sure feels like these are a lot of hoops to jump through for behavior that used to work in classic projects by simply specifying an alternate output folder. I also find it very odd that all dependencies are pulled in from an assembly reference (my main Markdown Monster project DLL which references *The World*). 
+This is a re-write of this post with the final solution that was found nearly 3 years later. This is way harder than it should be. I have no idea if this solution was available prior to the current .NET 6.0 release or not but even today finding out how to reference this functionality or even the `ExcludeAssets` flag is nearly impossible. Unless you know what you're looking for you're going to stumble across a lot of dead ends and outdated information from earlier versions of .NET or even earlier versions of .NET Core.
+
+What I'm describing here is a bit of an edge case because of the way the addins are wired up in my application, which is the opposite of most other components (ie. referencing a main executable from a component rather than the other way around).
 
 > To be clear having all assemblies in the output folder doesn't break the application so the default settings **work just fine**. But by default you do end up with a bunch of duplicated assemblies that likely don't want and have to explicitly exclude using the steps provided in this post.
 
-In the end it all works and that that's the important thing, but it's a bit convoluted to make this work and wasn't easy to discover. A few pointers from Twitter is what got me over the hump.
-
-And that's what this post is for - so I (and perhaps you) can come back to this and remember how the heck to get the right incantation to get just the right files copied into the output folder.
+Hopefully this post helps pointing you in the right direction to make it easier to reference other components when you don't want their dependencies dumped into your binary path.
 
 ## Related Resources
 
