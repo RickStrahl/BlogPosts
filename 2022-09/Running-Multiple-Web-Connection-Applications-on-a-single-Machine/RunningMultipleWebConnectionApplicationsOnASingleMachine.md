@@ -36,12 +36,18 @@ Physically separating applications on to separate physical servers is obviously 
   These days with cheap Virtual Machine hosting it's relative easy and cost-effective to completely isolate instances. This is not what this post is about, but it's probably the easiest way to run a duplicate site under all situations.
 
 * **Running Multiple Sites on the Same Server**  
-Running multiple instances of the same application on the same server can be more complicated as there may be some resources that can't easily be shared. File based Web Connection Server apps isolate very well without much effort, but COM based applications are much more complicated due to COM Server limitations that force a single executable to a COM instance. More on this later.
+Running multiple instances of the same application on the same server can be more complicated depending on whether you run in COM or File Mode. File mode installations are easily moved and copied and **just work** in new locations. COM however is more difficult as COM servers cannot be moved and cannot exist in more than one location - it requires multiple duplicated projects to ensure you can isolate the COM servers for each application. 
 
-The focus of this post is on hosting the same Web Connection application multiple times on a local machine, as the separate machine scenario is really no different than a single server install.
+The focus of this post is on **hosting the same Web Connection application multiple times on a local machine**. The separate machine scenario is really no different than a setting up and running a single server which is covered by basic install guidelines.
 
 ## Copying a Web Connection Web Site
+To continue on I will assume the following scenario:
 
+* We have a running Web Site 
+* I'll use the wcDemo sample application as an example
+* We want to create a second  *Staging* instance of the application
+
+This is a common scenario, so that you have a Production site to run the live application that is customer facing and you have a staging site that you can copy updates to for testing before taking the updates live.
 
 
 ## Multi-Site Scenarios
@@ -62,6 +68,37 @@ There's a big difference between using COM and File Mode for the multi-instance 
 If you need to run all multi-instance sites in COM mode things are considerably more complicated. The main reason for this is that COM Servers that are registered are bound to a **single executable** on disk in Windows.
 
 
+* Start with your original Web Connection Server Project
+* Unregister the original COM Server (ie. `wcdemo /unregserver`) to remove the original COM server
+(also make sure this happens on the server)
+* Remove the OLEPUBLIC clause from your wwServer class in the original project
+* Copy the Main program (ie. `wcDemoMain.prg`) and rename to `wcDemoMain2.prg`
+* Change the class definition to:
+    ```foxpro
+    DEFINE CLASS wcDemoServer1 from wcDemoServer OLEPUBLIC
+    ENDDEFINE
+    ```
+* Remove all the code below the the class definition.
+* At the top of the Main file add SET PROCEDURE TO `wcDemoMain.prg`
+* Rename all references to `wcDemoMain` to `wcDemoMain1` in the Main file
+* Build the project - twice
+* This should pull in all of the framework and process classes and dependencies
+* Fix any missing files in the compilation by adding explicitly
+
+If you have referenced all dependencies your project should now build and you should now have one new copy of your COM server.
+
+Now duplicate the steps above for the second and third or X number of servers - each time replacing the name of the server with wcDemoServer2, wcDemoServer3 etc. The projects will be named `wcDemo1`, `wcDemo2` etc. and the main program for each will be `wcDemoMain1`, `wcDemoMain2` etc.
+
+> You can name the servers and support files anything you want - you could go with `wcDemoProduction`, `wcDemoStaging` instead of `wcDemo1`, `wcDemo2`. Just make sure to use consistent naming so that you can keep the names straight - you will end up with a lot of similarly named files so keeping things organized is key. 
+
+Essentially you end up with new EXEs for each of the projects with unique COM Prog Ids for each of the EXEs. 
+
+
+
+
+
+
+* 
 
 
 #### File Based Operation is Easy
