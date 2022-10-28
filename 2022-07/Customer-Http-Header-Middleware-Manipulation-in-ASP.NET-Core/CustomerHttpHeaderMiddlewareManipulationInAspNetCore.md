@@ -10,7 +10,7 @@ dontStripH1Header: false
 postStatus: publish
 featuredImageUrl: https://weblog.west-wind.com/images/2022/Customer-Http-Header-Middleware-Manipulation-in-ASP.NET-Core/HeaderBanner.jpg
 permalink: https://weblog.west-wind.com/posts/2022/Jul/07/Back-to-Basics-Custom-HTTP-Response-Header-Manipulation-in-ASPNET-Core
-postDate: 2022-07-07T11:39:57.7380928-07:00
+postDate: 2022-07-07T08:39:57.7380928-10:00
 ---
 # Back to Basics: Custom HTTP Response Header Manipulation in ASP.NET Core
 

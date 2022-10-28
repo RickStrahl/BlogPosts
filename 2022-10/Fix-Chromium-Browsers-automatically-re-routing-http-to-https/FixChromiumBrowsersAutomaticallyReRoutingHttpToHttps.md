@@ -11,6 +11,11 @@ postStatus: publish
 featuredImageUrl: https://weblog.west-wind.com/images/2022/Fix-Chromium-Browsers-automatically-re-routing-http-to-https/ChainLinkBanner.jpg
 permalink: https://weblog.west-wind.com/posts/2022/Oct/24/Fix-automatic-rerouting-of-http-to-https-on-localhost-in-Web-Browsers
 postDate: 2022-10-24T15:28:14.3335732-10:00
+customFields:
+  mt_githuburl:
+    id: 
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2022-10/Fix-Chromium-Browsers-automatically-re-routing-http-to-https/FixChromiumBrowsersAutomaticallyReRoutingHttpToHttps.md
 ---
 # Fix automatic re-routing of http:// to https:// on localhost in Web Browsers
 
