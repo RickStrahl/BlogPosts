@@ -53,7 +53,7 @@ The following is accessing a site on `localhost` **that is not set up for HSTS**
 
 ![](HttpsRedirectFromNonHttpsSite.png)
 
-You can see that even so the browser immediately redirects to `https://` not even hitting the server - it looks like it's creating a fake redirect on the client as the server is not automatically redirecting. If you go to this same site when no HSTS caching is active from the ASP.NET Core site previously, it loads fine in `http://`. But now with HSTS applied to the ASP.NET Core site, the root site that doesn't use HSTS doesn't work.
+You can see that even though the browser immediately redirects to `https://` not even hitting the server - it looks like it's creating a fake redirect on the client as the server is not automatically redirecting. If you go to this same site when no HSTS caching is active from the ASP.NET Core site previously, it loads fine in `http://`. But now with HSTS applied to the ASP.NET Core site, the root site that doesn't use HSTS doesn't work.
 
 ##AD##
 
@@ -105,14 +105,16 @@ There are a few approaches you can take to this issue on in addition to the fixe
 ### Use Https for all Things
 The obvious solution is to use `https://` all the things, even on localhost. This is getting a bit easier these days as more and more development tools provide easier ways to either use private certificates, or run servers that automatically install local dev certificates for you on installation (like .NET does these days) or offer built in dev certificate management. 
 
-This by far the best solution, but if you're working on legacy applications that might be using an old server like full IIS or IIS Express without a pre-installed SSL certificate this is easier said than done. Creating of local self-signed certificates is still a pain in the ass especially on Windows.
+If you're using .NET for development, there's no reason to not use `https://` for development since it provides integrated development certificates and the default project templates even have options to set up the local site for `https` (which enables HSTS ironically which isn't exactly the same as 'enabling https` only).
 
-Also most client side frameworks (VueJs and Angular is what I use) certainly don't default to https and don't offer native tools, although there are dev pipeline plug-ins that do provide integration. The problem isn't that there isn't a solution, but that the problem is not real obvious to even reach for that solution eventually. It seems that eventually we need to get to a point where every tool automatically uses Https for its local development setup/dev servers. 
+This is not as common yet for client side development tools like Vue or Angular, but there are platform specific packages for most environments. For example, for Vue you can use Vite mkCert Plugin which adds a local dev certificate when you run the app. I suspect more integrated solutions for this are coming in the future so `https://` works right out of the box for local servers on any framework.
 
-It pays off to spend a little time to see if you can get Https to work with your local solution - it just might save some of these unpredictable further down the line.
+Using `https://` is by far the best solution, but if you're working on legacy applications that might be using an old server like full IIS or IIS Express without a pre-installed SSL certificate this is easier said than done. Creating of local self-signed certificates is still a pain in the ass especially on Windows and for those scenarios the steps above should be helpful to - at least temporarily - clear out the cached HSTS settings.
+
+It pays off to spend a little time to see if you can get `https` to work with your local Web Server - it just might save some of these unpredictable behaviors further down the line.
 
 ### Disable HSTS for Local Dev
-If HSTS is the problem one thing you can do is try to not send the HSTS headers when doing local development. Either set an explicit flag or differentiate between explicit
+If HSTS is the problem, one thing you can do is try to not send the HSTS headers when doing local development. Either set an explicit flag or differentiate between explicit
 
 If you are using a tool that supports HSTS, it might be a good idea to disable it on the local machine so that it **doesn't pollute other applications on localhost**. 
 
@@ -137,13 +139,17 @@ if (wsApp.Configuration.System.UseHsts)
 ```
 
 ### `thisisunsafe` Security ByPass Hack
-This hack is a weird one: If you get a security dialog that you cannot bypass like the one above for `localhost` and `https://` access with a certificate error, you can type `thisisunsafe` anywhere in the active browser window's Viewport. Yes - anywhere as long as the active browser window has focus. Then just type - invisibly - `thisisunsafe` into the browser and refresh the page.
+This is an aside that I found useful while I was tracking down this problem before I figured out that the HSTS tracking was an issue.
 
-The page should now come up and display your content. You'll still see the broken security icon in the address bar, but the page loads and works otherwise. This has the same effect as clicking on that button that says *I accept the risks*.
+There's a hack that allows you to bypass various security issues including using an invalid certificate. This hack is a weird one: If you get a security dialog that you cannot bypass like the one above for `localhost` and `https://` access with a certificate error, you can type `thisisunsafe` anywhere in the active browser window's Viewport. Yes - anywhere as long as the active browser window has focus. Then just type - invisibly - `thisisunsafe` into the browser and refresh the page.
+
+The page should now come up and display your content. You'll still see the broken security icon in the address bar, but the page loads and works otherwise. This has the same effect as clicking on that button that says *I accept the risks*. 
+
+
 
 Once you've done this, the security setting is cached for some time so repeated restarts of the browser continue to bring up the page without the blocking insecure warning page.
 
-This won't help you if you have no `https://` binding at all on the server because the server will just not allow the connection on port 443, but you can apply even a non-verified certificate and use this feature to get past it.
+> This hack won't help you if you have no `https://` binding at all on the server because the server won't be listening on the https port. It will however work if the server **is** responding on that port but without or with a non-validated certificate.
 
 It's not a good idea to use this 'out' as there's obviously a security issue. Better to fix the problem at the root and hopefully the HSTS fix above might provide the clean if temporary fix. If however you just don't have a workaround this `thisisunsafe` hack is one way to get on with life.
 
