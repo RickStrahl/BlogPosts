@@ -11,6 +11,11 @@ postStatus: publish
 featuredImageUrl: https://weblog.west-wind.com/images/2022/Use-ShadowCopyDirectory-on-IIS-with-ASP.NET-To-Avoid-WebDeploy-Locking-Issues/DeployBoat.jpg
 permalink: https://weblog.west-wind.com/posts/2022/Nov/07/Avoid-WebDeploy-Locking-Errors-to-IIS-with-Shadow-Copy-for-ASPNET-Core-Apps
 postDate: 2022-11-07T11:11:36.1551532-10:00
+customFields:
+  mt_githuburl:
+    id: 
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2022-10/Use-ShadowCopyDirectory-on-IIS-with-ASP.NET-To-Avoid-WebDeploy-Locking-Issues/UseShadowcopydirectoryOnIisWithAspNetToAvoidWebdeployLockingIssues.md
 ---
 # Avoid WebDeploy Locking Errors to IIS with Shadow Copy for ASP.NET Core Apps
 

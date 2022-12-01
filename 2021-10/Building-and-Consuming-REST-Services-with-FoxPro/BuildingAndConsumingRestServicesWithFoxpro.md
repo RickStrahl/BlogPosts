@@ -75,11 +75,13 @@ HTTP is very prominently used in today's modern applications even outside of the
 ### HTTP: Same as it ever was
 The HTTP protocol is used to send and retrieve data in a simple, one-way transactional manner: A request is made with headers and content, and a response is returned also with headers and content. It's still the nearly same stateless, distributed protocol that was originally created in the early 1990's.
 
-Requests only **go one way from the client to the server**. While the server can return data from in response to a request, it **cannot independently call back to the client**. There are other ways to do this namely using *Web Sockets* that are built on top of HTTP, but that's a separate protocol and not applicable to REST.
+Requests only **go one-way from the client to the server and back** in single transactional request. While the server can return data as a response to a request, it **cannot independently call back to the client outside of a transactional request**. There are other mechanisms to do this namely using HTTP **Web Sockets** that are also built on top of HTTP, but that's a separate protocol and not applicable to REST.
 
-It's important to remember that **HTTP is inherently stateless** - each request has to provide its own context to the server as each request opens and closes a connection to the server. There's no explicit persistent state across requests unless some mechanism like HTTP Cookies or custom headers are used between requests. It's unusual though to use these mechanisms for APIs - API clients tend to keep state in the context of the application and then send it as part of the request or the request headers which most commonly includes authentication in the form of auth tokens.
+It's important to remember that **HTTP is inherently stateless** - each request has to provide its own context to the server as each request connects to the server. There's no explicit persistent state across requests, unless some mechanism like HTTP Cookies or custom headers are used to store state explicitly between requests. It's unusual though to use these state mechanisms for APIs - API clients tend to keep any persistant state in the context of the client application, and then send it as part of the request or the request headers or authentication headers.
 
 ### Request and Response
+An HTTP Request is the unit of work for REST operations and the Request makes up the 'protocol' for REST.
+
 Here's what the HTTP Request and Response are made up of:
 
 **Request**
@@ -92,7 +94,7 @@ Here's what the HTTP Request and Response are made up of:
   *but can be any other raw data (xml, binary, form data)*
 
 **Response**
-
+* HTTP Status Code
 * HTTP Response Headers
 * Response Body
 
