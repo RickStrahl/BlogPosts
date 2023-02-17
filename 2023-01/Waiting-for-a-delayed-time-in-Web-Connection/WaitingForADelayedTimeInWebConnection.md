@@ -1,5 +1,5 @@
 ---
-title: Delaying or Waiting Code in Web Connection Applications
+title: Delaying or Waiting on Code in Web Connection Applications
 abstract: Sometimes it's necesasry to wait for an external operation to complete, and when using Web Connection you have to be careful to do the right thing to avoid  running into problems with user interface operations that might fail in COM mode. In this post I talk about different types of wait operations that you can use safely and how you should really try hard to minimize wait operations in your applications.
 categories: Web Connection
 keywords: Delay, Wait Window, Web Connection, COM, SYS(2335)
@@ -11,7 +11,9 @@ postStatus: publish
 featuredImageUrl: https://west-wind.com/wconnect/weblog/imageContent/2023/Waiting-for-a-delayed-time-in-Web-Connection/ComModeUIOperationError.png
 postDate: 2023-01-12T15:53:06.1482795-10:00
 ---
-# Waiting for a delayed time in Web Connection
+# Delaying or Waiting on Code in Web Connection Applications
+
+![Banner: Expect Delays](ExpectDelaysBanner.png)
 
 Here's a question that comes up quite frequently:
 
@@ -44,11 +46,13 @@ Not what you want...
 UI support is one of the few things that behave differently in file and COM modes, and while COM mode **can actually support UI operations** if you don't have `SYS(2335, 0)` set, you typically **want to enable that flag** to avoid having your application hang on 'accidental' application or system dialogs that might trigger on file access or locking or other errors.
 
 > #### SYS(2335): Unattended COM Mode
-> Web Connection by default sets an `UnattendedComMode=on` flag in your application's `yourApp.ini` file, to enable unattended mode when running in COM. When enabled any operation that uses FoxPro's user interface whether explicit via things like `WAIT WINDOW` calling `MESSAGEBOX` or the file open dialog, or implicit such as an error that can't find a database file, or a file locking operation that normally pop up a user interface.
+> Web Connection by default sets an `UnattendedComMode=on` flag in your application's `yourApp.ini` file, to enable **Unattended Com Mode**. 
+>
+>When enabled any operation that uses FoxPro's user interface whether explicitly via things like `WAIT WINDOW`, calling `MESSAGEBOX` or a file open dialog, or implicit such as an error that can't find a database file, or a file locking operation that normally pop up a user interface.
 > 
-> Instead when `SYS(2335, 0)` is set, the COM server throws an error when the UI operation occurs (shown above).
+> When `SYS(2335, 0)` is set, the COM server **throws an error when the UI operation occurs**. That error can be trapped like any other error, but it allows the application to continue instead of hanging on the UI dialog.
 > 
-> This is one of the few differences between file and COM modes, so be aware of this discrepancy. It's a good idea to test your application in COM while you're working on it occasionally to make sure you don't miss an issue like this.
+> In File Mode `SYS(2335,0)` has no effect: This is one of the few differences between file and COM modes, so be aware of this discrepancy. It's a good idea to test your application in COM occasionally, to make sure you don't miss these slight differences.
 
 
 ## Safely adding a Delay to your Code

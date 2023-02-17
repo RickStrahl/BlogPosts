@@ -9,23 +9,41 @@ dontInferFeaturedImage: false
 dontStripH1Header: false
 postStatus: publish
 featuredImageUrl: https://weblog.west-wind.com/images/2022/Fix-localhost-not-working-with-https-for-Development/EdgeConnectionNotPrivate.png
-permalink: https://weblog.west-wind.com/posts/2022/Sep/21/Work-around-localhost-unsecured-HTTPS-access-for-Development-Sites-in-Edge
-postDate: 2022-09-21T21:48:13.3114210-07:00
+permalink: https://weblog.west-wind.com/posts/2022/Oct/24/Fix-automatic-rerouting-of-http-to-https-on-localhost-in-Web-Browsers
+postDate: 2022-09-21T18:48:13.3114210-10:00
 ---
 # Work around localhost unsecured https access for Development Sites in Edge
 
 ![](EdgeConnectionNotPrivate.png)
 
-[Microsoft Edge](https://www.microsoft.com/en-us/edge) in recent versions has gotten really annoying when it comes to accessing local Dev sites for development. The problem appears to be that Edge automatically forces `http://` requests to `https://` and then no longer allows bypassing an invalid local dev certificate as other Chromium browsers allow you to do (and Edge used to).
+I've run into a lot of problems recently when it comes to accessing local Dev sites for development. The problem is that the browser automatically forces `http://` requests to `https://`. Because this usually happens on a site that does not have a certificate there's a hard SSL page error. And to make things worse there's no longer allows a bypass option on the page that lets step around the issue as you often can with other protocol or certificate based errors.
 
-Depending on what development tools you use this may or may not be a problem. If you're using .NET Server development you can easily set up local development certificates and install them via the  `dotnet dev-certs https import` command. Once installed `https://` connections just work locally using the Kestrel Web server. Unfortunately other tools are not so complete.
+The cause of this is typically related to an application that locally uses `HSTS`, which an HTTP security protocol used to force a domain that uses it to automatically redirect `http://` requests to `https://`. This is fine for the application using HSTS because it knows and intends this behavior and as a result likely has a certificate setup both on the live site and is running on `https://` locally as well. 
 
-I've been working with a Vue application lately and have been muddling through the lack of a valid  certificate - partly because I've been too lazy to figure out how to install a certificate. I've been using one of the hacks described below to get around the limitations in Edge.
+But insidiously **the HSTS protocol caches and applies itself to the entire domain beyond the lifetime of the running application**, and if the domain you are running the HSTS app on happens to be `localhost` it can end up affecting a whole lot of other things that have nothing to do with HSTS themselves. 
+
+## Side Effects, Side Effects
+HSTS can affect other applicationS on localhost such as other 'dev' servers and locally triggered Web pages like those used for desktop logins for many applications. For example, I ran into problems like the Angular and Vue dev servers which by default do not use `https://`. If HSTS was triggered and cached say by my .NET application I ran on localhost a week ago, the Angular or Vue local dev server apps will fail to run. They'll redirect to `https://` without a certificate and fail. There are workarounds for that by installing addins that provide local certificates and `https://` dev server ports, but it certainly is not obvious or built-in.
+
+What's even worse and more disruptive is that many applications these days use a local Web page on `localhost` in order to handle their OAuth/OpenID Connect authentications. For example, just today I ran into problems with authentication with the Git Credentials Helper, and the Azure Storage Explorer both of which open the default browser with a `http://localhost:port` address to validate the OAuth token. Both of these fail and become unusable when HSTS is cached on `localhost`. That sucks!
+
+In short, if HSTS gets enabled on `localhost` it can affect a lot of other applications that have nothing to do with `HSTS`.
+
+## Causes
+Depending on what development tools you use this may or may not be a problem. If you don't use HSTS in your local development it's unlikely this will be a problem. But if you're building .NET applications for example, it enables `HSTS` by default:
+
+```cs
+app.UseHsts();
+```
+
+This is fine for .NET server development as you can easily set up local development certificates and install them via the  `dotnet dev-certs https import` command. Once installed `https://` connections just work locally using the Kestrel Web server. Unfortunately other tools are not so complete.
+
+By doing the above in your app unconditionally you can inadvertently trigger the HSTS related problems for your entire `localhost` tool chain. I've done this and have run into a number of problems.
 
 This post describes some of the issues with the requirements that Edge has for using `https://` on localhost and for working with `https://` requests if you don't have certificate installs and that cannot be easily just ignored in Edge.
 
-## Localhost HTTPS Hell in Edge
-There are a couple of problems with Edge's handling of the Vue server:
+## Localhost HTTPS Hell 
+Intially I ran into this problem with my local Vue dev server and there are a couple of problems with the handling the issue. The browser:
 
 * Doesn't allow to override an Invalid Certificate
 * Doesn't allow access to a plain `http://localhost` URL
@@ -56,7 +74,7 @@ The `https://` certificate behavior on localhost seems to be specific to Edge, a
 Not so in Edge!
 
 ### localhost `http://' links get forced to `https://`
-So you might think - screw all this `https://` bullshit, lets just use plain old `http://`. You Heathen, you! `http://` is so frowned upon these days.
+So you might think - screw all this `https://` bullshit, lets just use plain old `http://`. You Heathen, you! 
 
 So for the Vite server, if I don't use the `--https` flag and serve plain `http://` content, I have another problem: Going to `http://localhost:3000` Edge immediately redirects me to `https://localhost:3000` and then fails with a protocol error:
 
@@ -65,6 +83,8 @@ So for the Vite server, if I don't use the `--https` flag and serve plain `http:
 The error makes sense at the `https://` link - the server is not serving `https://` but Edge insists on going there, and then of course there's no response from port 443.
 
 The point is by default you really can't use `http://localhost` anymore as Chromium browsers  always redirect to `https://`.
+
+This is the HSTS trap with the cached HSTS headers applying to this non-HSTS site. Are we having fun yet?
 
 **Heads you win, tails I lose!**
 
@@ -76,7 +96,7 @@ The redirect behavior seems to be common to all Chromium Browsers now (FireFox a
 >But for localhost it's not quite a simple. Setting up certificates for a local site is a pain  - especially for Windows. So why this insistence on making life more difficult when http:// would clearly suffice for a local development setup?
 
 
-### Solved: HSTS Caching for Localhost
+### Solved: Clear the HSTS Cache for Localhost
 As it turns out this the `http://` redirection problem is not a universal problem, but related to a very specific problem with  `HSTS` policy that is applied to **all of localhost** and cached if an application sets it. 
 
 Jesper Blad Jensen pointed this out on Twitter in reply to my post:

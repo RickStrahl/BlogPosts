@@ -19,6 +19,8 @@ customFields:
 ---
 # Avoid WebDeploy Locking Errors to IIS with Shadow Copy for ASP.NET Core Apps
 
+*<small style="color: red">Updated for .NET 7.0 - Feb 9, 2023</small>*
+
 ![Rocky Deployment - boat sliding off launch ramp](DeployBoat.jpg)
 
 If you're self-hosting ASP.NET Core applications on IIS and using WebDeploy to publish to the server, you've very likely run into the dreaded locked file problem on the server. You start to publish to the server, and the publish fails half way through, with an File in Use error because files on the server are locked. 
@@ -75,14 +77,16 @@ The following shows values for:
 ### ASP.NET Core doesn't use Shadow Copying by Default
 ASP.NET Core doesn't use Shadow Copying by default and as a result - even with `AppOffLine.html` it's frequent to see publish operations on IIS fail.  
 
-The good news is that as of .NET 6.0 shadow copying is back - albeit as an experimental and optional feature that nevertheless works as advertised.
+The good news is that as of .NET 6.0 shadow copying is back - albeit as an experimental and optional feature that nevertheless works as advertised. As of .NET 7.0 this is an officially supported, non-experimental feature.
 
 The shadow copying behavior in ASP.NET Core is provided as part of the ASP.NET Core IIS Hosting Module (ANCM) that manages hosting .NET Core application inside of IIS. This module behavior handles monitoring the Web folder for changes and copying files to a new temporary location, then re-launching the ASP.NET Core application and referencing all binaries **from that temporary folder**.
 
 ### Enabling Shadow Copy Folders in .NET 6.0+
-Shadow Copy deployment is a **new, experimental feature in .NET Core 6.0** using experimental keys you set in `web.config`. This feature is implemented at the .NET Core IIS Module level and configured via configuration settings in the `<aspNetCore>` key in `web.config`
+Shadow Copy deployment is a **new, experimental feature in .NET Core 6.0 and an official feature in .NET 7.0** using a set of `<handlerSettings>` keys in `web.config`. This feature is implemented as part of the **ASP.NET Core IIS Module (ANCM)** and configured via configuration settings in the `<aspNetCore>` key in `web.config`.
 
-Although it's marked 'experimental', after implementing this on several of my own IIS applications, I can safely say that it works without any issues for me and I get now reliable deploys that don't get hung up on file locking errors. This is in contrast to the frequent and somewhat random `ERROR_FILE_IN_USE` errors I was getting previously. I'd say roughly 3 out of 10 installs would fail for me prior to using Shadow Copy. No lock failures any more.
+After implementing this on several of my own IIS applications since the early .NET 6.0 days, I can safely say that it works without any issues for me and I get now reliable deploys that don't get hung up on file locking errors. 
+
+This is in contrast to the frequent and somewhat random `ERROR_FILE_IN_USE` errors I was getting previously. I'd say roughly 3 out of 10 installs would fail for me prior to using Shadow Copy. Now, no locking failures any more.
 
 **So yay, Shadow Copy!!!**
 
@@ -96,13 +100,20 @@ Because Shadow Copy is not an application feature, it's not set in your .NET Cor
             stdoutLogFile=".\logs\stdout" >
 
  <handlerSettings>
-   <handlerSetting name="experimentalEnableShadowCopy" value="true" />
+   <handlerSetting name="enableShadowCopy" value="true" />
    <handlerSetting name="shadowCopyDirectory"       
                    value="../ShadowCopyDirectory/" />
  </handlerSettings>
  
 </aspNetCore>
 ```
+
+> Shadowing copying is officially supported in .NET 7.0 and later. In .NET 6.0 it was an experimental feature and marked as such in the key settings:
+> ```xml
+> <!-- in .NET 6.0 use this instead -->
+> <handlerSetting name="experimentalEnableShadowCopy" value="true" />
+> ```
+> It also appears that the experimental key still works in .NET 7.0 for now.
 
 You enable the feature and provide a folder name. The folder name can be a relative path as in the example, or a fully qualified OS path.  You can point multiple applications at the same Shadow Copy folder, as the unique temporary folders are created underneath that folder with a unique ID.
 
@@ -115,6 +126,16 @@ Each application and each 'change' in the application generates a new shadow cop
 All of this works very well and has eliminated any publish errors for me due to file locking. This is a simple fix for an annoying problem and I'm very glad to see Shadow Copying again supported for publishing.
 
 Again: **Yay!**
+
+### Caveat: Permissions Required for ShadowCopy Folder!
+In order for shadow copying to work you have to make sure that the IIS Application Pool Identity account has full access to create folders, and write files in the ShadowCopy folder. 
+
+It's best to create the folder that will be used and then assign the appropriate full access permissions to that folder.
+
+#### ApplicationPoolIdentity: Choose a different Account
+Note that this can be problematic if you use the default `ApplicationPoolIdentity` account, which isn't a standard Windows account and that has practically no machine rights whatsoever. It won't be covered even if you were to assign `EveryOne` for full rights on the ShadowCopy folder (which I wouldn't recommend in any situation - be precise with your full rights assignments!).
+
+`ApplicationPoolIdentity` also doesn't show up in the Windows account list so you can't easily assign permissions to a folder for it. There are ways to make that work (using raw ACLs), but it's probably easier to switch to an explicit account for your application pool either by creating a new account with the exact permissions you need or using one of the Windows generic accounts like `NetworkService`.
 
 ### Potential Problems with Shadow Copying
 While Shadow Copying has fixed all of my issues, and I haven't run into any issues personally, it's important to point out that **there can potentially be some issues** that have to do with timing the file copy operation properly and the new location assemblies run out of.
