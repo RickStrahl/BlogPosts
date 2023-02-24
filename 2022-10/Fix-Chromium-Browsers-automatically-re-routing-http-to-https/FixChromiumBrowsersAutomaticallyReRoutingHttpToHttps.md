@@ -1,5 +1,5 @@
 ---
-title: Fix automatic re-routing of http:// to https:// on localhost in Web Browsers
+title: 'HSTS: Fix automatic re-routing of http:// to https:// on localhost in Web Browsers'
 abstract: If you're doing local Web develop with multiple development tools you've probably run into a problem where you end up not being able to access a local site via unsecured `http://` requests and automatically get redirected to `https://` no matter what you try. If you don't have a certificate set up for the site you may not even be able to access the site at all. Turns out this usually is due to HSTS which is a nasty little bugger of a security protocol that is applied universally to a domain even in applications that don't use HSTS. In this post I discuss how HSTS works and why it can be a problem for local development as well as how to clear out the HSTS cache or avoid using it locally.
 categories: ASP.NET, Security
 keywords: HSTS, http, https, re-routing, Chromium
@@ -11,13 +11,8 @@ postStatus: publish
 featuredImageUrl: https://weblog.west-wind.com/images/2022/Fix-Chromium-Browsers-automatically-re-routing-http-to-https/ChainLinkBanner.jpg
 permalink: https://weblog.west-wind.com/posts/2022/Oct/24/Fix-automatic-rerouting-of-http-to-https-on-localhost-in-Web-Browsers
 postDate: 2022-10-24T15:28:14.3335732-10:00
-customFields:
-  mt_githuburl:
-    id: 
-    key: mt_githuburl
-    value: https://github.com/RickStrahl/BlogPosts/blob/master/2022-10/Fix-Chromium-Browsers-automatically-re-routing-http-to-https/FixChromiumBrowsersAutomaticallyReRoutingHttpToHttps.md
 ---
-# Fix automatic re-routing of http:// to https:// on localhost in Web Browsers
+# HSTS: Fix automatic re-routing of http:// to https:// on localhost in Web Browsers
 
 ![](ChainLinkBanner.jpg)
 
@@ -107,7 +102,18 @@ The obvious solution is to use `https://` all the things, even on localhost. Thi
 
 If you're using .NET for development, there's no reason to not use `https://` for development since it provides integrated development certificates and the default project templates even have options to set up the local site for `https` (which enables HSTS ironically which isn't exactly the same as 'enabling https` only).
 
-This is not as common yet for client side development tools like Vue or Angular, but there are platform specific packages for most environments. For example, for Vue you can use Vite mkCert Plugin which adds a local dev certificate when you run the app. I suspect more integrated solutions for this are coming in the future so `https://` works right out of the box for local servers on any framework.
+You can do the following to clear out certificates and create new ones:
+
+```ps
+# if corrupted you can clean out certs first and recreate
+# dotnet dev-certs https --clean
+
+dotnet dev-certs https --trust
+```
+
+[More info...](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-dev-certs)
+
+This is not as common yet for client side development tools like Vue or Angular out of the box, but there are platform specific packages for most environments. For example, for Vue you can use [Vite mkCert Plugin](https://github.com/liuweiGL/vite-plugin-mkcert) which adds a local dev certificate when you run the app. I suspect more integrated solutions for this are coming in the future so `https://` works right out of the box for local servers on any framework.
 
 Using `https://` is by far the best solution, but if you're working on legacy applications that might be using an old server like full IIS or IIS Express without a pre-installed SSL certificate this is easier said than done. Creating of local self-signed certificates is still a pain in the ass especially on Windows and for those scenarios the steps above should be helpful to - at least temporarily - clear out the cached HSTS settings.
 

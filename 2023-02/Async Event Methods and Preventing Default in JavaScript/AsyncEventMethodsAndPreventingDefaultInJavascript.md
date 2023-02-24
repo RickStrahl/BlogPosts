@@ -118,9 +118,9 @@ Isn't async simple? 😄
 
 And that *seemed* to work at first. 
 
-I didn't notice it right away, but navigation now fired into the host application to do the external navigation (good), but... the internal browser also navigated to the linked page (bad). 
+I didn't notice it right away, but navigation now fired into the host application to do the external navigation (good), but... **the internal browser also navigated to the linked page (bad)**. 
 
-The code is **supposed to not navigate** because of the `e.preventDefault()` block and `return false`. That code **is executed**, but `e.preventDefault()` has no effect.
+The code is **supposed to not navigate** because of the conditional `e.preventDefault()` block and `return false`. That code **is executed**, but `e.preventDefault()` has no effect.
 
 What's going on here?
 
@@ -134,28 +134,28 @@ In hindsight that makes sense:
 * the `await` call executes out of band
 * the event completes before the first `await` call
 
-What this means is that `click` event completes before the first `await` call. 
+What this means is that `click` event completes before the first `await` call. Anything you do to event after the `await` is called is ignored!
 
-In my code above this means that the `e.preventDefault()` and `return false` have no effect, because the event is already done and has already navigated the document. The code after the `await` still executes, but it is now effectively executing **out-of-band** outside of the original event context.
+In my code `e.preventDefault()` and `return false` have no effect, because it fires after the `await` call and the event is already done and the href click has already navigated the document. The code after the `await` still executes, but it is now effectively executing **out-of-band** outside of the original event context and thus has no effect.
 
 In simple terms: The `click` event is not waiting for the `await` call to complete before completing.
 
-And the result is: Both my .NET code which navigates the external browser fires, as well as the local document which now also navigates to the same page.
+The end result is: Both my .NET code **and** the browser navigate which is exactly what this code was trying to prevent in the first place.
 
 Not what I want!
 
 ## Work around Async Event State 
-In hindsight this is fairly obvious. The `await` introduces a wait state and context switch, so the event completes before the await and the code following it runs. But, if you're converting code from sync, this is often **anything but obvious**.
+In hindsight this is fairly obvious. The `await` introduces a wait state and context switch, so the event completes before the `await`. The event related code post `await` still runs and doesn't fail, but also has no effect. 
 
-Knowing the behavior now, the key is to take over the event interaction directly, by handling the link navigation manually rather than relying on the event to trigger the navigation. So instead of using `preventDefault()` conditionally, I can **always disable navigation** at the start of the event, and then manually navigate the document or not all depending on my application logic.
+Makes sense once you know the behavior, but especially if you're converting code from sync, this is often **anything but obvious**.
 
-For `<a>` links this is easy to do, for other UI events this may be trickier.
+Knowing the behavior now, the key to make this work is to take over the event interaction directly, by handling the link navigation manually rather than relying on the event to trigger the navigation. So instead of using `preventDefault()` conditionally, I can **always disable navigation** by calling `preventDefault()` before the `await` where it has an actual effect on the event. Then in the code following the `await` I can check the result value and if necessary, manually navigate the document or not all depending on my application logic.
 
-The key is to **fire e.preventDefault() before the await** call, so it is applied to the event before it completes.
+For `<a href>` links this is easy to do, for other UI events this may be trickier.
 
-Then make the `await` call for the external navigation.
+The key is to **fire e.preventDefault() before the await** call, so it is applied to the event before it completes. In some cases you can move the logic prior to the await which would be optimal. In my case I had to use the await to decide on whether the event aborts, so I had to take over the entire event handling using my own code - manual navigation in this case.
 
-If the external navigation doesn't handle the navigation completely, I can then manually navigate the document. Here's what this logic looks like:
+Here's what this looks like for the above code:
 
 ```javascript
 document.addEventListener("click", async function (e) {
@@ -180,14 +180,14 @@ document.addEventListener("click", async function (e) {
     // document hash navigation if we opened MD document
     if (el.hash) {
         if (!navigateHash(el.hash))
-            return;
+            return;   // no browser nav
     }
 
     // navigate manually if not handled
     if (!handled)
        window.location.href = url;
     
-    return;
+    return;  //  no browser nav
 });
 ```
 
@@ -200,7 +200,9 @@ If the result is not handled I then manually navigate the browser to the new loc
 ## Summary
 At the end of the day async code is not sync code even if `async` and `await` sometimes can lull you into thinking that it is. Behind the scenes the code is still asynchronous and **it will change the way the code executes**. And that can have side effects. 
 
-In the example the side effect is that the `event` object's state was already applied by the time the `await` call returns and any further state changes on the event properties/methods are ignored. If you need to access that behavior after the fact, you may have to find another way.
+In the example the side effect is that the `event` object's state was already applied by the time the `await` call returns and any further state changes on the event properties/methods are ignored. If you need to access that behavior after the fact, you may have to find another way to perform the default event behavior conditionally.
+
+Now I know and you do too - and I'll likely make this mistake again, regardless :smile: But hopefully I find this solution a little quicker next time around.
 
 <div style="margin-top: 30px;font-size: 0.8em;
             border-top: 1px solid #eee;padding-top: 8px;">
