@@ -11,6 +11,11 @@ postStatus: publish
 featuredImageUrl: https://weblog.west-wind.com/images/2023/Basic-Machine-Hardware-information-for-Exception-Logging/ErrorInVsCode.png
 permalink: https://weblog.west-wind.com/posts/2023/Feb/02/Basic-Windows-Machine-Hardware-information-from-WMI-for-Exception-Logging-from-NET
 postDate: 2023-02-02T09:53:14.7619754-10:00
+customFields:
+  mt_githuburl:
+    id: 
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2023-02/Basic-Machine-Hardware-information-for-Exception-Logging/BasicMachineHardwareInformationForExceptionLogging.md
 ---
 # Basic Windows Machine Hardware information from WMI for Exception Logging from .NET
 Recently I've been running into problems with a couple of my WPF applications which appear to be hardware related - specifically due to two things:

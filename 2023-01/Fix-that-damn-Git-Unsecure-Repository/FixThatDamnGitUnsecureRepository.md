@@ -34,7 +34,7 @@ This change in Git came about due a security issue which allows parent repositor
 There are a number of solutions for this problem.
 
 * [`git config` Command](#git-config-command-fix)
-* [`.gitignore` Safe Folder List](#gitconfig-safe-folders)
+* [`.gitconfig` Safe Folder List](#gitconfig-safe-folders)
 * [Developer Tools can set Safe Repo Status](#some-developer-tools-can-automatically-trust-repositories)
 * [Change Folder Ownership](#folder-ownership)
 

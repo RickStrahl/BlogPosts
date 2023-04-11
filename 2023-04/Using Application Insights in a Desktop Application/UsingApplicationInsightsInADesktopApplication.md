@@ -11,6 +11,11 @@ postStatus: publish
 featuredImageUrl: https://weblog.west-wind.com/images/2023/Using-Application-Insights-in-a-Desktop-Application/ApplicationInsightsAncientLoupe.jpg
 permalink: https://weblog.west-wind.com/posts/2023/Apr/10/Using-Application-Insights-in-a-Desktop-Application
 postDate: 2023-04-10T09:26:38.0908155-10:00
+customFields:
+  mt_githuburl:
+    id: 
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2023-04/Using%20Application%20Insights%20in%20a%20Desktop%20Application/UsingApplicationInsightsInADesktopApplication.md
 ---
 # Using Application Insights in .NET Desktop Applications
 
@@ -27,9 +32,7 @@ The needs of my desktop applications for analytic logging tend to be pretty basi
 
 The error logging breaks down into multiple types of logging from hard application failure logging (critical) to known and well understood logging of application 'incidents' plus a very few trace messages.
 
-To be clear, this post isn't meant to cover all aspects of Application Insights. In fact, I'm going to be describing my very specific usage scenario and implementation. 
-
-I'm by no means using all the features of Application Insights - I use a bare minimum, but yet I find this usage extremely beneficial for me to get the basic usage statistics and more importantly the critical error information that helps me track down and fix application errors in the application effectively.
+To be clear, this post isn't meant to cover all aspects of Application Insights. In fact, I'm going to be describing my very specific usage scenario and implementation. I'm by no means using all the features of Application Insights - I use a bare minimum, but I find this minimal usage extremely beneficial and distraction free for me to get the basic usage statistics - and more importantly the critical error information that helps me track down and fix application errors     effectively.
 
 ## Application Insights - Setup
 Application Insights is an Azure service, so in order to use it you'll need to use an Azure account and set up an Application Insights application. 
@@ -92,9 +95,19 @@ Start by adding the Application Insights NuGet package to your application with 
 ### Initialize Application Insights
 Before you can log or record anything, Application Insights has to be initialized by specifying a connection string which includes a connection id, and also assigning a unique instance id. 
 
+A full connection string looks something like this (as a single line):
+
+```text
+InstrumentationKey=11111111-22222-33333-fffff-2222222222222;
+IngestionEndpoint=https://eastus-1.in.applicationinsights.azure.com/;
+LiveEndpoint=https://eastus.livediagnostics.monitor.azure.com/
+```
+
+Typically you'll hardcode the connection string and then embed the Instrumentation key into it from a secret store or encrypted value.
+
 > You can find the connection string and connection ID in the Azure portal as shown above. **You'll want to keep that information hidden in your application** either by reading it from some sort of key store or by encrypting it.
 
-In a desktop app, we'll only have a single instance that lives for the duration of the application.
+You use the connection string to create an AppTelemetry session instance, which is used for session tracking and optionally specific exception or trace logging. In a desktop app, we'll only have a single session instance that lives for the duration of the entire application and we'll use the shutdown operation to write out any session specific information we want to track - like duration, some user status info etc.
 
 In my desktop applications, I define the Application Insights logic on my top level 'global' Application object so it's easy to access from anywhere and I combine the App Insights initialization and session start into a single operation.
 
@@ -124,7 +137,8 @@ public class mmApp
                     // `Telemetry.Key` is a secret key in a static value loaded
                     //  from secure storage (from Azure Portal)
                     ConnectionString =
-                    $"InstrumentationKey={Telemetry.Key};" + "IngestionEndpoint=https://eastus-1.in.applicationinsights.azure.com/;" +
+                    $"InstrumentationKey={Telemetry.Key};" +
+                    "IngestionEndpoint=https://eastus-1.in.applicationinsights.azure.com/;" +
                     "LiveEndpoint=https://eastus.livediagnostics.monitor.azure.com/"
                 };
     

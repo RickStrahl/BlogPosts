@@ -11,6 +11,11 @@ postStatus: publish
 featuredImageUrl: https://weblog.west-wind.com/images/2023/WkHtmlToPdf-and-Url-Encoding-and-Extended-Characters/UrlEncodedMessBanner.png
 permalink: https://weblog.west-wind.com/posts/2023/Mar/15/WkHtmlToPdf-and-Url-Encoding-and-Extended-Characters
 postDate: 2023-03-15T21:53:03.2192246-10:00
+customFields:
+  mt_githuburl:
+    id: 
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2023-03/WkHtmlToPdf%20and%20Url%20Encoding%20and%20Extended%20Characters/WkhtmltopdfAndUrlEncodingAndExtendedCharacters.md
 ---
 # WkHtmlToPdf: Dealing with broken Url Encoded and Extended Character Links
 
