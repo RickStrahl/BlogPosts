@@ -91,6 +91,18 @@ Inside of the file you have:
 	...
 ```
 
+Finally it was pointed out in the comments that you make this change **globally** by providing a wildcard operator:
+
+```text
+[user]
+	name = rick
+	email = 
+[safe]
+	directory = *
+```
+
+Et voila: Fogettaboutit! You now should not see any more of those pesky warning popups.
+
 ### Some Developer Tools can Automatically Trust Repositories
 Some applications including Visual Studio and Rider now have updated their Git functionality to detect when you get an untrusted repository and prompt you to trust the repository:
 
