@@ -11,6 +11,11 @@ postStatus: publish
 featuredImageUrl: https://weblog.west-wind.com/images/2023/Fix-that-damn-Git-Unsecure-Repository/GitSafeRepositoryError.png
 permalink: https://weblog.west-wind.com/posts/2023/Jan/05/Fix-that-damn-Git-Unsafe-Repository
 postDate: 2023-01-05T11:33:20.5872245-10:00
+customFields:
+  mt_githuburl:
+    id: 
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2023-01/Fix-that-damn-Git-Unsecure-Repository/FixThatDamnGitUnsecureRepository.md
 ---
 # Fix that damn Git Unsecure Repository
 
@@ -110,8 +115,7 @@ Some applications including Visual Studio and Rider now have updated their Git f
 
 which is a welcome addition.
 
-Yet some other Git tools completely side step this issue with their own private versions of Git that don't have this issue. For example I use [SmartGit](https://www.syntevo.com/smartgit/) as my interactive Git client and even though it's on recent versions of Git I never saw this dialog. That's helpful in a pinch, but doesn't help if you're still using command line or other tool integration (ie. VS Code, WebStorm etc.) that don't have support.
-
+Yet some other Git tools completely side step this issue with their own private versions of Git that don't have this issue at all. For example I use [SmartGit](https://www.syntevo.com/smartgit/) as my interactive Git client, and even though it's on recent versions of Git I never saw the security warning dialog on any of the repositories. That's helpful in a pinch, but isn't useful if you're still using command line or other tool integration (ie. VS Code, WebStorm etc.) that don't have support.
 
 
 ### Folder Ownership
