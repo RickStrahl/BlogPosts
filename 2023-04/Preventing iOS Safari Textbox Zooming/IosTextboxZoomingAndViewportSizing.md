@@ -11,6 +11,11 @@ postStatus: publish
 featuredImageUrl: https://weblog.west-wind.com/images/2023/Preventing-iOS-Safari-Textbox-Zooming/ZoomOverflowBanner.png
 permalink: https://weblog.west-wind.com/posts/2023/Apr/17/Preventing-iOS-Safari-Textbox-Zooming
 postDate: 2023-04-17T09:30:15.9978198-10:00
+customFields:
+  mt_githuburl:
+    id: 
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2023-04/Preventing%20iOS%20Safari%20Textbox%20Zooming/IosTextboxZoomingAndViewportSizing.md
 ---
 # Preventing iOS Textbox Auto Zooming and ViewPort Sizing
 
@@ -25,9 +30,12 @@ If you've build mobile Web applications that need to run on iOS Safari and on an
 * You type your text on the keyboard
 * Hit done or click out into the Viewport
 
-...and you find that the zoomed ViewPort state persists even though the keyboard is no longer active. IOW - the keyboard access zoomed in, but the zoomed in state is not ever released unless you manually pinch and zoom back out, or you double tap some empty area in the body content.
+...and you find that the zoomed ViewPort state persists even though the keyboard is no longer active. IOW - the keyboard access zoomed in, but the zoomed in state is not ever released unless you:
 
-Very ugly behavior and behavior that seems quite common in mobile Web applications (not just mine 😄) and which frankly makes for a real shitty mobile Web experience. 
+* manually pinch and zoom back out to 100%
+* double tap some empty area in the body content
+
+Very ugly behavior and behavior that seems not uncommon in mobile Web applications (not just mine 😄) and which frankly makes for a real shitty mobile Web experience. 
 
 Even worse, the experience seems incredibly pointless. Zooming in on keyboard input doesn't seem to serve a useful purpose. **After all you're not actually entering any input into the text field** - you're using the pop up keyboard. If the field was too small before zooming, it would be bad UI to just display it inactively. It's likely if the input field is too small to read/view it would get fixed, but zooming into the field on input doesn't make that scenario any better. It only provides annoying behavior that doesn't even revert when input is complete. Grrrr!
 
@@ -89,21 +97,25 @@ The setting in question is to add `maximum-scale=1` to the ViewPort string:
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 ```
 
-For iOS Safari (> v10) this actually fixes the problem by forcing textbox input not to auto-zoom content on focus. Despite the name and actual designed behavior of the tag - `maximum-scale` - **on iOS you can still manually pinch and zoom** and size the ViewPort larger than 100%, **but it's now a user initiated operation**: No more auto-zooming. On iOS this behavior is most likely what you want to see!
+For iOS Safari (> v10) this actually fixes the problem by forcing textbox input not to auto-zoom content on focus. Despite the name and actual designed behavior of the tag - `maximum-scale` - **on iOS you can still manually pinch and zoom** and size the ViewPort larger than 100%, **but it's now a user initiated operation**: No more auto-zooming. 
 
-So this fixes the auto-input zoom problem on iOS devices. Yay!
+On iOS this is the behavior you want to see and this fixes the auto-input zoom problem on iOS devices. Yay!
 
-Well not quite... Unfortunately, Android devices treat `maximum-scale` more literally and actually won't allow pinch and zoom sizing beyond the value specified in `maximum-scale`. So on Android, if `maximum-scale=1` is specified you can't manually pinch and zoom beyond the 100% bound, which is serious an accessibility problem.
+Well... not quite so Yay! Unfortunately, Android devices treat `maximum-scale` more literally and won't allow pinch and zoom sizing beyond the value specified in `maximum-scale`. So on Android, `maximum-scale=1` won't manually pinch and zoom beyond the 100% bound, which is a serious accessibility problem.
 
-MDN recommends that `maximum-scale` should not be set under a value of 3:
+Arguably the Android/Mobile Chromium behavior - which doesn't 'auto-zoom' at any size - is the correct behavior, which is that maximum-scale defines the maximum and thus inhibits sizing beyond the scale boundary including for pinch and zoom gestures.
+
+In fact, MDN recommends that `maximum-scale` should not be set under a value of 3 and the default is 10:
 
 > #### maximum-scale
 > Controls how much zoom is allowed on the page. Any value less than `3` fails accessibility. Minimum: `0.1`. Maximum: `10`. Default: `10`. Negative values: ignored.
 
-Bottom line is that Safari on iOS more or less hi-jacks the `maximum-scale` behavior to affect the auto-zoom behavior, without affecting the pinch and zoom behavior, which actually fixes the problem of the auto-zoom. But Android treats `maximum-scale` literally and once set limits pinch and zoom behavior. Android however doesn't have the 'auto-zoom' behavior problem that iOS Safari has, so really it doesn't need any changes from default browser behavior - that's only required for iOS.
+What this means is once again browsers behaving differently depending on platform which is always a shitty proposition (echos of the 90's and 2000's).
+
+Bottom line is that Safari on iOS more or less hi-jacks the `maximum-scale` behavior to affect the auto-zoom behavior, without affecting the pinch and zoom behavior, while Android treats `maximum-scale` literally and directly affects the pinch and zoom behavior. Which behavior is correct is moot, the fact is that the two platforms handle these things differently and you need to potentially work around it.
 
 #### Selective maximum-scale for Safari on iOS
-Since this is selective behavior that should specifically applies to iOS Safari, it's possible to hack together some startup code that selectively replaces the meta ViewPort tag in your startup code only on iOS.
+Since this unwanted auto-zoom behavior is selective behavior for iOS Safari, it's possible to hack together some startup code that only selectively replaces the meta ViewPort tag in your startup code only on iOS Safari.
 
 First make it easy to address the ViewPort tag via an `id` tag:
 
@@ -116,7 +128,7 @@ First make it easy to address the ViewPort tag via an `id` tag:
 </html>
 ```
 
-Then check the user agent for `iPhone` and replace by adding the `maximum-scale` parameter.
+Then check the browser's user agent for `iPhone` and replace by adding the `maximum-scale` parameter.
 
 ```javascript
 if(navigator.userAgent.indexOf('iPhone') > -1 )

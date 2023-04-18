@@ -123,10 +123,11 @@ Notice that I explcitly provide the startup folder for the project, but also **t
 
 You can place a shortcut like this on the desktop or on the Windows Taskbar for quick access on busy projects, and also add it into your project folder.
 
-For example, when Web Connection creates a new project it automatically creates a desktop and project folder shortcut for you. I typically take that shortcut and also drag it into the project folder:
+For example, when Web Connection creates a new project it automatically creates a desktop and project folder shortcut for you. Alternately if you don't auto-generate a shortcut, just copy the desktop shortcut into the project folder.
 
 ![](ProjectShortcuts.png)
 
+### Creating a Desktop ShortCut with FoxPro Code
 As an aside you can create a desktop shortcut programmatically using the `Wscript.Shell` COM interface:
 
 ```foxpro
@@ -155,8 +156,8 @@ IF IsComObject("Wscript.Shell")
 ENDIF	
 ```
 
-### Generic PowerShell Launcher
-As nice as a desktop short cut is, it's not portable. It doesn't work with relative paths, and you pretty much have to hard code the path to both the FoxPro IDE and location of the startup folder and config.fpw. This means every time you move the project you have to adjust the shortcut. It's not a huge deal, but if you share your project in a source code repository shortcuts won't work necessarily across machines - in fact you probably should exclude shortcuts from committing into the SCC.
+### Creating a Generic PowerShell Launch Script
+As nice as a desktop short cut is, it's not portable. Shortcuts don't work with relative paths, and you pretty much have to hard code the path to both the FoxPro IDE and location of the startup folder and `config.fpw`. This means every time you move the project you have to adjust the shortcut. It's not a huge deal, but if you share your project in a source code repository, shortcuts likely won't work necessarily across machines - in fact you probably should exclude shortcuts from committing into the SCC.
 
 To provide a more generic solution that can:
 
@@ -164,9 +165,9 @@ To provide a more generic solution that can:
 * Determine the project relative path
 * Build an execution command
 
-you need something that can execute some code. Preferably something that can generically retrieve the location of the FoxPro installation. This is pretty easy with PowerShell.
+you need something that can execute some code. Preferably something that can generically retrieve the location of the FoxPro installation. 
 
-Here's a generic launcher that also gets created into a new Web Connection project:
+You can accomplish this with a small PowerShell script. Here's a generic launcher that also gets created into a new Web Connection project:
 
 
 ```powershell
@@ -180,6 +181,10 @@ Here's a generic launcher that also gets created into a new Web Connection proje
 # This file should live in any Project's Root Folder
 ###########################################################
 
+# Force folder to the script's location
+cd "$PSScriptRoot" 
+
+# Get VFP Launch Command Line
 $vfp = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Classes\WOW6432Node\CLSID\{002D2B10-C1FA-4193-B134-D86EAECC5250}\LocalServer32")."(Default)"
 if ($vfp -eq $null)
 {
@@ -190,39 +195,45 @@ if ($vfp -eq $null)
 $vfp = $vfp.Replace(" /automation","")
 $vfp
 
+# Launch VFP from the .\Deploy folder
 cd .\Deploy
 $path = [System.IO.Path]::GetFullPath(".\Deploy")
 $path
 
 & $vfp -c"$path\config.fpw"
 
+# Command line back to project root
 cd ..\
 ```
 
-This code reads out the FoxPro installation location out of the registry in case installed in a non-default location. Also `Program Files (x32)` may be named differently in different languages so, this is a relevant operation regardless of idiots like me using custom FoxPro install locations :smile:
+Unlike the shortcut, this code discovers the FoxPro install location when it runs, and can use relative paths based on the script's startup path. In other words, it's totally portable and can be shared by multiple developers in a shared project regardless of whether their base folders are different or not.
 
-The registry basically holds the location of the registered FoxPro IDE runtime and this code strips that out from the `/automation` command that COM uses to launch the FoxPro IDE.
+The code reads out the FoxPro installation location out of the registry in case installed in a non-default location (my scenario) or if using a locale that might not be using the English `Program Files (x32)` location. 
 
-The rest of the code then is specific to the Web Connection installation which launches the application out of the `.\Deploy` folder rather than the project root where the `.ps1` script file lives.
+The registry holds the location of the registered FoxPro IDE runtime - a ClassId for the COM object that refers the `VisualFoxPro.Application` - and this code strips that out from the `/automation` command that COM uses to launch the FoxPro IDE.
+
+In this case the rest of the code then is specific to the Web Connection installation which launches the FoxPro out of the `.\Deploy` folder rather than the project root where the `.ps1` script file lives. This might vary for your application, but because you can use relative paths here, this can be made to work generically regardless of what your project root folder is.
+
+Here's how you can run the script from Explorer in the project root folder (in this case a Web Connection project):
 
 ![](PowershellLaunchScriptInProject.png)
 
-If you have a recent version of PowerShell Core installed you can use **Run with PowerShell** context menu option to run the command. There are also PowerShell configuration options to allow to run `.ps1` scripts on double click (like `.bat` or `.cmd` - but hey, Windows security idiocy!)
+If you have a recent version of PowerShell Core installed you can use **Run with PowerShell** context menu option to run the command. There are also PowerShell installation configuration options that allow you to run `.ps1` scripts on double click which is **not the default** (like `.bat` or `.cmd` - but hey, Windows security idiocy!) .
 
-The advantage of the PowerShell is two-fold:
+The advantage of the PowerShell script is three-fold:
 
+* It's fully self-contained
 * It's portable across machines as you can use relative paths
 * It's text and can be shared in Source Code Repositories
 
-
 ## Summary
-Having a clean startup development environment is crucially important, especially if you work with many projects side by side. It saves time, reduces mistakes and is easier to maintain as you don't have to remember random startup and launch instructions.
+Having a clean startup development environment is crucially important, especially if you work with many projects side by side. It saves time, reduces mistakes and makes your launch configuring automatically repeatable. It's easier to maintain as you don't have to remember random startup and launch instructions especially if you step away from the project for a few months or years and then come back.
 
-I work with many customers and it's not uncommon for me to have multiple projects open and running and working on all of them at the same time. With totally isolated development environments that are self-configuring this process is easy.
+I work with many customers and it's not uncommon for me to have multiple projects open, running and working on all of them at the same time. With totally isolated development environments that are self-configuring this process is easy.
 
 To those of you that are already doing this you're probably nodding your head and going *Why are you telling me this? It's bloody obvious!* But as I mentioned I see  **a lot of developers** not doing this, and literally firing up either in one standard application, or even the generic Foxpro launch icon and manually navigating and then fiddling with configuration settings.
 
-Even if you're working only on a single project, it's useful to have a simple launch sequence that gets you right into a runnable environment. Don't waste time and keystrokes on navigating on where you have to be or running commands to get the app ready - automate that process. If you're not you're also making it harder for on-boarding of new developers who have to follow the same inconsistent operations.
+Even if you're working only on a single project, it's useful to have a simple launch sequence that gets you right into a runnable environment. Don't waste time and keystrokes on navigating to where you have to be or running commands to get the app ready - automate that process. If you're not you're also making it harder for on-boarding of new developers who have to follow the same inconsistent operations.
 
 Do yourself a favor and make sure your environment is easily launchable and runnable, from the moment the FoxPro Command Window comes up...
 
