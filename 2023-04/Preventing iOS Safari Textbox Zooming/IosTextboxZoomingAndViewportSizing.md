@@ -158,15 +158,17 @@ In my use case, of the application shown above I had several problems that were 
 * Using a root size smaller than `16px` (ironically `15.75px` 😂)
 
 #### Bootstrap default input font sizing: 1rem
-Bootstrap uses default input field sizing for it's widely used `form-control` style as `1rem`. My first inclination was trying to hunt down the base font size. Well, Bootstrap never hardcodes the size, using `1rem` as the base. `rem` is Root Element Relative sizing, so it's based on the root element's (ie. the `<html>` tag) font-size. 
+Bootstrap (and other frameworks) uses default input field sizing for it's widely used `form-control` style as `1rem`. My first inclination was trying to hunt down the base font size in `form-control` and overriding it. While certainly possible this breaks the CSS sizing inheritance in Bootstrap's layout so overriding `form-control` specifically with a hard coded value is not the best approach. Neither is updating individual fields to use `16px` or larger hardcoded values.
+
+So Bootstrap and other framework use `1rem` as the base size. `rem` is Root Element Relative sizing, so it's based on the root element's (ie. the `<html>` tag) font-size. 
 
 This means the root sizing is set either by:
 
 * A CSS size defined for the `html` element
-* A hardcoded `font-size` style on the `<html>` tag
+* A hard coded `font-size` style on the `<html>` tag
 * Don't set a root font-size which uses the browser default (typically `16px`)
 
-Personally I tend to set my root font settings like font family and size in my top level CSS file (`application.css`):
+Personally I use the first apprach setting the base font size on the `html` element of my base application level CSS file (`application.css`):
 
 ```css
 html, body {
@@ -174,7 +176,8 @@ html, body {
     font-size: 16px;
 }
 ```
-If you don't have an explicit CSS file you can also declare the size directly on the HTML element:
+
+If you don't have an explicit override CSS file you can also declare the size directly on the HTML element:
 
 ```html
 <html style="font-size: 16px">
@@ -182,12 +185,12 @@ If you don't have an explicit CSS file you can also declare the size directly on
 
 With either of these in place `1rem` now equals `16px` and assuming I use `form-control` in Bootstrap, my input no longer auto-zooms. Yay!
 
-> If you use Bootstrap's `form-control-sm` you'll fall below the 16px/1rem minimum and you end up zooming again, so you might want to avoid `form-control-sm` for mobile applications.
+> If you use Bootstrap's `form-control-sm` you'll fall below the 16px/1rem minimum and you end up zooming again, so you might want to avoid `form-control-sm` for mobile applications or ensure that `form-control-sm` sizing sits above the 16px minimum with `form-control` somewhat larger.
 
 #### 16px - Not as quick to Fix
-Not knowing about the `16px` minimum size to avoid zooming requirement, I'd been running my app at `15.75px` on the `html` tag style in my `application.css`. Which then caused **all input fields to auto-zoom in on iOS Safari**.
+Not knowing about the `16px` minimum size to avoid zooming requirement, I'd been running my app at `15.75px` on the `html` tag style in my `application.css`. Which then caused **all input fields to auto-zoom in on iOS Safari**. Silly me, right? Sometimes the fractional font-sizes sizes look a little cleaner than the rounded values.
 
-Once I found the root cause of the `16px` requirement, it still took a while to trace that down to the `html` root tag and `font-size`. 
+Once I found the root cause of the `16px` requirement, it still took a while to trace that down to the `html` root tag and `font-size` because - it's not exactly obvious where the root size is set if you're using a framework like Bootstrap.
 
 And that only addressed any fields that are using `form-control` style which is the 'regular' font size box. Several additional input fields were using the smaller `form-control-sm` designation which falls below the `16px` boundary and so still failed even after adjusting the root font to `16px`. Luckily my base font-size of 15.75px was already close so bumping it to 16px didn't cause much of a difference. But if you used a size smaller it's quite possible that the larger base font might screw up existing layouts that now start overflowing due to the larger overall control sizes.
 
