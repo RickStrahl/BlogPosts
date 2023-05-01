@@ -101,40 +101,37 @@ For iOS Safari (> v10) this actually fixes the problem by forcing textbox input 
 
 On iOS this is the behavior you want to see and this fixes the auto-input zoom problem on iOS devices. Yay!
 
-Well... not quite so Yay! Unfortunately, Android devices treat `maximum-scale` more literally and won't allow pinch and zoom sizing beyond the value specified in `maximum-scale`. So on Android, `maximum-scale=1` won't manually pinch and zoom beyond the 100% bound, which is a serious accessibility problem.
-
-Arguably the Android/Mobile Chromium behavior - which doesn't 'auto-zoom' at any size - is the correct behavior, which is that maximum-scale defines the maximum and thus inhibits sizing beyond the scale boundary including for pinch and zoom gestures.
+Well... not quite so Yay! Unfortunately, Android devices treat `maximum-scale` as the spec recommends, so it and won't allow pinch and zoom sizing beyond the value specified in `maximum-scale`. So on Android with Chrome or Chromium style browser (also with FireFox Mobile), `maximum-scale=1` won't manually pinch and zoom beyond the 100% bound, which is a serious accessibility problem for people that have vision impairments and depend on zooming content.
 
 In fact, MDN recommends that `maximum-scale` should not be set under a value of 3 and the default is 10:
 
 > #### maximum-scale
 > Controls how much zoom is allowed on the page. Any value less than `3` fails accessibility. Minimum: `0.1`. Maximum: `10`. Default: `10`. Negative values: ignored.
 
-What this means is once again browsers behaving differently depending on platform which is always a shitty proposition (echos of the 90's and 2000's).
+Arguably the Android/Mobile Chromium behavior - which doesn't 'auto-zoom' at any size - is the correct behavior: `maximum-scale` per spec should fix the maximum zoom size for pinch and zoom. So `maximum-scale=1` shouldn't zoom beyond 100%. However, iOS Safari ignores this requirement, which can work in our favor for the selective hack described above.
 
-Bottom line is that Safari on iOS more or less hi-jacks the `maximum-scale` behavior to affect the auto-zoom behavior, without affecting the pinch and zoom behavior, while Android treats `maximum-scale` literally and directly affects the pinch and zoom behavior. Which behavior is correct is moot, the fact is that the two platforms handle these things differently and you need to potentially work around it.
+At the end of the day this means that **once again browsers are behaving differently depending on platform** which is always a shitty proposition (echos of the 90's and 2000's).
 
 #### Selective maximum-scale for Safari on iOS
-Since this unwanted auto-zoom behavior is selective behavior for iOS Safari, it's possible to hack together some startup code that only selectively replaces the meta ViewPort tag in your startup code only on iOS Safari.
+Since this unwanted auto-zoom behavior is selective behavior for iOS Safari, it's possible to hack together some startup code that only **selectively replaces the meta ViewPort tag** in your startup code only on iOS Safari.
 
-First make it easy to address the ViewPort tag via an `id` tag:
+First make sure you have a *standard* ViewPort tag in your document:
 
 ```html
 <html>
     <head>
-        <meta id="HeaderViewport" name="viewport"
-              content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
 </html>
 ```
 
-Then check the browser's user agent for `iPhone` and replace by adding the `maximum-scale` parameter.
+Then check the browser's user agent for `iPhone` and add the `maximum-scale` parameter by replacing the `content`:
 
 ```javascript
 if(navigator.userAgent.indexOf('iPhone') > -1 )
 {
     document
-      .getElementById("HeaderViewport")
+      .querySelector("[name=viewport]")
       .setAttribute("content","width=device-width, initial-scale=1, maximum-scale=1");
 }
 ```
