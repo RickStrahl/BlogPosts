@@ -11,6 +11,11 @@ postStatus: publish
 featuredImageUrl: https://weblog.west-wind.com/images/2023/Sending-and-Receiving-GMail-Email-Attachments-that-contain-Code-or-Binaries/GmailBlockedAttachments-Banner.jpg
 permalink: https://weblog.west-wind.com/posts/2023/Apr/30/Sending-and-Receiving-GMail-Email-Attachments-that-contain-Code-or-Binaries
 postDate: 2023-04-30T19:43:35.9847326-07:00
+customFields:
+  mt_githuburl:
+    id: 
+    key: mt_githuburl
+    value: 2023-04/Sending and Receiving GMail Email Attachments that contain Code or Binaries/SendingEmailsWithDirectOrZippedCodeAttachments.md
 ---
 # Sending and Receiving GMail Email Attachments that contain Code or Binaries
 
@@ -35,6 +40,7 @@ To give you an idea, here's GMail, trying to send a few attachments of code and 
 You can see that some code files are (`.js` in this case) are marked as blocked while others like the `.cs` and `.prg` files are not. Presumably this is because `.js` files can potentially be executed **directly**. C# files can't be executed directly. The FoxPro `.prg` file is surprising in that it's not blocked, even though in really old versions `.prg` were once executable. Go figure.
 
 You can also see in **Figure 1** that the `.zip` file contains the same `WebConnectionModule.dll` that is rejected outright and even though the content is not directly accessible it's still blocked due to the *contained* binary file and even though `.dll` files also aren't directly executable anyway. 
+
 ##AD##
 
 If you want to find out what works and what doesn't with GMail you can create an email and start adding files - those that won't work are immediately flagged right in the UI as shown in **Figure 1**.
@@ -144,6 +150,9 @@ https://raw.githubusercontent.com/RickStrahl/highlightjs-badge/master/highlightj
 
 The recipient doesn't have to know how to use GitHub as long as you send them directly to the final download link.
 
+
+##AD##
+
 ### Send as Base64 Text File
 This final solution is a bit geeky as it requires some tooling to create a Base64 file from your actual file or files.
 
@@ -180,6 +189,8 @@ Here's what that workflow looks like:
 
 ![](https://github.com/RickStrahl/ImageDrop/raw/master/BlogPosts/2023/Base64Conversion.gif)
 <small>**Figure 6** - Using the Base64 conversion utility allows you to convert and attach files, and using 7Zip to convert back to file. </small>
+
+Note that if you have 7Zip installed, it can decode and open Base64 files **natively**, including stripping off leading and trailing spaces. In that case you can open the `.b64` file and extract the original file to either copy to disk, or if it's an archive file, you can directly  drill into the archive to extract individual or all files. Yay! Alternately, you can use `Base64.exe` to decode the `.b64` content back into a file.
 
 Yeah it's still a bit more work than just attaching a file, but with a few extra steps you can at least get files that make it to the recipient and can be relatively easily retrieved by the recipient with a somewhat mainstream and free tool (7Zip).
 
@@ -230,6 +241,8 @@ Base64 WebConnectionExperimental.zip.b64
 
 There are also more explicit commands using the `encode` and `decode` actions and the `-i` Input and `-o` output file names. You can find out more on the [GitHub site](https://github.com/RickStrahl/Base64) or by looking at the source code.
 
+##AD##
+
 #### Creating a Base64 Windows Explorer Context Menu Option
 On Windows you can make life for encoding a little easier by creating a Context Menu Shortcut to encode files to Base64:
 
@@ -246,25 +259,8 @@ Windows Registry Editor Version 5.00
 @="Convert to Base64 file (.b64)"
 
 [HKEY_CLASSES_ROOT\*\shell\Base64\command]
-@="C:\\Users\\rstrahl\\Dropbox\\admin\\Base64.exe \"%1\ -s" -s"
+@="C:\\Users\\rstrahl\\Dropbox\\admin\\Base64.exe \"%1\ -s"
 ```
-
-Adjust the path to point at your location. Once you do, you get a **Convert to Base64 (.b64)** shortcut on all files in the context menu that will create a base 64 version of the file with a `.b64` extension that you can attach to an email:
-
-![Base64 conversion via Context Menu and opening in 7Zip](https://github.com/RickStrahl/ImageDrop/raw/master/BlogPosts/2023/Base64Conversion.gif)
-
-Note that 7Zip can decode and open Base64 files **natively**, including stripping off leading and trailing spaces. So if you have it installed you can open the `.b64` file and extract the original file to either copy to disk, or if it's an archive file, you can directly  drill into the archive to extract individual or all files. Yay!
-
-If you rather do the conversion on the command line you can use the `Base64` tool:
-
-```ps
-# Simplified syntax
-base64 WebConnectionExperimental.zip.b64
-
-# Verbose syntax
-base64 decode -i WebConnectionExperimental.zip.b64 -o WebConnectionExperimental-downloaded.zip
-```
-
 ## More Options
 I posted some thoughts of this topic originally on Twitter and that topic took off with lots of access and many comments. 
 
@@ -298,3 +294,13 @@ It is what it is and it sucks, but I hope this post has given you some idea how 
 * [Download `Base64.exe` Console App (Windows)](https://github.com/RickStrahl/Base64/raw/master/Distribution/Base64.exe)
 * [Westwind.Base64 Dotnet Tool](https://www.nuget.org/packages/Westwind.Base64)
 * [Base64 Github Repository](https://github.com/RickStrahl)
+
+
+<div style="margin-top: 30px;font-size: 0.8em;
+            border-top: 1px solid #eee;padding-top: 8px;">
+    <img src="https://markdownmonster.west-wind.com/favicon.png"
+         style="height: 20px;float: left; margin-right: 10px;"/>
+    this post created and published with the 
+    <a href="https://markdownmonster.west-wind.com" 
+       target="top">Markdown Monster Editor</a> 
+</div>
