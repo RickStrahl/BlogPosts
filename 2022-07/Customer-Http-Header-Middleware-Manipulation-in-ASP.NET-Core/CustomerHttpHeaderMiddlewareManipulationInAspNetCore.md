@@ -10,7 +10,7 @@ dontStripH1Header: false
 postStatus: publish
 featuredImageUrl: https://weblog.west-wind.com/images/2022/Customer-Http-Header-Middleware-Manipulation-in-ASP.NET-Core/HeaderBanner.jpg
 permalink: https://weblog.west-wind.com/posts/2022/Jul/07/Back-to-Basics-Custom-HTTP-Response-Header-Manipulation-in-ASPNET-Core
-postDate: 2022-07-07T08:39:57.7380928-10:00
+postDate: 2022-07-07T11:39:57.7380928-07:00
 ---
 # Back to Basics: Custom HTTP Response Header Manipulation in ASP.NET Core
 
@@ -272,6 +272,25 @@ For example if you host on IIS you can place headers to add and remove in `web.c
 Similar options are available for most other Web Servers as well. 
 
 This approach is probably the most efficient as it offloads the header processing entirely onto the Web server which is optimized for it. However, it externalizes the configuration which is often undesirable especially with ASP.NET's new configuration in code paradigm.
+
+## That Pesky IIS Server Header
+If you're running on IIS and you want to get rid of the IIS Server header shown here:
+
+![](IISServerHeader.png)
+
+You'll find that none of the approaches discussed above remove this header. That's because this header is injected by the IIS Response pipeline very late in the IIS Request Pipeline processing.
+
+Instead you have to resort to an IIS Security setting that explicitly turns off generation of this header in `web.config` (requires IIS 10+):
+
+```xml
+<system.webServer>
+ <security>
+    <requestFiltering removeServerHeader="true" />
+ </security>
+</system.webServer>
+```
+
+If you want more info, it's covered in detail in t[his previous post](https://weblog.west-wind.com/posts/2023/May/08/Removing-IIS-Server-Request-Header-from-ASPNET-Core-Apps-any-version).
 
 ## Summary
 So, choice is good. You've got a lot of options with what works best for your application environment. You can choose from:
