@@ -11,6 +11,11 @@ postStatus: publish
 featuredImageUrl: https://weblog.west-wind.com/images/2023/Removing-IIS-Server-Request-Header-from-ASP.NET-Core-Apps-(any-version)/Headless.jpg
 permalink: https://weblog.west-wind.com/posts/2023/May/08/Removing-IIS-Server-Request-Header-from-ASPNET-Core-Apps-any-version
 postDate: 2023-05-08T11:02:50.9812836-07:00
+customFields:
+  mt_githuburl:
+    id: 
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2023-05/Removing%20IIS%20Server%20Request%20Header%20from%20ASP.NET%20Core%20Apps%20(any%20version)/RemovingIisServerHeaderFromAspNetCore5Apps.md
 ---
 # Removing the IIS Server Request Header from ASP.NET Core Apps (any version)
 
@@ -67,8 +72,6 @@ app.UseCustomHeaders((opt) =>
 {
     // ...
     opt.HeadersToAdd.Add("Server", "nginx");
-    opt.HeadersToRemove.Add("X-Powered-By");
-    opt.HeadersToRemove.Add("x-aspnet-version");
 });
 ```
 
@@ -76,9 +79,11 @@ This produces:
 
 ![](FakeServerHeader.png)
 
-Apparently IIS won't inject its own `Server` header, **if your application already has set it**. This means you can use your own header and add some misdirection for potential attacks against your server.
+Apparently IIS won't inject its own `Server` header, **if your application already has set it**. This means you can use your own header and add some misdirection for potential attacks against your server. 
 
 Enjoy all the Linux and WordPress attack links in your IIS logs after this... :smile:
+
+> Note that if you're running this code on Kestrel, you still get the default `Kestrel` server header rather than `nginx` - the above fake header trick doesn't work. For Kestrel the only way to affect the `Server` header is to remove during startup builder configuration (see below).
 
 ## What doesn't work
 I don't want to belabor the point, but since this issue has gone through a number of changes since earlier versions of ASP.NET Core, I want to take a moment and discuss some other approaches that don't work and why.
@@ -102,7 +107,7 @@ Like the other approaches mentioned above you can't use the IIS `<customHeaders>
 ##AD##
 
 ## Summary
-The moral of the story is: This is an IIS setting and you should use IIS to override it, so use the `web.config` setting...
+The moral of the story is: This is an IIS setting and you should use IIS to override it, so use the `web.config` setting or overwrite the header with your own bogus value for misdirection.
 
 ## Resources
 
