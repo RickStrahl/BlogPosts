@@ -15,57 +15,63 @@ postDate: 2023-05-17T23:08:39.5194845-07:00
 
 # Implementing Two-Factor Auth using an Authenticator App in ASP.NET
 
-![](ChainLinkBanner.png)
+![](ChainLinkBanner.jpg)
 
 Authenticator based Two Factor Authentication (2FA) using an external app like [Authy](https://authy.com/), Google or [Microsoft Authenticator](https://support.microsoft.com/en-us/account-billing/download-and-install-the-microsoft-authenticator-app-351498fc-850a-45da-b7b6-27e523b8702a) or one of the Two Factor Authentication (2FA) enabled password managers like [1Password](https://1password.com/) are becoming more common in Web applications. Unlike using Email or SMS for the second piece of validation in 2FA, Authenticator apps don't require you give up another piece of private information or use an external service to verify an existing account. 
 
-Two Factor Authentication is an **additional bit of security that you can use on top of an existing authentication system** to provide extra security and that can't be easily discovered or stolen as it uses one-time keys. As such you still need a primary authentication provider to verify the user first, and you can use 2FA to provide additional security or provide it as a way to verify an account in case passwords are lost.
+Two Factor Authentication is an **additional bit of security that you can use on top of an existing authentication system** to provide extra security, that can't be easily discovered or stolen as it uses one-time keys. As such you still need a primary authentication provider to verify the user first, and you can use 2FA to provide additional security or provide a way to recover an account in case the passwords is lost.
 
-In this post I'll describe how to to implement Authenticator based verification **outside of the context of ASP.NET Identity**, so you can add this to just about any solution. I'll describe my integration in my own Web Store, so it's somewhat app specific, but the examples I provide should be generic enough that you can easily modify to fit your particular application and integration scenario.
+In this post I'll describe how to to implement Authenticator based verification **outside of the context of ASP.NET Identity**, so you can add this to just about any solution. I'll describe my integration in my own Web Store, so it's somewhat app specific, but the examples I provide are generic enough that you can easily modify them to fit into your particular application scenario.
 
 For reference, here is the implementation I'm going to be discussing:
 
 ![](https://raw.githubusercontent.com/RickStrahl/ImageDrop/master/BlogPosts/2023/TwoFactorAuthentication.gif)  
-<small>**Figure 1** - Two Factor Authentication with an Authenticator App (1Password)</small>
+<small>**Figure 1** - The entire workflow of two Factor Authentication with an Authenticator App (1Password)</small>
 
 ## Two-Factor Authenticators
-This post is specific to 2FA with an Authenticator app, but there are other ways to implement 2FA including a second email address, SMS messages or phone callbacks. I prefer Authenticator apps because they are a self-contained solution - you don't need an external service as is the case for SMS and phone callbacks or another piece of private information in the case of an email address.
+This post is specific to 2FA with an Authenticator app, but there are other ways to implement 2FA including a second email address, SMS messages or phone callbacks. 
 
-The downside is that Authenticators are still somewhat unconventional for the average computer user and the process of using one of them is not always obvious. If you haven't used an Authenticator before you have to install one which can also be annoying to users, although that's a one time installation.
+I prefer Authenticator apps because  - outside of the free Authenticator app requirement - **they are a fully self-contained solution: you don't need an external service to verify a validation**. Other 2FA mechanisms like SMS and phone callbacks require you to use a paid for service to initiate the request, or yet another piece of private information you have to hand over in the case of a second email address or SMS phone number.
+
+The downside is that Authenticators are still somewhat unconventional for the average computer user, and the process of using them isn't exactly obvious. If you haven't used an Authenticator app before, you have to install one first, which can also be annoying to new users. Once installed though, you can use any Authenticator app with any site, so installation is a one time thing.
 
 ##AD##
 
-In order to use Authenticator based 2FA you **have to use one of the many Authenticator apps**. 
-
-A few popular ones are:
+There are many Authenticator apps available. Here are a few popular ones:
 
 * [Authy](https://authy.com/) (by Twilio)
 * [Microsoft Authenticator](https://support.microsoft.com/en-us/account-billing/download-and-install-the-microsoft-authenticator-app-351498fc-850a-45da-b7b6-27e523b8702a)
-* Google Authenticator (device only get on App store)
+* Google Authenticator (device only, get on App store)
 * Integration in [1Password](https://1password.com/)  
 <small>*(and other password managers)*</small>
 
-These apps are interchangeable and you can use any of them to set up sites/accounts.
+These apps are interchangeable and you can use any of them to set up accounts/site.
 
 To give you an idea, here's what Authy looks like on a phone:
 
-![](AuthenticatorView.png)
+![](AuthenticatorView.png)  
+<small>**Figure Figure 2** - An Authenticator app - Authy - running on a phone</small>
 
-Authenticators tend to have a list of configured 'accounts' that you choose from and a detail screen that lets generates a new validation code that updates at a shortish interval. The code is valid only for a short time. Typically you can copy this code to the clipboard and then paste it into the application requiring the code for 2FA.
+Authenticators tend to have a list of configured 'accounts' that you choose from, and a detail screen that  generates a new validation code that is valid only for a short interval and updates after the interval is up. You can copy this code to the clipboard and then paste it into the application requiring Two Factor Validation code.
 
-To set up an account you either scan a QR code or provide a manual code. Again here's Authy's capture screen:
+To set up a new account or site, you either scan a QR code or you can provide manual entry via a text based code. Again here's Authy's capture screen:
 
-![](AuthenticatorSetup.png)
+![](AuthenticatorSetup.png)  
+<small>**Figure 3** - Capturing a QR code or manually entering a Setup key.</small>
 
 If you click the Scan button it then brings up a camera view that lets you point at a QR code. Alternately you can manually type in the Setup code.
 
+![](AuthenticatorScan.png)  
+<small>**Figure 4** - QR Code capture with a phone camera</small>
+  
 This is on a phone, so you can use the camera to scan the QR code. If you're setting up on a desktop you can either use a text based Setup code, or if the tool has browser integration it sometimes can pick up a QR code off the current Web page (1Password does this). 
  
-Some password managers also have 2FA integration. I use 1Password and it has integrated 2FA. This offers a seamless workflow that can autofill, username/password and 2FA auth code all in one quick automated pass. You can see that in the example screen capture a little later.
+Some password managers also have 2FA integration. I use 1Password and it has integrated 2FA. This offers a seamless workflow that can autofill, username/password and 2FA auth code all in one quick automated pass. You can see that in use in the screen capture at the beginning of the post.
 
 Alternately you can also do this manually. Here's 1Password once configured with 2FA auth:
 
-![](1PasswordAuthenticator.png)
+![](1PasswordAuthenticator.png)  
+<small>**Figure 5** - Password manager integration lets you keep passwords and 2FA codes in one place</small>
 
 You can copy the code (if set up to manually fill) or you can set up the 1Password to autofill, which completely automates the GitHub username/password and 2FA login which is pretty sweet.
 
@@ -111,9 +117,9 @@ There are quite a few moving pieces so before starting out let's review what too
 * Once validated apply  to user tracking authentication
 
 ### The `GoogleAuthenticator` Library
-The first thing we need is to use `GoogleAuthenticator` NuGet package to provide the key generation and validation logic needed to create a setup key, display a QR code and text key, and then also verify Authenticator generated validation keys. 
+The first thing we need is to use the  [GoogleAuthenticator](https://github.com/BrandonPotter/GoogleAuthenticator) NuGet package to provide the key generation and validation logic needed to create a setup key, display a QR code and text key, and then also verify Authenticator generated validation keys. 
 
-The  `GoogleAuthenticator` library by Brandon Potter is easy to use and provides the basic features you need in a few easy to use static methods that require little more than a few lines of code. This library solves all of the technical semantics of dealing with 2FA. Contrary to its name this library can be used with **any authenticator** including Microsoft Authenticator, Authy and as shown above using 1Password and other Password managers that have support for 2FA.
+The  `GoogleAuthenticator` library by Brandon Potter is easy to use and provides the basic features you need in a couple of easy to use static methods that require only a few lines of code. This library solves all of the technical semantics of dealing with 2FA. The rest is related to application and UI integration. Contrary to its name this library can be used with **any authenticator** including Microsoft Authenticator, Authy and as shown above using 1Password and other Password managers that have support for 2FA.
 
 To install the package use the Package Manager in your IDE or from the command line:
 
@@ -129,18 +135,19 @@ We'll use this library for two tasks:
 ### Creating the Setup key and QR Code
 The first thing is to create the 2FA Setup page which should look something like this:
 
-![](2FASetupForm.png)
+![](2FASetupForm.png)  
+<small>**Figure 6** - Setup form for 2FA authentication: QR Code, Manual key and initial validation form</small>
 
 The three key pieces on the page are:
 
 * **The QR code**  
-The QR code can be scanned or read by Authenticator apps to simplify setup of a site or 'resource' to provide keys for. The QR code represents a setup code that uniquely identifies this resource. 
+The QR code can be scanned or read by Authenticator apps to simplify setup of an account/site to provide keys for. The QR code represents a setup code that uniquely identifies this resource. 
 
 * **Manual Setup Code**  
 If your Authenticator or device doesn't support scanning a QR code you can also enter the code manually using the text based code.
 
 * **Validation Form**  
-Once the Authenticator app has the account set up it can generate a validation code which you then need to use to to actually create the account. This ensures that the account is setup and you can save the 2FA unique identifier with the user, and which you'll need later to verify validation codes generated by the Authenticator app.
+Once the Authenticator app has the account set up, it can generate a validation code which you then need to use to to actually associate the account with your application's security implementation. You need to validate first to ensure that the account is set up and working before you associate it with your app's security. At this point the application needs to save the unique secret key that identifies this Authenticator account.
 
 Behind the scenes a few additional things need to happen:
 
@@ -183,8 +190,6 @@ customerBus.Save();
 ```
 
 The `GenerateSetupCode()` method from GoogleAuthenticator does most of the work in this and it returns a structure that contains both the QRCode as an image-ready base64 string, and the manual entry code that can be displayed as text. Both are bound to the Razor page via the model I'll discuss in a minute.
-
-##AD##
 
 Because the image data is returned in in base64 image-ready format (ie. `data:image/png;base64,base64Data`), the QR code image data can be directly assigned to a plain `<img>` tag:
 
@@ -247,13 +252,14 @@ Here's the Razor View for the Setup page:
 
 The middle section displays the QR code and manual key as read only values. The form on the bottom captures the validation code you need to verify using your Authenticator app. Additionally the `CustomerSecretKey`  hidden form value is used to persist the new unique user key that we eventually need to save with the user to validate subsequent requests.
 
-The workflow flow is:
+
+The workflow of this page is:
 
 **On Get**
 
 * Display the QR code and Manual Code
 * Initialize the CustomerSecret key
-* Remove a 2FA Setup ('remove' task parameter)
+* Allow removal of a 2FA Setup ('remove' task parameter)
 
 **On Post** 
 
@@ -350,7 +356,8 @@ At this point our 2FA is set up for the application.
 ### Validating a 2FA Authenticator Key
 If 2FA is enabled the user has to first log in with username and password, and is then redirected to the additional Two Factor Validation form. 
 
-![](ValidationCodeForm.png)
+![](ValidationCodeForm.png)  
+<small>**Figure 7** - Form to verify a validation code</small>
 
 The user then has to use the Authenticator app to generate a validation key, either types it in or auto-fills it.  The application then validates the key. For validation, `GoogleAuthenticator` makes it very easy to verify a validation key:
 
@@ -472,6 +479,8 @@ AppUserState.IsTwoFactorValidated = twoFactor.ValidateTwoFactorPIN(customer.TwoF
 ```
 
 `AppUserState` is an internal framework component I use to hold cached state that is used throughout the application. It's persisted across requests and available at any time in the Request pipeline to give easy access to commonly accessed data like userid, username, displayname, etc. as well as some user related state like in this case the TwoFactorValidation status. Once logged in successfully both with user auth and the 2FA validation, `IsAuthenticated()` checks both the original login status (is there a userId) and the TwoFactorValidation status. If 2FA validation is turned off or the user decides not to use it the `IsTwoFactorValidated` is set to `true`.
+
+##AD##
 
 The application can then at any point check `AppUserState.IsAuthenticated()` to check whether the user is authenticated - both for primary and 2FA auth.
 
