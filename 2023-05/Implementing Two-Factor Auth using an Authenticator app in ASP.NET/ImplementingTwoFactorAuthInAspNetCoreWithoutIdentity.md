@@ -1,16 +1,16 @@
 ---
 title: Implementing Two-Factor Auth using an Authenticator App in ASP.NET
+featuredImageUrl: https://weblog.west-wind.com/images/2023/Implementing-Two-Factor-Auth-using-an-Authenticator-app-in-ASP.NET/ChainLinkBanner.png
 abstract: "Two factor authentication using Authenticator apps is getting more popular. One advantage of Authenticator 2FA is that you don't need to use a service nor do users have to provide additional bits of personal information. It's easy to implement, doesn't cost anything and also very secure as it uses one-time codes that can't easily be corrupted short of physical take over of a device. In this article I describe how Authenticator based 2FA works in the context of an application without using ASP.NET Identity. "
-categories: ASP.NET Security
 keywords: Two Factor Authentication, Authentication, Authenticator, Authy,2FA
+categories: ASP.NET Security
 weblogName: West Wind Web Log
 postId: 3847525
-dontInferFeaturedImage: false
-dontStripH1Header: false
-postStatus: publish
-featuredImageUrl: https://weblog.west-wind.com/images/2023/Implementing-Two-Factor-Auth-using-an-Authenticator-app-in-ASP.NET/ChainLinkBanner.png
 permalink: https://weblog.west-wind.com/posts/2023/May/17/Implementing-TwoFactor-Auth-using-an-Authenticator-app-in-ASPNET
 postDate: 2023-05-17T23:08:39.5194845-07:00
+postStatus: publish
+dontInferFeaturedImage: false
+dontStripH1Header: false
 ---
 
 # Implementing Two-Factor Auth using an Authenticator App in ASP.NET
@@ -80,12 +80,15 @@ You can copy the code (if set up to manually fill) or you can set up the 1Passwo
 >
 > While that's true to some extent, the important thing is that 2FA works not so much because of separate devices, but rather that you are validating two independent pieces of information. 
 >
-> While email and passwords can be hacked at the host site, Authenticator security comes from the fact that it's second, very short lived one-time piece of information that can only be compromised by physically gaining access to an unlocked device, or by corrupting the key store provider. If the key store is corrupted an attacker still would have to correlate the keys to a Web site and a username and password combo. Not impossible (social engineering or gun to your head), but pretty unlikely.
+> While email and passwords can be hacked at the host site, Authenticator security comes from the fact that it's a second, very short lived, one-time piece of information that can only be compromised by physically gaining access to an unlocked device, or by compromising the key store provider. If the key store is corrupted an attacker still would have to correlate the keys to a Web site and a username and password combo. Not impossible (social engineering or gun to your head), but as far as the real world goes - pretty unlikely.
 
 ## Implementation
-I'm going to be talking about this topic in the context of an actual application, so the code presented here **is not meant to be cookie cutter, of the 'just plug it in' type**. Rather it's intended to show you what you need to know and how it all fits together in the context of a larger application. The bits and pieces are pretty small and can be easily adapted for integration into your own solutions.  I do provide most of the code in small snippets and also with links to the implementation in [the Web Store on GitHub](https://github.com/RickStrahl/Westwind.Webstore) if you want to look at it in the full context of an application.
+I'm going to be talking about this topic in the context of an actual application, so the code presented here **is not meant to be cookie cutter, of the 'just plug it in' type**. Rather it's intended to show you what you need to know and how it all fits together in the context of a real application. The bits and pieces are pretty small and can be easily adapted for integration into your own solutions. I do provide most of the code in small snippets and also with links to the implementation in [the Web Store on GitHub](https://github.com/RickStrahl/Westwind.Webstore) if you want to look at it in the full context of an application.
 
-To give some context, in my Web Store application I'm using username/password based authentication with 2FA as an optional add-on that sits on top of the existing authentication scheme. 
+To give some context, in my Web Store application I'm using:
+
+* Custom Username Password Authentication (not using Identity)
+* 2FA Authenticator authenticate
 
 ##AD##
 
