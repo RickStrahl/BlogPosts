@@ -18,11 +18,11 @@ dontStripH1Header: false
 
 I'm in the process of updating the next version of [Markdown Monster](https://markdownmonster.west-wind.com) to run under .NET Core using .NET 7.0.
 
-Although Markdown Monster has supported .NET Core for some time I've kept it running on .NET Framework for the time being. However, I've gradually moved various parts that needed updates to .NET Core over the last couple of years and recently I've got the final libraries moved over so that all existing features are not working on Core.
+Although Markdown Monster has supported .NET Core for some time I've kept it running on .NET Framework for the time being. However, I've gradually moved various parts that needed updates to .NET Core over the last couple of years and recently got the final libraries moved over so that all existing features and built-in addins are now working on .NET 7.0.
 
-The technical aspects of the migration were never a big deal - the move from .NET Framework to .NET Core was surprisingly painless even though MM has a boatload of oddball integrations. For the most part it all just worked or could be fixed with relatively minor updates, although there were a few library dependencies that needed customizations or re-packaging along the way.
+The technical aspects of the migration were never a big deal - the move from .NET Framework to .NET Core was surprisingly painless even though MM has a boatload of oddball integrations. For the most part it all just worked or could be fixed with relatively minor updates, although there were a few library dependencies that needed customizations or re-packaging for .NET Core or .NET Standard along the way.
 
-What has been mostly holding me back was how to distribute the application without undue bloating of the download installer sizes or effectively getting the shared .NET Core runtimes installed. And this latter point is the focus of this post:
+No, what was holding me back was the issue on **how to distribute the application** without undue bloating of the download installer sizes or effectively getting the shared .NET Core runtimes installed. The Runtime Distribution is the focus of this post:
 
 * Discussion of Runtime Distribution modes for Desktop Applications
 * Comparison of distribution modes and sizes
@@ -35,9 +35,9 @@ What has been mostly holding me back was how to distribute the application witho
 Let's dive in...
 
 ## Bennies!
-Moving to .NET Core isn't a major change in terms of product features, but it is one that I had to make at some point as .NET Framework code - while it still works - is slowly but surely falling behind in functionality and features compared to .NET Core.  Most of the improvements for Desktop applications are more developer focused, but nevertheless it seems prudent to move forward to the currently recommended platform rather than holding out. 
+Moving to .NET Core isn't a major change in terms of product features, but it is one that I had to make at some point as .NET Framework code - while it still works - is slowly but surely falling behind in functionality and features compared to .NET Core.  For desktop applications I'd say most of the improvements are more developer focused, but nevertheless it seems prudent to move forward to the currently recommended platform rather than holding out and hope things don't break or key libraries no longer support full framework (and there are more and more of those!). 
 
-Technically I could have moved to Core quite a while ago as I've long ported the application to run (with a few, very recent holdouts), but my biggest issue has  been balancing the pros of improved tooling, performance and being *'up to date'* vs the increased complexity of runtime distribution.
+Technically I could have moved to Core quite a while ago as I've long ported the application to run, but my biggest issue has  been balancing the pros of improved tooling, performance and being *'up to date'* vs the increased complexity or potential size penality of runtime distribution.
 
 **Benefits**
 
@@ -67,7 +67,7 @@ The existing version of Markdown Monster 2.x runs on .NET Framework (NetFX) and 
 It's been easy peasy.
 
 ### .NET Core Runtimes require More Effort
-For MM v3.x running on .NET Core runtimes are now transient and **constantly changing**. Applications have to somehow provide a runtime as part of their setup by either:
+For MM v3.x running on .NET Core runtimes are now transient and **constantly changing**. Applications have to somehow provide a runtime as part of their setup by either by:
 
 * Using a shared globally installed System Runtime
 * Shipping the required runtime files with your app
