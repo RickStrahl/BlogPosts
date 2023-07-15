@@ -1,24 +1,20 @@
 ---
 title: Creating Custom .NET Project Types with .NET CLI Project Templates
 abstract: Custom project templates can be extremely useful in quickly creating new projects especially for extensible applications. They're also great for creating specialized setups to make it quicker to hit the ground running. With the .NET SDK tooling new project templates are now easy to create and this post takes you through the process.
-categories: .NET, .NET Core
 keywords: project,template,dotnet new
+categories: .NET, .NET Core
 weblogName: West Wind Web Log
 postId: 2036743
+permalink: https://weblog.west-wind.com/posts/2020/Oct/05/Creating-a-dotnet-new-Project-Template
+postDate: 2020-10-05T23:05:11.5235085-07:00
+postStatus: publish
 dontInferFeaturedImage: true
 dontStripH1Header: false
-postStatus: publish
-permalink: https://weblog.west-wind.com/posts/2020/Oct/05/Creating-a-dotnet-new-Project-Template
-postDate: 2020-10-05T20:05:11.5235085-10:00
-customFields:
-  wp_post_thumbnail:
-    id: 
-    key: wp_post_thumbnail
-    value: https://weblog.west-wind.com/images/2020/Creating-.NET-Project-Templates/ProjectTemplateLayout.png
 ---
 # Creating Custom .NET Project Types with .NET CLI Project Templates
 
-
+![](Banner.png)\
+*<small>updated: July 15th, 2023</small>*
 
 I recently updated my [Visual Studio template for creating Markdown Monster addins](https://marketplace.visualstudio.com/items?itemname=rickstrahl.markdownmonsteraddinproject) in order to support the newer .NET SDK style projects, which are easier to work with and provide a 'ready-to-run' [Markdown Monster Addin project](https://markdownmonster.west-wind.com/docs/_4ne0s0qoi.htm) which was not quite possible with the older project type and a project template.
 
@@ -36,7 +32,7 @@ The new project system also supports a straight forward mechanism for creating y
 
 You can also create your own templates and easily publish and share them via NuGet. They are easy to create: You create a template project that contains all the files you want to be contained in your template, and wrap around a project folder hierarchy and add a small metadata file that describes your template.
 
-The wrapped template - or several of them - can then be bundled up into a NuGet package that can be published and shared on the NuGet Repository and can be installed via `dotnet new -i <package-name>`.
+The wrapped template - or several of them - can then be bundled up into a NuGet package that can be published and shared on the NuGet Repository and can be installed via `dotnet new install <package-name>`.
 
 While this is process is not vastly different from the process for Visual Studio Templates, the syntax and metadata used, plus the debug and run cycle is much more manageable. For example, you can simply update your template by reinstalling it and re-running the template. Templates can be installed from online NuGet packages, local NuGet packages, or a local folder. This makes it quick and easy to make changes to a template, test it out again and get it perfect.  When done publishing to NuGet for sharing your template with the world is just a few more simple commands away.
 
@@ -275,11 +271,11 @@ The good news is that unlike Visual Studio extensions it's super easy to install
 You can also install your project template from:
 
 * **A NuGet package from NuGet.org**  
-`dotnet new -i <package-id>`
+`dotnet new install <package-id>`
 * **A local NuGet Package from a folder**  
-`dotnet new -i <path-to-nuget-package>`
+`dotnet new install <path-to-nuget-package>`
 * **A Project Folder**  
-`dotnet new -i <path-to-project-template-folder>`
+`dotnet new install <path-to-project-template-folder>`
 
 For initial testing the easiest is usually to use your project template folder, which in my example here is the path to the `MarkdownMonsterAddinProject` folder in **Figure 1**.
 
@@ -287,7 +283,7 @@ To test the addin:
 
 ```ps
 # Install template from local folder
-dotnet new -i "<project-path>\templates\MarkdownMonsterAddinProject"
+dotnet new install "<project-path>\templates\MySweetAddin"
 
 # create a new project folder
 md \projects\MySweetAddin
@@ -300,17 +296,17 @@ dotnet new -n MySweetAddin -c "West Wind Technologies"
 code .
 ```
 
-If you install your template and you find out that it's not working quite right, you can simply fix the template in your project and then re-run the `dotnet new -i` command to re-install the template from the folder. You can then simply delete the contents of the generated project folder and re-run the install:
+If you install your template and you find out that it's not working quite right, you can simply fix the template in your project and then re-run the `dotnet new install` command to re-install the template from the folder. You can then simply delete the contents of the generated project folder and re-run the install:
 
 ```ps
 # assuming you're still in the MySweetAddin folder
 remove-item *.* -f -recurse
 
-# reinstall the template
-dotnet new -i "<project-path>\templates\MarkdownMonsterAddinProject"
+# install the template
+dotnet new install "<project-path>\templates\MySweetAddin"
 
-# create the project again
-dotnet new -n MySweetAddin -c "West Wind Technologies"
+# create the project
+dotnet new -n MySweetAddin --company "West Wind Technologies"
 code .
 ```
 
@@ -342,29 +338,29 @@ if (test-path ./nupkg) {
 dotnet build -c Release
 
 $filename = gci "./nupkg/*.nupkg" | sort LastWriteTime | select -last 1 | select -ExpandProperty "Name"
+
+
 $len = $filename.length
 
 if ($len -gt 0) {
     Write-Host "Signing... $filename"
-    nuget sign  ".\nupkg\$filename"   -CertificateSubject "West Wind Technologies" -timestamper " http://timestamp.comodoca.com"
+    nuget sign  ".\nupkg\$filename" -CertificateSubject "West Wind Technologies" -timestamper " http://timestamp.digicert.com"  
        
-    # nuget setapikey <key> -source nuget.org
-       
-    nuget push  ".\nupkg\$filename" -source nuget.org
+    nuget push  ".\nupkg\$filename" -source "https://nuget.org" 
 }
 ```
 
 Here's the package, published on NuGet:
 
-![](PublishedPackage.png)  
+![](PublishedPackage.png)
 <small>**Figure 4** - The published package on NuGet</small>
 
 ### Installing and Running from NuGet
 Once the package has been published you can now install it from NuGet.org by simply running:
 
 ```ps
-# install/update the project template
-dotnet new -i MarkdownMonster.AddinProject.Template
+# First-time install/update the project template
+dotnet new install MarkdownMonster.AddinProject.Template
 
 # Create the new project
 md \projects\MySweetAddin
@@ -390,8 +386,8 @@ Cool. One nice thing about the new .NET SDK templates is that they can be custom
 
 Sweet!
 
-### What about Visual Studio?
-You can of course also open this generated project in Visual Studio; you don't need to compile or run from the command line as I'm doing here. 
+### Open generated Project in Visual Studio
+You can of course also open this generated project in Visual Studio. You don't need to compile or run from the command line as I've shown above.
 
 To open the project in Visual Studio:
 
@@ -404,33 +400,39 @@ Here's what the generated folder and Visual Studio look like when the project is
 ![](ProjectInVisualStudio.png)  
 <small>**Figure 6** - Opening the new project in Visual Studio</small>
 
+> If you want to auto-launch an addin you'll probably want to add a `Properties\Launchsettings.json` file that points at your main executable that launches the app and then launches your addin.
 
-## Visual Studio Extension or Dotnet New Template
+## Visual Studio Extension or Dotnet New Template?
 In this article I've gone into detail on how to create a project template with the `dotnet new` SDK tooling and it's pretty easy to create these templates. Compared to creating a Visual Studio addin the process of the project template creation is much simpler and much more maintainable. It's easier to create the templates, much, much easier to test and update them, and the format layouts are straight-forward so that coming back to them after a few months won't be a shock. By comparison Visual Studio Project Template Extensions are a bit painful, especially the VSIX creation process.
 
-The big benefit of a Visual Studio Extension is discoverability and ease of installation in Visual Studio. Using the Visual Studio Marketplace is very easy and quick - although you do have to restart Visual Studio these days to install new extensions.
 
-dotnet new templates unfortunately do not show up in Visual Studio's New Project dialog (yet), so you're pretty much relegated to using the `dotnet new` command line to create projects. Since that's a one time deal that's probably not a big deal. 
+### Dotnet New Templates: Also playing in Visual Studio now
+The good news is that `dotnet new` installed templates also show up in Visual Studio as a project template, so from a purely functional point of view you no longer need a VSIX extension.
 
-On the plus side, unlike Visual Studio project templates, you can use `dotnet new` templates for any other IDE, so they work with Visual Studio, Rider and any OmniSharp based environment. 
+`dotnet new` installed templates don't show up in the Extensions Manager, so you have to know what you're looking for when creating a new project  by searching for the project type.
 
-For example, [JetBrains Rider](https://www.jetbrains.com/rider/) picks up my new template in the **New Solution** dialog:
+![](DotnetTemplateInVisualStudio.png)
 
-![](RiderNewProjectDialogWithMarkdownMonsterTemplate.png)  
+<small>**Figure 8** - using a dotnet new template in Visual Studio: It's just available</small>
+
+The only downside compared to a full VSIX project is the visibility and discoverability in the Extension Manager and Marketplace app. But functionally the `dotnet new` template provides most of the same features - unless you need explicit shell Visual Studio Shell integration - that a VSIX does, **without all the complexity of setting up and maintaing a VSIX project.
+
+### Dotnet New Templates in Rider: Look for 'Other`
+[JetBrains Rider](https://www.jetbrains.com/rider/) picks up my new template in the **New Solution** dialog on the bottom of the Template list in the **Other** section:
+
+![](RiderNewProjectDialogWithMarkdownMonsterTemplate.png)
 <small>**Figure 7** - JetBrains Rider shows `dotnet new` templates in its *New Solution* dialog</small>
 
-### Dotnet New Templates in Visual Studio
-`dotnet new` installed templates are also available in Visual Studio, but they don't show up in the Extensions Manager, so you have to know what you're looking for to use it by searching for the project type.
+### Template Installation Location (Windows)
+Since templates are just an installed component any environment that supports .NET projects can use them to create a new project by checking for installed templates in a folder:
 
-![](DotnetTemplateInVisualStudio.png)  
-<small>**Figure 8** - Selecting a dotnet new template is still a bit rough</small>
+```ps
+%userprofile\.templateengine\packages
+```
 
-This dialog has seen a lot of improvements since I originally wrote this post. Now you can:
+![](TemplatePackage.png)
 
-* Add an icon `icon.png` in the `templates.config` folder to show an icon
-* Parameters are now prompted for
-
-In short you can easily use the template in Visual Studio, but you have to know how it's there as there's no UI to discover installed templates.
+The folder holds NuGet packages, which are just a Zip file that can be opened and unpacked and parsed with the `./template.config/template.json` file holding the template detail information to display on a template listing.
 
 ## Summary
 Creating project templates can be very productive for certain scenarios. In my scenario of allowing users to easily create new Addins for Markdown Monster, I certainly want to make that process as easy as possible. Nothing sucks more than trying to get stuck before you ever get your first bit of code to run. Project templates make it possible to create a new project that's ready to run with just a few dotnet CLI commands which is awesome.

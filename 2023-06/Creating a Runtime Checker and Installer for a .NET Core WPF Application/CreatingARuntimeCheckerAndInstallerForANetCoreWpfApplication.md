@@ -412,6 +412,7 @@ I'd be curious to hear if there are [any issues](https://github.com/RickStrahl/M
 ## Wouldn't it be nice...
 ... if the .NET EXE launcher had much of this functionality built into it? Instead of sending users to the download directory the launcher could provide the download and install functionality and then launch the EXE afterwards.
 
+
 But... for now this installer + custom launcher provides similar functionality albeit recreating a bunch of functionality that already exists in the native launcher :smile:
 
 ## Summary

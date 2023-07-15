@@ -101,11 +101,16 @@ There aren't very good alternatives for FoxPro if you have to work with 64 bit a
 
 One option is to build out of process COM components. Because the components are out of process they run separately from the host application in their own host and so allow you to use a 32 bit FoxPro server with a 64 bit application.
 
-Another option is to build a Web service (including a local service) of some sort and share data that way.
+Another option is to build a Web service (including a local service) that can run in 32 bit and share data that way.
 
 Finally VFP 10 Advanced also offers options for compiling FoxPro code to 64 bit including creating COM objects, but that introduces its own set of problems if you depend on DLLs that FoxPro might be using (I do in most of my applications) because now the 64 bit FoxPro application can't use 32 bit DLLs. Heads you lose, tails you lose, huh?
 
+[Advantage OleDb drivers](https://www.connectionstrings.com/advantage-ole-db-provider/using-foxpro-tables/) also used to support 64 bit access to FoxPro databases, however since SAP bought them out those drivers no longer seem to be available - I can't find them any longer. If you can dig up the old drivers, that's *a potential option*.
+
 It sucks being stuck in 32 bit, but unfortunately that's what happens eventually with legacy software that is far removed from modern development stacks.
+
+## Alternatives: Don't use FoxPro Data!
+Finally it probably should be stated that using FoxPro data from other applications is probably not the best course of action. If you use a more common data store like SQL Server, PostGres or MySql/MariaDb you have a much easier path to data interoperability. If you still are on FoxPro data, and you plan on continuing to use FoxPro, it might be a worth while consideration to at least update the data access to use a centralized data store that does not require FoxPro specific components to be accessed.
 
 ## Summary
 32 bit technology is on its last leg and the VFP OleDb provider is one of the 32 bit only components that on the very end of that leg and so both the VFP OleDb and ODBC drivers are unlikely to be used in new development that needs to interface with modern applications.

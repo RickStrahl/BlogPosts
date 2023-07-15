@@ -7,7 +7,7 @@ postId: 398834
 
 ![](Raw-Data.jpg)
 
-A few years back I wrote a post about [Accepting Raw Request Content with ASP.NET Web API](https://weblog.west-wind.com/posts/2013/Dec/13/Accepting-Raw-Request-Body-Content-with-ASPNET-Web-API). The process to get at raw request data is rather indirext, with no easy, or official way to get it into Controller action parameters. Not much has raelly changed in ASP.NET Core.
+A few years back I wrote a post about [Accepting Raw Request Content with ASP.NET Web API](https://weblog.west-wind.com/posts/2013/Dec/13/Accepting-Raw-Request-Body-Content). The process to get at raw request data is rather indirext, with no easy, or official way to get it into Controller action params. Not much has raelly changed in ASP.NET Core.
 
 ### Creating a Simple Test Controller
 To check this out I created a new stock Core Web API project and changed the default `ValuesController` to this:

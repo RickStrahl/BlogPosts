@@ -172,19 +172,43 @@ The following **does not work**:
 
 So much promise, so little satisfaction 😂
 
+### Project and Assembly References - Different again
+As if all of this wasn't confusing enough, things work a little differently yet with project and assembly references. Assembly and project references in .NET Core import and output all dependencies into the output folder, so you have to **explicitly prevent that from happening** if you don't want a mess of assemblies in an addin output folder.
+
+The common scenario with assembly references is that I want addin authors to have a quick way to reference the main application by adding either an assembly reference to the binary, or - if they want to work with the source code - use a project reference.
+
+To create a reference that **does not** include all the reference's assemblies:
+
+**Assembly Reference** 
+
+```xml
+<ItemGroup>
+   <Reference Include="MarkdownMonster">
+      <HintPath>..\MarkdownMonster\bin\Release\net7.0-windows\MarkdownMonster.dll</HintPath>
+      <Private>false</Private>
+      <IncludeAssets>compile</IncludeAssets>
+   </Reference>
+</ItemGroup>
+```
+
+**Project Reference**
+
+```xml
+<ItemGroup>
+   <ProjectReference Include="..\MarkdownMonster\MarkdownMonster.csproj" >
+      <Private>false</Private>
+      <IncludeAssets>compile</IncludeAssets>
+   </ProjectReference>
+</ItemGroup>
+```
+
+So this behavior is the opposite of what I described for the NuGet packages. Go figure...
+
+
 ## Summary
-At the end of the day, the only thing works with explicit build output in library projects is:
+At the end of the day, it's great that the build system supports all of these combinations of features. It's annoying that there isn't more consistency and that the naming is confusing at best, and misleading at worst. But it's way more important that we can get the job done and the options allow for that!
 
-* Use: `<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>` to output everything
-* Mark all packages that you **don't want to output** with `<IncludeAssets>compile</IncludeAssets>`
-* Everything else is then sent to the build output folder
-
-This is tedious as this basically says:
-
-* Include everything
-* Then explicitly exclude everything, except the one thing I want to include.
-
-But hey it gets the job done, even if verbose and counter-intuitive and that's better than not working at all :smile:
+It's confusing, but once you know you know and you can copy and paste. But I'll be damned if can remember all this off the top of my head. So I know I'll be back for this post to jog my memory. Maybe you will be too... :metal: 
 
 <div style="margin-top: 30px;font-size: 0.8em;
             border-top: 1px solid #eee;padding-top: 8px;">
