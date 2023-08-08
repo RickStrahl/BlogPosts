@@ -22,8 +22,9 @@ In my desktop applications I've been using a reusable Status bar control that ma
 * Updates not immediately displaying due to Dispatching issues
 * Resetting the status bar after some expiration time
 * Providing some visual clues to draw the eye to the status bar
+* Timing issues related to timeout reset and icon flashing animations
 
-In the past I used to create this functionality for each app then copy it around. I finally took the time to separate this out into a reusable control and helper that can be easily reused. 
+In the past I used to create this functionality for each app then copy it around - and in many cases change it for the different kind of icons used. I finally took the time to separate this out into a reusable control and helper that can be easily reused along with an embedded set of default icons that can be easily customized.
 
 In this post I'll discuss this status control and helper for WPF that addresses the concerns providing a real easy way to add common status bar functionality to your Windows, Dialogs and Controls.
 
@@ -528,6 +529,13 @@ I know because I've worked with various different implementations of this basic 
 Having a default set of Icons that's built-in with the ability to easily override with custom icons which I now customize with FontAwesome icons, and have all the render details taken care of is a big time saver.
 
 Hopefully a few of you will find this library as useful as I have. Enjoy.
+
+## Resources
+
+* [Westwind.Wpf.Statusbar on GitHub](https://github.com/RickStrahl/Westwind.Wpf.Statusbar)
+* [Westwind.Wpf.Statusbar on NuGet](https://www.nuget.org/packages/Westwind.Wpf.Statusbar/)
+* [FontAwesome6 WPF Iconlibrary](https://github.com/MartinTopfstedt/FontAwesome6)
+* [Debouncing and Throttling Dispatcher Events](https://weblog.west-wind.com/posts/2017/Jul/02/Debouncing-and-Throttling-Dispatcher-Events)
 
 <div style="margin-top: 30px;font-size: 0.8em;
             border-top: 1px solid #eee;padding-top: 8px;">
