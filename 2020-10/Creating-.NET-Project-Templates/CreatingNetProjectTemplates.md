@@ -430,9 +430,17 @@ Since templates are just an installed component any environment that supports .N
 %userprofile\.templateengine\packages
 ```
 
+The folder holds NuGet packages which are .zip files so you can peek into the package:
+
 ![](TemplatePackage.png)
 
-The folder holds NuGet packages, which are just a Zip file that can be opened and unpacked and parsed with the `./template.config/template.json` file holding the template detail information to display on a template listing.
+The template details are found in the template configuration file which lives in:
+
+```
+content/templates/YourTemplateName/template.config/template.json
+```
+
+which holds the template detail information that can be used to display the template name and other details which would allow for integration in other tooling.
 
 ## Summary
 Creating project templates can be very productive for certain scenarios. In my scenario of allowing users to easily create new Addins for Markdown Monster, I certainly want to make that process as easy as possible. Nothing sucks more than trying to get stuck before you ever get your first bit of code to run. Project templates make it possible to create a new project that's ready to run with just a few dotnet CLI commands which is awesome.
