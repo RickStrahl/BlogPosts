@@ -46,9 +46,10 @@ This demonstrates most of the features that it provides:
 * Icon changes based on display mode
 * Icon 'flashes' when initially rendered to help draw attention
 * Status messages 'expire' and reset to a default icon and message
-* Handles dispatching so status updates immediately even in sync code
+* Handles dispatching so status updates immediately  
+even in sync code in single code block
 
-Here's another example that demonstrates a few more features of the control and/or helper more generically ([GitHub repo](https://github.com/RickStrahl/Westwind.Wpf.Statusbar/blob/master/SampleApp/MainWindow.xaml.cs))
+Here's another example that demonstrates a few more features of the control and/or helper more generically (from the sample in the [GitHub repo](https://github.com/RickStrahl/Westwind.Wpf.Statusbar/blob/master/SampleApp/MainWindow.xaml.cs))
 
 ![Statusbar generic example](https://github.com/RickStrahl/Westwind.Wpf.Statusbar/raw/master/ScreenCapture.gif)
 
@@ -61,12 +62,12 @@ A basic status bar control that has an icon plus 3 status panels that can be ind
 * **[A Status Bar Helper](#statusbar-helper)**  
 If you prefer to use your own layout for the Statusbar, you can instead use the `StatusbarHelper` to add the status bar update functionality to your own instances. Requires that your Statusbar has an icon `Image` control and a main `TextBlock` area to update which is handled via the helper's `ShowStausXXX()` methods.
 
-Personally I've been using the `StatusbarHelper` version with custom StatusBar instances, because that's where I traditionally have started with. I create a status bar, add my text control and off I go. Then decide to add an icon and update that too.
+Personally I've been using the `StatusbarHelper` version with custom StatusBar instances, because that's what I traditionally have started with. I create a status bar, add my text control and off I go. Then I decide to add an icon and update that too. Then some sort of timeout. Then attention grabbing flashing. It all adds up to a bunch of code that I didn't intend originally :smile:
 
-Eventually all that morphed into the StatusHelper which automates some of that operation.
+Eventually all of that morphed into the `StatusHelper` class which automates some of that operation although my app specific versions were always tied to a specific icon library. In this version I've added dedicated XAML icon resources so the control doesn't have an external icon library dependency, but still has the ability to easily work with custom icons if you choose to.
 
+## How it works
 The idea is that you can basically make very simple calls to update the status bar immediately (not after the Dispatch cycle) and also provide some visual indication of what's going on (an icon) and that the there's something happening (flashing of the icon).
-
 
 To set this up with the StatusHelper looks like this:
 
@@ -263,7 +264,7 @@ As I mentioned you can customize the control itself by providing your own `Statu
 
 Beyond that you can also customize the icons used for the status display. The library ships with its own default icon resources in `icons.xaml` which you can add to your pages via a resource include in your `Window.Resources` or `App.Resources`.
 
-It's possible to override icons globally by overriding the `StatusIcons.Default` collection, per control by creating a new `StatusIcons` instance and replacing the various `ImageSource` properties, or passing an `ImageSource` as a parameter to any of the `ShowStatusXXX()` methods.
+It's possible to override icons globally by overriding the `StatusIcons.Default` or  per control by creating a new `StatusIcons` instance and replacing the various `ImageSource` properties, or by passing an `ImageSource` as a parameter to any of the `ShowStatusXXX()` methods.
 
 Here's an example of how you can replace the per instance icons using [FontAwesome6 icons](https://github.com/MartinTopfstedt/FontAwesome6) by [Martin Topfsted](https://github.com/MartinTopfstedt) for example.
 
@@ -344,6 +345,19 @@ var image = new ImageAwesome()
 };
 StatusbarIcons.DefaultIcon = image.Source;  // overrides anywhere the default is used
 ```
+
+And finally you can call any of the main methods with the `imageSource` set:
+
+```csharp
+var image = new ImageAwesome()
+{
+    PrimaryColor = Brushes.ForestGreen,
+    Height = 15,
+    Icon = EFontAwesomeIcon.Solid_SquareCheck
+};
+Status.ShowStatusSuccess("Done!", itemSource: image.Source);
+```
+
 
 ## Behind the Scenes
 The core functionality of the `StatusHelper` is really what drives this library so a quick look behind the scenes gives you an idea how this works. 
@@ -450,7 +464,7 @@ debounce.Debounce(milliSeconds, (p) =>
 }, null);
 ```
 
-The **debounce operation** ensures that only the latest status operation is applied and that any previously set timers are reset to only respect the last one applied. This functionality uses a [DebouceDispatcher](https://github.com/RickStrahl/Westwind.Wpf.Statusbar/blob/master/Westwind.WPF.Statusbar/Utilities/DebounceDispatcher.cs) that I discussed in a [previous post](https://weblog.west-wind.com/posts/2017/Jul/02/Debouncing-and-Throttling-Dispatcher-Events) and that is included as an internal helper in the library.
+The **debounce operation** ensures that only the latest status operation is applied and that any previously set timers are reset to only respect the last one applied. This functionality uses a [DebounceDispatcher](https://github.com/RickStrahl/Westwind.Wpf.Statusbar/blob/master/Westwind.WPF.Statusbar/Utilities/DebounceDispatcher.cs) that I discussed in a [previous post](https://weblog.west-wind.com/posts/2017/Jul/02/Debouncing-and-Throttling-Dispatcher-Events) and that is included as an internal helper in the library.
 
 ### Icon Animations and Timing
 
