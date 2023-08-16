@@ -11,6 +11,11 @@ postDate: 2023-08-15T16:02:14.9303013-07:00
 postStatus: publish
 dontInferFeaturedImage: false
 dontStripH1Header: false
+customFields:
+  mt_githuburl:
+    id: 
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2023-08/Map%20Physical%20Paths%20with%20an%20HttpContext.MapPath()%20Extension%20Method%20in%20ASP.NET/RootPathMappingInAspNetCoreUsingARequestMappathExtensionMethod.md
 ---
 # Map Physical Paths with an HttpContext.MapPath() Extension Method in ASP.NET
 
