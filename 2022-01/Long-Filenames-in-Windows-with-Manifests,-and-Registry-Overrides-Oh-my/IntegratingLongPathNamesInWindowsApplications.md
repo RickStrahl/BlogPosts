@@ -7,7 +7,7 @@ categories: Windows, .NET
 weblogName: West Wind Web Log
 postId: 2906478
 permalink: https://weblog.west-wind.com/posts/2022/Jan/03/Integrating-Long-Path-Names-in-Windows-NET-Applications
-postDate: 2022-01-03T13:55:32.4771851-10:00
+postDate: 2022-01-03T15:55:32.4771851-08:00
 postStatus: publish
 dontInferFeaturedImage: false
 dontStripH1Header: false
@@ -56,6 +56,11 @@ For an application like Markdown Monster both things have to be in place in orde
 ## Enabling Long Paths in Windows
 There are two ways to enable the core Windows support for long path names.
 
+* Registry Key
+* Group Policy Setting
+
+Unfortunately both are **global** settings that affect all of Windows, rather than application specific. Since long paths can have side effect behaviors, it's probably not a good idea to force it on via an unannounced installation step but rather give an option for it.
+
 ### Registry Key
 For a typical developer the easiest way to add support is via the registry setting.
 
@@ -68,12 +73,12 @@ Windows Registry Editor Version 5.00
 "LongPathsEnabled"=dword:00000001
 ```
 
-or you can use Powershell from an Adminstrative Terminal:
+or you can use Powershell from an Administrative Terminal:
 
 ```ps
 Set-ItemProperty `
   -Path HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem `
-e  -Name LongPathsEnabled -Value 1
+  -Name LongPathsEnabled -Value 1
 ``` 
 
 This enables Windows support for long path names via the core Windows APIs without explicitly having to specify extended path syntax (`\\?\` prefixed described below).
@@ -326,9 +331,11 @@ c:\users\rstrahl\docume~1\longpa~1\evenlo~1\evenmu~1\itgets~1\morede~1\justwh~1\
 ```
 
 #### Using GetShortPath() for External Applications
-I showed how to create above, here are a few examples how I use it. Basically for several scenarios that shell out and pass file names to other applications I use `GetShortPath()` to shorten the path **if the path is near `MAX_PATH` length.
+I showed how to create above, here are a few examples how I use it. Basically for several scenarios that shell out and pass file names to other applications I use `GetShortPath()` to shorten the path **if the path is near `MAX_PATH` length**.
 
-To use it I call the method and make sure to check for `null` results, which means it failed in which case we keep the original file, which likely means that MM will fail in the same way as before. Technically that shouldn't happen and only will if the file doesn't exist in the first place - which is one of the limitations of the API.
+To use it I call the method and make sure to check for `null` results, which means it failed in which case we keep the original file, which likely means that MM will fail in the same way as before. 
+
+Technically that shouldn't happen and only will if the file doesn't exist in the first place - which is one of the limitations of the API. The API works by looking at the current file list and creating numbered versions for overlapping `8.3` filenames which can easily occur when truncating longer filenames.
 
 Here's an example of how I use it in Markdown Monster. The code below is for opening documents in the Preview browser which previously showed a broken image or showed an error loading message.
 

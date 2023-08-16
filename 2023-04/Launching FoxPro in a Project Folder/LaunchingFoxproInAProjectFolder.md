@@ -1,21 +1,21 @@
 ---
 title: Launching FoxPro in a Project Folder
+featuredImageUrl: https://west-wind.com/wconnect/weblog/imageContent/2023/Launching-FoxPro-in-a-Project-Folder/LaunchBanner.png
 abstract: I work with a lot of different customers that use FoxPro to build applications, and it always amazes me when I see developers launching into their application by starting FoxPro and then explicitly navigating - via `CD` commands or even interactively - to the actual project folder for about a minute. In this post I describe why it's a good idea to build a consistent startup environment for your development setup and some of the ways you can accomplish that task.
-categories: FoxPro, Development
 keywords: Startup, Configuration, Development, config.fpw, Shortcut, Launch
+categories: FoxPro, Development
 weblogName: Web Connection Weblog
 postId: 9174
+postDate: 2023-04-15T14:00:20.5799309-07:00
+postStatus: publish
 dontInferFeaturedImage: false
 dontStripH1Header: false
-postStatus: publish
-featuredImageUrl: https://west-wind.com/wconnect/weblog/imageContent/2023/Launching-FoxPro-in-a-Project-Folder/LaunchBanner.png
-postDate: 2023-04-15T11:00:20.5799309-10:00
 ---
 # Launching FoxPro in a Project Folder Consistently
 
 ![](LaunchBanner.png)
 
-I work with a lot of different customers that use FoxPro to build applications, and it always amazes me when I see developers launching into their application by starting FoxPro and then explicitly navigating - via `CD` commands or even interactively - to the actual project folder for about a minute.
+I work with a lot of different customers that use FoxPro to build applications, and it always amazes me when I see developers launching into their application by starting FoxPro and then explicitly navigating - via `CD` commands or even interactively - to the actual project folder for about a minute, and then manually adding paths and other configuration commands to 'set up' their environment just to run their application.
 
 To me that seems a crazy proposition: When you launch FoxPro you should be able to consistently start in a known configured environment. When you launch via a generic FoxPro command and navigate to the project folder you may or may not get a pre-configured environment that is ready to run your application. 
 
@@ -25,7 +25,7 @@ I like to configure projects in such a way that I have a reliable way to start t
 * In the known project folder location
 * With a clean start up environment configured
     * `config.fwp` - Base environment configuration
-    * `Startup.prg` - For more complex stuff, launch from `config.fpw` via `COMMAND=`
+    * `Startup.prg` - For more complex stuff, launch from `config.fpw` via `COMMAND=DO Startup`
 * Dependency paths added to the `SET PATH` setting
 * Common SET Variables set:
     * `EXCLUSIVE OFF`
@@ -166,7 +166,6 @@ To provide a more generic solution that can:
 * Build an execution command
 
 you need something that can execute some code. Preferably something that can generically retrieve the location of the FoxPro installation. 
-
 You can accomplish this with a small PowerShell script. Here's a generic launcher that also gets created into a new Web Connection project:
 
 
@@ -225,6 +224,37 @@ The advantage of the PowerShell script is three-fold:
 * It's fully self-contained
 * It's portable across machines as you can use relative paths
 * It's text and can be shared in Source Code Repositories
+
+## Reset your Environment
+Another related tip is to be able to reset your environment by completely unloading everything loaded.
+
+In FoxPro I use the following commands and tie them to my `F4` key as a shortcut:
+
+```foxpro
+CANCEL
+CLEAR ALL
+CLOSE ALL
+RELEASE ALL
+CLEAR PROGRAM
+CLEAR
+```
+
+Go to **Tools->Macros** and add a new Macro. I use `F4` as the key: 
+
+![](FoxProMacro.png)
+
+The macro text needs to include all whitespace expressions so it looks like this:
+
+```foxpro
+cancel{ENTER}
+clear{SPACEBAR}all{ENTER}
+close{SPACEBAR}all{ENTER}
+release{SPACEBAR}all{ENTER}
+clear{SPACEBAR}prog{ENTER}
+CLEAR{ENTER}
+```
+
+Once the macro is created, you can press `F4` (or whatever key combo you assigned) in the command window to completely clear your environment, followed by `DO STARTUP` if you need additional local project configuration.
 
 ## Summary
 Having a clean startup development environment is crucially important, especially if you work with many projects side by side. It saves time, reduces mistakes and makes your launch configuring automatically repeatable. It's easier to maintain as you don't have to remember random startup and launch instructions especially if you step away from the project for a few months or years and then come back.

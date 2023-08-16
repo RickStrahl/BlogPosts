@@ -11,6 +11,11 @@ postDate: 2023-08-08T13:21:45.0094052-07:00
 postStatus: publish
 dontInferFeaturedImage: false
 dontStripH1Header: false
+customFields:
+  mt_githuburl:
+    id: 
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2023-08/A%20WPF%20Statusbar%20Control/AWpfStatusbarControl.md
 ---
 # A WPF Statusbar Control
 
@@ -52,6 +57,8 @@ even in sync code in single code block
 Here's another example that demonstrates a few more features of the control and/or helper more generically (from the sample in the [GitHub repo](https://github.com/RickStrahl/Westwind.Wpf.Statusbar/blob/master/SampleApp/MainWindow.xaml.cs))
 
 ![Statusbar generic example](https://github.com/RickStrahl/Westwind.Wpf.Statusbar/raw/master/ScreenCapture.gif)
+
+##AD## 
 
 ## Simple Statusbar Operation
 This library consists of two separate components:
@@ -264,6 +271,8 @@ As I mentioned you can customize the control itself by providing your own `Statu
 
 Beyond that you can also customize the icons used for the status display. The library ships with its own default icon resources in `icons.xaml` which you can add to your pages via a resource include in your `Window.Resources` or `App.Resources`.
 
+##AD##
+
 It's possible to override icons globally by overriding the `StatusIcons.Default` or  per control by creating a new `StatusIcons` instance and replacing the various `ImageSource` properties, or by passing an `ImageSource` as a parameter to any of the `ShowStatusXXX()` methods.
 
 Here's an example of how you can replace the per instance icons using [FontAwesome6 icons](https://github.com/MartinTopfstedt/FontAwesome6) by [Martin Topfsted](https://github.com/MartinTopfstedt) for example.
@@ -472,6 +481,8 @@ The final bits of interest are the `SetStatusIcon()` and `FlashIcon()` animation
 
 The Status icon has a couple of optional parameters that allow spinning of the icon, which is a useful feature for progress operations and is used in `ShowStatusProgress()` by default. 
 
+##AD##
+
 The spinning is handled by an animation that is applied to the icon and have it spin around its axis.
 
 ```csharp
@@ -536,7 +547,6 @@ Funny note: Before I implemented the OriginalSize tracking in Markdown Monster y
 
 ## Summary
 A Statusbar control sounds simple and boring, but once you consider the various support operations required for timing out status messages, flashing icons for attention and dealing with a host of different icons, as well as supporting different icon types, it turns out having a reusable component is big time saver. 
-
 
 I know because I've worked with various different implementations of this basic concept with various different types of image sources (different versions of FontAwesome Icons, raw images etc.) and having to adjust to each type of icon and image source for each project was a pain. In fact, I've been sitting on this library for some time, but I had been fretting on what I should do for the icon distribution. Most of my apps these days use FontAwesome icons and my first take was to just reference one of those libraries. I thankfully decided against that to avoid pulling in a big dependency and instead used stock icons converted into XAML and embedded as resources.
 
