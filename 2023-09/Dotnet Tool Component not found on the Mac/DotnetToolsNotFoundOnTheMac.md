@@ -11,13 +11,18 @@ postDate: 2023-09-11T16:05:47.9318402-07:00
 postStatus: publish
 dontInferFeaturedImage: false
 dontStripH1Header: false
+customFields:
+  mt_githuburl:
+    id: 
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2023-09/Dotnet%20Tool%20Component%20not%20found%20on%20the%20Mac/DotnetToolsNotFoundOnTheMac.md
 ---
-# Dotnet Tools not found on the Mac
+# Dotnet Tool not found on the Mac
 ![banner](Banner.png)
 
-This is a very short note to self in regards to running installing and then running a global dotnet tool on a Mac, which apparently after a default install of the .NET SDK, doesn't work *out of the box*.
+This is a very short note to self in regards to installing and then running a global **DotNet Tool** on a Mac, which apparently after a default install of the .NET SDK, doesn't work *out of the box*.
 
-So I installed the .NET SDK using the Mac installer from the d[otnet download page](https://dotnet.microsoft.com/en-us/download) which is easy enough as it now is a one click install.
+Here's the scenario: I installed the .NET SDK using the Mac installer from the [.NET download page](https://dotnet.microsoft.com/en-us/download) which is easy enough as it now is a one click install.
 
 After installing the .NET SDK, I went ahead and installed one of my tools on a Mac using the `dotnet tool install -g` command from the default (ZSH) Mac Terminal:
 
@@ -40,21 +45,23 @@ Unfortunately when I try to now execute the tool with this default configuration
 ```bash
 LiveReloadServer
 
-#or no luck with (why?)
-dotnet tool run -g LiveReloadServer
+#also no luck with this
+dotnet tool run LiveReloadServer
 ```
 
 Here's what I get:
 
 ![Dotnet tool command not finding my Tool](ToolNotFoundWhenExecuting.png)
 
-Hrmph!
+I sort of understand the issue with the stand-alone command which is likely paths not being found. But the direct access to the command - which is listed in the `dotnet tool list` command is rather baffling!
+
+##AD##
 
 ## The Problem: Paths!
 As you might expect the problem here is path resolution. Well at least for the direct access command - the `dotnet tool run` command may have other reasons for failing.
 
 ### Restart the Terminal after Installing SDK
-If you installed the SDK before the terminal was opened the first thing that needs to happen is to restar the terminal so that it can find both the .NET SDK and `dotnet tool` command as well as the tools folder.
+If you installed the SDK before the terminal was opened the first thing that needs to happen is to restart the terminal so that it can find both the .NET SDK and `dotnet tool` command as well as the tools folder.
 
 The initial terminal restart after SDK installs is meant to ensure that:
 
@@ -65,18 +72,18 @@ The initial terminal restart after SDK installs is meant to ensure that:
 ### Fix the Global Folder Path
 Unfortunately, if you're using the default ZSH shell on the Mac, the generated path value is not valid and doesn't work. 
 
-The path is generated `/private/etc/paths.d/dotnet-cli-tools` and it looks like this by default:
+The path to the dotnet tools folder is supposed to be set in  `/private/etc/paths.d/dotnet-cli-tools` and the SDK links to this path using the following path in Path environment file by default:
 
 ```bash
 # /private/etc/paths.d/dotnet-cli-tools
 $HOME/.dotnet/tools
 ```
 
-As mentioned - this doesn't work on ZSH (AFAIK anyway), so you have to expand out the path. `~/.dotnet/tools` also doesn't work.
+As mentioned - this path as set here doesn't work on ZSH (AFAIK anyway). So you have to expand out the path **explicitly**. FWIW, `~/.dotnet/tools` also doesn't work.
 
-> Note that if you use the Bash shell, the profile settings work just fine. It's only in ZSH that the path expansion is not occurring.
+> Note that if you use the Bash shell, the profile settings above work just fine. It's only in the default ZSH shell that the path expansion is not occurring.
 
-The only way I could get it to work is with hardcoding my user path, which is fine since it's a local profile anyway:
+The only way I could get this to work is with explicit expanding my full user path, which is fine since it's a local profile anyway:
 
 ```bash
 # /private/etc/paths.d/dotnet-cli-tools
@@ -87,18 +94,22 @@ The only way I could get it to work is with hardcoding my user path, which is fi
 #~/.dotnet/tools
 ```
 
-> Note that the folder is protected so you have to edit with `SUDO` or if you're using VS Code as I do, you'll be prompted to save using `SUDO` for the save operation.
+> Note that the folder is protected so you have to edit with `SUDO` or if you're using VS Code as I do, you'll be prompted to save using `SUDO` for the save operation or use `SUDO nano /private/etc/paths.d/dotnet-cli-tools`.
 
-Remember to restart the terminal to force a reload the path settings.
+Remember to restart the terminal to force a reload the path environment settings.
 
-With that in place my Dotnet Tool is now working:
+With the explicit path in place, my `dotnet tool` component is now working:
 
 ![LiveReloadServer Dotnet Tool working in shell](SuccessFullToolLaunch.png)
 
 Yay!
 
+So this works, but it's a pain in the ass to remember and change the path value every time you install the .NET SDK.
+
 ## Summary
-Not news this has been a known issue for a long time, but you have to wonder why the .NET SDK install doesn't generate a working path entry on a Mac. This seems like such a common problem. As a casual Mac user this has tripped me up several times over the years and I always struggle to find the right files to update. This post will hopefully remind me to do the right thing a bit quicker...
+Nothing really new here as this has been a known issue for a long time, but you have to wonder why the .NET SDK install doesn't generate a **working path entry** on a Mac. This seems like a common problem - I've hit this at least 3 times now. As a casual Mac user this has tripped me up several times over the years and I always struggle to find the right place to add the correct environment path values. 
+
+This post hopefully reminds me and perhaps a few of you as well, to do the right thing a little bit quicker next time...
 
 ## Resources
 
