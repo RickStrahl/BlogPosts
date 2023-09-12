@@ -1,21 +1,16 @@
 ---
 title: Avoid WebDeploy Locking Errors to IIS with Shadow Copy for ASP.NET Core Apps
+featuredImageUrl: https://weblog.west-wind.com/images/2022/Use-ShadowCopyDirectory-on-IIS-with-ASP.NET-To-Avoid-WebDeploy-Locking-Issues/DeployBoat.jpg
 abstract: If you're self-hosting ASP.NET Core applications on IIS and using WebDeploy to publish to the server, you've very likely run into the dreaded locked file problem on the server. In this post I show you how you can work around locking problems with the base WebDeploy configuration and by using a new experimental feature in ASP.NET 6.0 to Shadow Copy deploy binaries. As a bonus this post also describes setting up and using Web Deploy in some detail.
-categories: ASP.NET, Deployment
 keywords: WebDeploy, Shadow Copy, Locking, IIS, Publish
+categories: ASP.NET, Deployment
 weblogName: West Wind Web Log
 postId: 3558288
+permalink: https://weblog.west-wind.com/posts/2022/Nov/07/Avoid-WebDeploy-Locking-Errors-to-IIS-with-Shadow-Copy-for-ASPNET-Core-Apps
+postDate: 2022-11-07T13:11:36.1551532-08:00
+postStatus: publish
 dontInferFeaturedImage: false
 dontStripH1Header: false
-postStatus: publish
-featuredImageUrl: https://weblog.west-wind.com/images/2022/Use-ShadowCopyDirectory-on-IIS-with-ASP.NET-To-Avoid-WebDeploy-Locking-Issues/DeployBoat.jpg
-permalink: https://weblog.west-wind.com/posts/2022/Nov/07/Avoid-WebDeploy-Locking-Errors-to-IIS-with-Shadow-Copy-for-ASPNET-Core-Apps
-postDate: 2022-11-07T11:11:36.1551532-10:00
-customFields:
-  mt_githuburl:
-    id: 
-    key: mt_githuburl
-    value: https://github.com/RickStrahl/BlogPosts/blob/master/2022-10/Use-ShadowCopyDirectory-on-IIS-with-ASP.NET-To-Avoid-WebDeploy-Locking-Issues/UseShadowcopydirectoryOnIisWithAspNetToAvoidWebdeployLockingIssues.md
 ---
 # Avoid WebDeploy Locking Errors to IIS with Shadow Copy for ASP.NET Core Apps
 
@@ -23,7 +18,7 @@ customFields:
 
 ![Rocky Deployment - boat sliding off launch ramp](DeployBoat.jpg)
 
-If you're self-hosting ASP.NET Core applications on IIS and using WebDeploy to publish to the server, you've very likely run into the dreaded locked file problem on the server. You start to publish to the server, and the publish fails half way through, with an File in Use error because files on the server are locked. 
+If you're self-hosting ASP.NET Core applications on IIS and using WebDeploy to publish to the server, you've very likely run into the dreaded locked file problem on the server. You start to publish to the server, and the publish fails half way through, with an File in Use error because files on the server are locked.
 
 Regardless of whether you publish from within Visual Studio or you publish from the command line (via `dotnet publish` or `MSDeploy`) you have probably run into this issue:
 
@@ -33,34 +28,49 @@ The error is the dreaded `ERROR_FILE_IN_USE` which indicates that one of the fil
 
 This means when applications are shut down for updates from WebDeploy, sometimes it's possible to retry and succeed, but at other times this update never succeeds. This happens even, if the `AppOffLine.html` option is enabled in the profile, which is supposed to unload the app before it starts updating. Alas - it does not, at least not always.
 
+In this scenario, not only did the publish not work, but most likely you've just screwed up your live deployed site as files were partially published leaving the app in an inconsistent state. It'll also leave around an app_offline.htm which signals IIS to show that page (which is empty by default) leaving your site dead in the water.
+
+The solution in the past has been -  *let the punishment continue until morale improves*: You try again, and if necessary recycle the App Pool or IIS on the server then try again.
+
+That sucks big time!
+
+Long story short in .NET 6 and later Microsoft has brought back Shadow Copy deployment for IIS publishing via Web Deploy, which can alleviate these issues.
+
 I'll break this post down into two major sections:
 
 * Part 1: Shadow Copying - What is it, what problem does it solve, and how do you use it
 * Part 2: Setting up WebDeploy for Publishing to IIS both on the client and server
 
-The latter is obviously out of order, but if you're new to IIS Publishing and WebDeploy or it's been a while, it might be good to get a quick start or refresher to get up to speed.
+The latter is obviously out of order, but Web Deploy is so badly supported and even more badly (:smile:) documented that I thought it'd be useful to add it to this post, if for nothing else than my own reference.
+
+But before we get to the solution, let's talk about the problem.
 
 ## Why are Files Locked Files in ASP.NET Core Applications?
-Unlike classic ASP.NET applications, by default ASP.NET Core applications are hosted and execute **in place** when running in IIS or anywhere else. This means that the application **runs directly in the location that it is deployed** and loads all files out of that folder. 
+Unlike classic ASP.NET applications, by default ASP.NET Core applications are hosted and execute **in place** when running in IIS or anywhere else. This means that the application **runs directly in the location that it is deployed in** and loads all files out of that folder which Microsoft calls the `ContentRoot`. 
 
-On IIS, ASP.NET Core is hosted through the **ASP.NET Core Hosting Module (ANCM)** which is responsible for firing up the .NET Runtime - either in-process or out-of-process - and starting up your .NET core application. The module handles translating IIS's inbound data stream so ASP.NET Core can consume the data using the familiar ASP.NET Request/Response/Server model.
+On IIS, ASP.NET Core is hosted through the **ASP.NET Core Hosting Module (ANCM)** which is responsible for firing up the .NET Runtime - either in-process or out-of-process - and starting up your .NET core application. The module handles translating IIS's inbound data stream so ASP.NET Core can consume the data using the familiar ASP.NET Request/Response/Server model. 
 
-WebDeploy is the tooling technology you can use to publish ASP.NET Core applications to a self-hosted instance of IIS. It copies files, is supposed to unload the running application (with mixed results), updates files and then is supposed to restart the application. 
+> #### @icon-info-circle In-Process or Out of Process
+> In general **you'll want to use InProcess hosting with IIS** as the message passing between IIS and the ASP.NET Core framework is much quicker than out of process hosting, which sends proxy HTTP requests to an externally running Kestrel .NET Core process.
+
+For publishing to a self-hosted IIS Web site, WebDeploy is the tooling technology you can use to publish ASP.NET Core applications. WebDeploy can handle file copying, is supposed to unload the running application (with mixed results), updates files and then is supposed to restart the application. 
 
 Although WebDeploy has a basic mechanism of unloading the running Application on IIS before copying files using `AppOffline.html`, often this simple IIS unload mechanism fails, and files continue to be locked. Usually this is due to the application still running pending requests or running some background operations that have not completed and released their background threads. End result: In some cases the IIS application does not unload.
 
 Sometimes you can wait a little bit and try again, but if the application is super busy or has long running requests or background services it might be increasingly difficult to update the application without explicitly shutting down the Web application on the server.
 
-This experience sucks, especially if you need to get a fix out quickly. Even worse in some scenarios this can leave your application in a non-running state as some files were updated and others did not. Unfortunately, **this default behavior  is not uncommon.**
+This experience sucks, especially if you need to get a fix out quickly. Even worse in some scenarios this can leave your application in a non-running state as some files were updated and others did not. Unfortunately, **this default behavior is not uncommon.**
 
 ##AD##  
 
 ## Part 1: Shadow Copying
-Thankfully with .NET 6.0 and later an oldie but goodie feature called **Shadow Copying** is coming back. This feature originated in Classic ASP.NET where it was the default deploy scheme, but it is not the default behavior in ASP.NET Core which executes binaries in-place in the original deploy folder.
+Thankfully with .NET 6.0 and later an oldie but goodie feature called **Shadow Copying** is now available for ASP.NET Core apps. This feature originated in Classic ASP.NET where it was the default deploy scheme, but it is not the default behavior in ASP.NET Core which executes binaries in-place in the original deploy folder.
 
-Unlike in-place execution where binaries are run from where they are copied, Shadow Copying copies files into a separate temporary folder in addition to keeping them in the actual deploy folder. Files are published to the deploy folder first and a background operation in IIS then detects that the binaries have changed and copy the files to a secondary, temporary location. Once the copy operation is complete, the application is restarted with binary file loading re-directed to retrieve binaries from the temporary, shadow copy location.
+Unlike in-place execution where binaries are run from where they are copied, Shadow Copying copies files into a separate temporary folder in addition to keeping them in the actual deploy folder. Files are published to the deploy folder first and a background operation in IIS then detects that the binaries have changed and copy the files to a secondary, temporary location. 
 
-In .NET Core this, this is how this works:
+Once the copy operation is complete, the application is restarted with binary file loading re-directed to retrieve binaries from the temporary, shadow copy location.
+
+In .NET Core this, this is how the ShadowCopy behavior works:
 
 `Environment.CurrentDirectory` continues to reflect your original deploy folder - the application isn't actually running out of the shadow deploy folder. But if you check the currently executing assembly you'll find that it is executing out of a temporary folder.
 

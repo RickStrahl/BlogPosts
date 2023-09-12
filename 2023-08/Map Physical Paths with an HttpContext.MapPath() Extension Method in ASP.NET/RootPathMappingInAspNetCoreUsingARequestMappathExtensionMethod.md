@@ -11,11 +11,6 @@ postDate: 2023-08-15T16:02:14.9303013-07:00
 postStatus: publish
 dontInferFeaturedImage: false
 dontStripH1Header: false
-customFields:
-  mt_githuburl:
-    id: 
-    key: mt_githuburl
-    value: https://github.com/RickStrahl/BlogPosts/blob/master/2023-08/Map%20Physical%20Paths%20with%20an%20HttpContext.MapPath()%20Extension%20Method%20in%20ASP.NET/RootPathMappingInAspNetCoreUsingARequestMappathExtensionMethod.md
 ---
 # Map Physical Paths with an HttpContext.MapPath() Extension Method in ASP.NET
 
@@ -59,7 +54,7 @@ In order to get at these two values you need an instance of `IWebHostEnvironment
 > In ASP.NET Core versions prior to 3.0, there was no `IWebHostEnvironment`. Instead you had to use  `IHostingEnvironment` to access `ContentRootPath` and `WebRootPath`. The syntax otherwise was the same.
 
 ## Resolving Relative Paths
-To make root path retrieval and mapping a relative path onto it easier, here's a `MapPath` extension method for the `HttpContext` object:
+To make root path retrieval and mapping a relative path to a physical, on-disk path easier, here's a ASP.NET Core version of a `MapPath()` extension method for the `HttpContext` object:
 
 ```csharp
 public static class HttpContextExtensions

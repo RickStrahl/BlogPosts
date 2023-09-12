@@ -11,11 +11,6 @@ postDate: 2023-08-08T13:21:45.0094052-07:00
 postStatus: publish
 dontInferFeaturedImage: false
 dontStripH1Header: false
-customFields:
-  mt_githuburl:
-    id: 
-    key: mt_githuburl
-    value: https://github.com/RickStrahl/BlogPosts/blob/master/2023-08/A%20WPF%20Statusbar%20Control/AWpfStatusbarControl.md
 ---
 # A WPF Statusbar Control
 

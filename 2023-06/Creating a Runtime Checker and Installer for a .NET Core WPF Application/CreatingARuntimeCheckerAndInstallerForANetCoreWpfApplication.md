@@ -239,7 +239,7 @@ In `-silent` mode, the code runs without all the prompts and runs the actual run
 ##AD##
 
 ### Small Console Project
-The project is a small .NET 4.72 Console project that produces a small EXE file (~30k). I'm using .NET 4.72 since it's available on any Windows 10+ platform (and likely on anything Windows 7+).
+The project is a small **.NET 4.72 Console project** that produces a small fully self-contained .EXE file (~30k). I'm using .NET 4.72 since it's built-in on any Windows 10+ platform (and likely on anything Windows 7+) and has no other dependencies.
 
 You can use the project as is to create the EXE, but you'll probably want to rename the executable to something that matches your application like `myAppLauncher` or `myAppInstaller` etc.
 
@@ -381,9 +381,9 @@ catch (Exception ex)
 And we're done!
 
 ### How I'm using this Launcher
-The launcher can be used interactively from the command line or you can launch it from an installer.
+The launcher can be used interactively from the command line or you can launch it from within an installer.
 
-In Markdown Monster I already am using an optional launcher program to provide shortcut access to the main executable  named `mm.exe`. For the most part it simply forwards the command line to the larger main executable. 
+In Markdown Monster I already am using an optional launcher program to provide shortcut access to the main executable  named `mm.exe`. For the most part it simply forwards the command line to the larger main executable, but for the runtime installer I simply added an additional command line option to perform the install described here.  Since the code is a single file it's easy to add to an existing project with minimal impact - all that needs to happen is the check for the command line and calling the install component.
 
 > In .NET Core because the main EXE  is not actually your code and therefore very small, you can now simply rename the main exe to the shortcut. But alas since I need a launcher, I continue to use the old `mm.exe` file, leave it as a Net472 executable and add support for the `-runtimeinstall` switch to handle the installation tasks.
 

@@ -1,16 +1,21 @@
 ---
 title: 'Back to Basics: Rewriting a URL in ASP.NET Core'
+featuredImageUrl: https://weblog.west-wind.com/images/2021/Rewriting-a-URL-in-ASP-NET-Core/RewriteHistory.jpg
 abstract: Sometimes in an application you need to take over the routing process with some custom processing that acts on an incoming URL and actually has to go to another URL. This can be a simple relinking task from old content to new, or it can be more complex where you access a specific URL on the public site that actually needs to be processed by another URL altogether.
-categories: ASP.NET Core
 keywords: UrlRewrite,Redirect,Rewrite
+categories: ASP.NET Core
 weblogName: West Wind Web Log
 postId: 1603425
+permalink: https://weblog.west-wind.com/posts/2020/Mar/13/Back-to-Basics-Rewriting-a-URL-in-ASPNET-Core
+postDate: 2020-03-13T21:11:56.4843833-07:00
+postStatus: publish
 dontInferFeaturedImage: false
 dontStripH1Header: false
-postStatus: publish
-featuredImageUrl: https://weblog.west-wind.com/images/2021/Rewriting-a-URL-in-ASP-NET-Core/RewriteHistory.jpg
-permalink: https://weblog.west-wind.com/posts/2020/Mar/13/Back-to-Basics-Rewriting-a-URL-in-ASPNET-Core
-postDate: 2020-03-13T18:11:56.4843833-10:00
+customFields:
+  '':
+    id: 
+    key: ''
+    value: ''
 ---
 # Back to Basics: Rewriting a URL in ASP.NET Core
 
@@ -33,6 +38,8 @@ There a few common scenarios for re-writing URLs:
 The first two are pretty obvious as they are simple transformations - go from one URL to another because either some content has moved or as part of a change of state that requires to user to see something different. This is quite common especially in applications that have been around for a while and have changed around a bit.
 
 A less common but arguably more useful use case are URL transformations for tools that render **custom content**. For example, my [westwind.aspnetcore.markdown](https://github.com/RickStrahl/Westwind.AspNetCore.Markdown) page processing middleware, lets you access either an `.md` 'page' or an extensionless folder with a specified `.md` file inside of it. When one of these monitored URLs is accessed, a rewrite middleware actually routes the original request to a common markdown controller endpoint that renders the Markdown into a page template while the original URL stays the same. This is a classic **rewrite scenario**.
+
+##AD##
 
 The most common rewrite scenario however, likely is at the application level. If you're building applications you've almost certainly had a need to redirect to another endpoint at some point. Think Login and Authentication - you hit a Login URL, the URL logs you in and as part of the login routine - once successful - you're redirected to a start page, or a redirect URL that was passed in. Most HTML applications and some REST services that requires identity have a handful of requests like this that require explicit redirects. This is a classic **redirect scenario**.
 
@@ -112,13 +119,43 @@ app.Use(async (context,next) =>
 });
 ```
 
+> `Response.Redirect()` in ASP.NET Core doesn't do automatic path fixups as classic ASP.NET did. You can't use: `Response.Redirect("~/docs/MarkdownDoc.md")` but you have to specify the whole full site relative path or absolute Url.
+
 Unless your target URL includes application external URLs I'd argue there's no good reason to use a Redirect in middleware. It only makes sense for external, non-application URLs in that scenario.
 
 However, Redirects are more commonly used when you need to redirect as part of your application/controller logic, where you can't use a rewrite operation because the path has already been routed to your application endpoint/controller method.
 
 Notice also in the code above that it's a good idea to short-circuit the Response when redirecting, rather than continuing through the rest of the middleware pipeline.
 
-> Note also that `Response.Redirect()` in ASP.NET Core doesn't do automatic path fixups as classic ASP.NET did. You can use: `Response.Redirect("~/docs/MarkdownDoc.md")` but you have to specify the whole path.
+##AD##
+
+### Routing Order is Important!
+If you plan on using Url Rewriting or generic redirection, **it's important that you do it at the right time in the routing and request handling sequence** during start up. You want to make sure you do your rewriting **before** the operations you need to rewrite to but after anything that you don't want to have routed (like static files most likely).
+
+Specifically, rewrites should be declared **before** 
+
+* `app.UseRouting()`,
+* `app.UseRazorPages()`
+* `app.UseMvcControllers()` 
+*  or any other end point route handlers
+
+You may also need to decide how static pages are handled before or after your rewriting. Ideally if your static content is not affected you'd want to declare it prior to your rewrites, but if paths are affected then put it after.
+
+Here's what a typical rewrite and routing setup might look like:
+
+```cs
+// don't rewrite static content - if you do put after app.Use()
+app.UseStaticFiles();
+
+// do your rewrites against anything that FOLLOWS
+app.Use(async (context, next) => 
+   // ... rewrite logic
+});
+
+// IMPORTANT: Do after custom redirects so rewrites
+//            are applied here
+app.UseRouting();
+```
 
 ## The ASP.NET Core Rewrite Middleware Module
 For more complex rewrite and redirect scenarios you can also use the full-fledged ASP.NET Core Rewrite Middleware. It's beyond the scope of this article to go into the details of this complex module, but basically it provides the ability to set regEx based rewrites and redirects and  a number of different and some common rewrite operations.
