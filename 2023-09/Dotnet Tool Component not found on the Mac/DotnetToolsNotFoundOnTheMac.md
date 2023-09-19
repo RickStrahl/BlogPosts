@@ -22,7 +22,9 @@ customFields:
 
 This is a very short note to self in regards to installing and then running a global **DotNet Tool** on a Mac, which apparently after a default install of the .NET SDK, doesn't work *out of the box*.
 
-Here's the scenario: I installed the .NET SDK using the Mac installer from the [.NET download page](https://dotnet.microsoft.com/en-us/download) which is easy enough as it now is a one click install.
+One of the reasons I like using `dotnet tool` is that it's one very easy way to create tools/console apps that can run on any platform that support the .NET SDK **without having to explicit target a specific platform**. .NET Tools handles creating the correct proxy file to launch the tool on each platform that the tool is installed.
+
+So here's the scenario: I installed the .NET SDK on a brand new M2 Mac, using the Mac installer from the [.NET download page](https://dotnet.microsoft.com/en-us/download), which is easy enough as it's now a one-click install.
 
 After installing the .NET SDK, I went ahead and installed one of my tools on a Mac using the `dotnet tool install -g` command from the default (ZSH) Mac Terminal:
 
@@ -59,6 +61,10 @@ I sort of understand the issue with the stand-alone command which is likely path
 
 ## The Problem: Paths!
 As you might expect the problem here is path resolution. Well at least for the direct access command - the `dotnet tool run` command may have other reasons for failing.
+
+How do I know that? I can run the dotnet tools installed proxy loader from `~/.dotnet/tools/LiveReloadServer` and that works just fine launching either from Finder or directly from the Terminal.
+
+So paths are the problem...
 
 ### Restart the Terminal after Installing SDK
 If you installed the SDK before the terminal was opened the first thing that needs to happen is to restart the terminal so that it can find both the .NET SDK and `dotnet tool` command as well as the tools folder.
