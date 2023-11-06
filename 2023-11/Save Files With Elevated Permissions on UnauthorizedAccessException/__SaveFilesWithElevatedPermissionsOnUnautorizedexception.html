@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8"/>
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <link href="file:///d:\projects\MarkdownMonsterCode\MarkdownMonster\PreviewThemes\Pdf Output\..\Scripts\fontawesome\css\font-awesome.min.css" rel="stylesheet"/>
+    <link href="file:///d:\projects\MarkdownMonsterCode\MarkdownMonster\PreviewThemes\Pdf Output\Theme.css" rel="stylesheet"/>
+
+
+    <script src="file:///d:\projects\MarkdownMonsterCode\MarkdownMonster\PreviewThemes\Pdf Output\..\Scripts\jquery.min.js"></script>
+    <!--<link href="file:///d:\projects\MarkdownMonsterCode\MarkdownMonster\PreviewThemes\Pdf Output\..\Scripts\highlightjs\styles\vs.css" rel="stylesheet"/>-->
+    <!--<script src="file:///d:\projects\MarkdownMonsterCode\MarkdownMonster\PreviewThemes\Pdf Output\..\Scripts\highlightjs\highlight.pack.js"></script>-->
+    <script src="file:///d:\projects\MarkdownMonsterCode\MarkdownMonster\PreviewThemes\Pdf Output\..\Scripts\preview.js" id="PreviewScript"></script>
+
+    
+
+</head>
+<body>
+<div id="MainContent">
+  <!-- Markdown Monster Content -->
+  <h1 id="save-files-with-elevated-permissions-on-unautorizedexception">Save Files With Elevated Permissions on UnautorizedException</h1>
+<p>When building Desktop Applications that are document based and that allow users to save files in any location - like an editor for example - you may run into a situation where you on rare occasions need to save a file in a location that doesn't have permissions of the current user.</p>
+<p>Ideally the file shouldn't be saved in a restricted location, but sometimes you need to edit a file that lives in this restricted file location, and then save the file after making changes.</p>
+<p>This should be fairly rare, but I've seen a number of instances in my logs of users trying to save files in <a href="https://markdownmonster.west-wind.com/">Markdown Monster</a> and failing with <code>UnauthorizedAccessException</code> due to file location that is inaccessible.
+Rather than outright failing the request, I wanted to show a notification, and give the user the option to save the file with elevated rights on Windows, which amounts to popping up the UAC dialog to elevate the user to Admin in order to save.</p>
+<p>I originally saw this in VS Code and thought this came in quite handy, and I've now implemented something similar in Markdown Monster:</p>
+<p><img src="https://github.com/RickStrahl/ImageDrop/blob/master/MarkdownMonster/SaveElevated.gif?raw=true" alt="Save with Elevation in Markdown Monster" /></p>
+<p>In this example, I'm opening and saving a file in the <code>Program Files</code> folder, which usually <em>doesn't have write permissions</em> for saving a file. When the call to write the file fails, a notification dialog is popped up with an option to <strong>Elevate</strong> and then save the file using the elevated account.</p>
+<blockquote>
+<h4 id="icon-info-circle-uac-elevation"><i class="fa fa-info-circle"></i>  UAC Elevation</h4>
+<p>UAC account elevation only works if the user is or can log on as an Admin on the machine.</p>
+<p>Even though a user may be set up as an 'Admin' user, the account by default runs as a non-Admin user (unless you disable UAC) which can then be elevated to provide admin rights via the UAC dialog.</p>
+<p>If the user is not an Admin an optional login for an Admin account can be provided.</p>
+<p>Failing that, the write operation cannot be performed.</p>
+</blockquote>
+<h2 id="how-to-copy-a-file-with-elevation">How to Copy a File with Elevation</h2>
+
+  <!-- End Markdown Monster Content -->
+</div>
+
+</body> 
+</html>

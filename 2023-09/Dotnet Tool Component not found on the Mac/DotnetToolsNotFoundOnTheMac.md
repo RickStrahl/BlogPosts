@@ -11,13 +11,9 @@ postDate: 2023-09-11T16:05:47.9318402-07:00
 postStatus: publish
 dontInferFeaturedImage: false
 dontStripH1Header: false
-customFields:
-  mt_githuburl:
-    id: 
-    key: mt_githuburl
-    value: https://github.com/RickStrahl/BlogPosts/blob/master/2023-09/Dotnet%20Tool%20Component%20not%20found%20on%20the%20Mac/DotnetToolsNotFoundOnTheMac.md
 ---
 # Dotnet Tool not found on the Mac
+
 ![banner](Banner.png)
 
 This is a very short note to self in regards to installing and then running a global **DotNet Tool** on a Mac, which apparently after a default install of the .NET SDK, doesn't work *out of the box*.

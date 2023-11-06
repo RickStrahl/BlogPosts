@@ -11,6 +11,11 @@ postDate: 2023-09-19T00:02:02.5082376-07:00
 postStatus: publish
 dontInferFeaturedImage: false
 dontStripH1Header: false
+customFields:
+  mt_githuburl:
+    id: 
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2023-09/IIS%20500.19%20with%20ASP.NET%20Core%20Application/Iis50019WithAspNetCoreApplication.md
 ---
 # IIS Error 500.19 with ASP.NET Core Application
 
@@ -28,7 +33,6 @@ The ASP.NET Core Hosting Module (ANCM) is not installed by default with the .NET
 
 > The only way to get the ASP.NET Core Hosting Module onto your machine is by installing the [Windows Hosting Bundle](https://dotnet.microsoft.com/en-us/download/dotnet) from the .NET Download site.
 
-##AD##
 
 ## What's in an Error?
 The **500.19** error refers to a `web.config` error condition which can take a few different forms:
@@ -38,6 +42,8 @@ The **500.19** error refers to a `web.config` error condition which can take a f
 * A missing, referenced Module in `web.config`
 
 It's a pretty broad error, but in the case of an ASP.NET Core application not working, the missing ASP.NET Core Module is the problem.
+
+##AD##
 
 When you build your ASP.NET Core application on Windows, the publish process automatically builds a `web.config` file which includes a reference to the ANCM in the `<handlers>` section of the Web Server configuration (modules=`AspNetCoreModuleV2`):
 
@@ -60,15 +66,23 @@ Once you install the ASP.NET Hosting installer the `AspNetCoreModuleV2` becomes 
 > If you install IIS after the module install, you'll have to reinstall or repair the Hosting Bundle to ensure the module is registered in the default IIS handler list.
 
 ## Not Obvious on a Dev Machine!
-On a production machine installing the Hosting Bundle makes sense: You need to install the .NET and ASP.NET Runtimes and the Hosting Bundle is the recommended way to do that: It installs everything you need to run ASP.NET Apps either with Kestrel or IIS. It installs all runtimes both for 32 and 64 bit.
+On a production machine installing the Hosting Bundle makes sense: You need to install the .NET and ASP.NET Runtimes and the Hosting Bundle is the recommended way to do that: It installs everything you need to run ASP.NET Apps either with Kestrel or IIS. It installs all runtimes both for 32 and 64 bit and the ANCM.
 
-On a Dev machine however it's easy to overlook the Hosting Bundle requirement because 99% of the time you don't actually test your application against IIS. I typically run locally with Kestrel, using a local port for development and testing. So if you run into a problem with this, the problem doesn't show up until you test in IIS.  
+On a Dev machine however it's easy to overlook the Hosting Bundle requirement, because 99% of the time you don't actually test your application against IIS. And when you do it's likely not at the time you originally installed the .NET SDK or the .NET Runtimes.
 
-This really only comes up when you need to run IIS locally on your dev box which should be exceedingly rare. Usual scenarios for have been checking various security scenarios with Windows Authentication or Active Directory, and the occasional performance checking. Even though I run many of my applications on a self-hosted Windows Server, I rarely ever run IIS locally. Today's episode for me had to do with some performance comparisons between running Kestrel and IIS locally. 
+I typically run locally with Kestrel, using a local port for development and testing. So if you run into a problem with this, the problem doesn't show up until you test in IIS.  
 
-##AD## 
+This issue really only comes up when you need to run IIS locally on your dev box which should be exceedingly rare. Usual scenarios for running IIS locally for me have been: 
 
-Note that most ASP.NET Core **hosting errors show up in the Event Viewer in Windows**, but since the module is not yet installed it obviously can't log into the Event log, duh. Yeah obvious in hindsight but that didn't prevent me from scratching my head why nothing showed up in the event log. Unfortunately IIS is also too dumb to give you more detailed error information besides the vague 500.19 which points at a problem with `web.config`. It would be nice if it could either put the missing module name into the local error message or write out an event log entry, but... 
+
+* Checking various security scenarios with Windows Authentication or Active Directory
+* The occasional performance testing for IIS
+
+Even though I run many of my applications on a self-hosted Windows Server using IIS, I rarely ever run IIS locally. Today's episode for me had to do with performance comparisons between running Kestrel and IIS locally. 
+
+Note that most **ASP.NET Core hosting errors show up in the Event Viewer in Windows**, but not if the module isn't installed.  Since it's not yet installed, it obviously can't log into the Event log, duh. Yeah quite obvious in hindsight, but that didn't prevent me from scratching my head why nothing showed up in the event log :joy:. 
+
+Unfortunately IIS is also too dumb to give you more detailed error information besides the vague **500.19** which points at **some** problem with `web.config`. It would be nice if it could either put the missing module name into the local error message or write out an event log entry, but we should be so lucky... 
 
 So, this is another note to self from myself, since I've run into this issue a few times and I've actually forgotten what the problem was. In the future, I might actually find the culprit based on the title of this post, and maybe you will too if you ever need to run ASP.NET Core locally on IIS...
 
