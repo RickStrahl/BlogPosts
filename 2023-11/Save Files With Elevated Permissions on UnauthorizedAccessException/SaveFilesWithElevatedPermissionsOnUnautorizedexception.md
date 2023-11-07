@@ -20,9 +20,7 @@ When building Desktop Applications that are document centric and that allow user
 
 This should be fairly rare, but I've seen a number of instances in my logs of users trying to save files in [Markdown Monster](https://markdownmonster.west-wind.com/) and failing with an `UnauthorizedAccessException` due to a file location that is inaccessible, so it's not like this doesn't happen especially in a generic document centric application.
 
-Previously MM would fail if the permissions weren't available and treat the file write like any other invalid location, which... well, it sucks!
-
-It sucks because if you really need to save a file in a protected location the process then becomes an exercise in Yak shaving:
+Previously MM would fail if the permissions weren't available and treat the file write like any other invalid file operation which produces an error message, which... well, it sucks! It sucks because if you really need to save a file in a protected location the process then becomes an exercise in Yak shaving:
 
 * Make your edits
 * Save to a temporary location
