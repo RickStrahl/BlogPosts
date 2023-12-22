@@ -23,22 +23,22 @@ This should be fairly rare, but I've seen a number of instances in my logs of us
 Previously MM would fail if the permissions weren't available and treat the file write like any other invalid file operation which produces an error message, which... well, it sucks! It sucks because if you really need to save a file in a protected location the process then becomes an exercise in Yak shaving:
 
 * Make your edits
-* Save to a temporary location
-* Exit out to Explorer or Command Line using RunAs
-* Copy the file from temp location to actual manually
-* Delete the temp file
+* Save to a **temporary location**
+* **Exit out** to Explorer or Command Line using RunAs
+* **Copy the file** from temp location to actual manually
+* **Delete** the temp file
 
-No fun, all that.
+A lot of steps, all that, just to save a file...
 
 ## Giving the Option to Save with Elevated Rights
-So, rather than outright failing the Save operation in MM, I want to show a notification and  **give the user the option to save the file with elevated rights**. If the user chooses to do so, this amounts to popping up the UAC dialog to elevate the user to Admin in order to save and **then** externally copying/saving the file assuming the user has the permissions.
+So, rather than outright failing a Save operation due to permissions in MM, I want to show a notification and  **give the user the option to save the file with elevated rights**. If the user chooses to do so, this amounts to popping up the UAC dialog to elevate the user to Admin in order to save and **then** externally copying/saving the file assuming the user has the permissions.
 
 I originally saw behavior in VS Code and thought this came in quite handy, and I've now implemented something similar in Markdown Monster:
 
 ![Save with Elevation in Markdown Monster](https://github.com/RickStrahl/ImageDrop/blob/master/MarkdownMonster/SaveElevated.gif?raw=true)  
 <small>**Figure 1** - Popping up an elevation notification for saving protected files. </small>
 
-In this (contrived) example, I'm opening and saving a file in the `Program Files` folder, which usually *doesn't have write permissions* for saving a file. When the call to write the file fails, a notification dialog is popped up with an option to **Elevate and Save** and then save the file using the elevated account.
+In this (contrived) example, I'm opening and saving a file in the `Program Files` folder, which usually *doesn't have write permissions* for saving a file by the non-elevated, interactive user. When the call to write the file fails, a notification dialog is popped up with an option to **Elevate and Save** and which then saves the file using the elevated account.
 
 > #### @icon-info-circle UAC Elevation
 > User Account Configuration (UAC) account elevation only works if the user is marked as an Administrator user, **or** the user can log on as Administrator on the machine.
