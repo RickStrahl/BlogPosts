@@ -2,7 +2,7 @@
 title: Integrating OpenAI Image Generation into a .NET Application
 featuredImageUrl: https://weblog.west-wind.com/images/2023/Integrating-OpenAI-image-generation-into-your-.NET-Application/ImageGeneratorBanner.jpg
 abstract: Image Generation AIs are proving to be very good at creating images that can be used for all sorts of purposes. In this article I discuss how you can integrate image generation right into your own .NET applications using the OpenAI REST API. In addition I'll show how you can integrated this functionality into a larger application and discuss some general thoughts on image AI usage based on some of the experiences from a developer/non-designer user perspective.
-keywords: .NET, AI, Image Generation, OpenAI, Dall-E-3,REST,API
+keywords: .NET, AI, Image Generation, OpenAI, Dall-E 3,REST,API
 categories: .NET,AI
 weblogName: West Wind Web Log
 postId: 4146698
@@ -11,6 +11,11 @@ postDate: 2023-12-21T12:22:07.7410770-10:00
 postStatus: publish
 dontInferFeaturedImage: false
 dontStripH1Header: false
+customFields:
+  mt_githuburl:
+    id: 
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2023-12/Integrating%20OpenAI%20image%20generation%20into%20your%20.NET%20Application/IntegretingOpenaiImageGenerationIntoYourNetApplication.md
 ---
 # Integrating OpenAI Image Generation into a .NET Applications
 
@@ -24,18 +29,18 @@ And Image AIs can fill that hole quite nicely by providing imaginative ideas and
 
 Beyond the utility of Image AIs is also the need to potentially embed that functionality into applications. I publish a Markdown editor tool - Markdown Monster - that can greatly benefit from having image generation built right into it, so users can create images and then immediately embed or paste them into documents.
 
-So I ended up building an integration using the OpenAI and Dall-E-3 image model APIs. The result looks like this:
+So I ended up building an integration using the OpenAI and Dall-E 3 image model APIs. The result looks like this:
 
 ![Embedded Image Generator](EmbeddedImageGenerator.jpg)  
 <small>**Figure 1** - An AI Image Generator embedded into the Markdown Monster desktop application.</small>
 
-In this post I'll talk about how to do the actual image generation using the OpenAI Dall-E-3 API integration through OpenAI (and also Azure OpenAI once they roll out Dall-E-3 officially). I'll also talk a bit about the integration itself - there are a number of things that need to happen around the edges in order to work with the generated images especially if you build something similar to what's shown above which is basically an image browser.
+In this post I'll talk about how to do the actual image generation using the OpenAI Dall-E 3 API integration through OpenAI (and also Azure OpenAI once they roll out Dall-E 3 officially). I'll also talk a bit about the integration itself - there are a number of things that need to happen around the edges in order to work with the generated images especially if you build something similar to what's shown above which is basically an image browser.
 
 I'll talk about the OpenAI (and AzureAI) API because it's by far the easiest to work with. There are obviously other Image AI engines (I really like MidJourney) but they cannot be easily integrated into your own applications. 
 
 I've broken this article into 2 main parts:
 
-1. [OpenAI Dall-E-3 API usage and integration](#image-creation-101---raw-api)
+1. [OpenAI Dall-E 3 API usage and integration](#image-creation-101---raw-api)
 2. [Some Thoughts on using Image AIs and AI in General](#some-thoughts-on-using-image-ais-and-ais-in-general)
 
 I've chosen this **reverse order** because the second part falls in the TLDR category, while the first part is the real meat of this article. You can read part 2 at your leisure... or not.
@@ -48,7 +53,7 @@ It's a long post so let's get started.
 
 ##AD##
 
-## Image Generation using OpenAI and Dall-E-3
+## Image Generation using OpenAI and Dall-E 3
 I'm going to break down this section into 3 parts:
 
 * [What do you need to get started and what does it cost?](#what-you-need-to-get-started-with-openai-and-azure-openai)
@@ -63,15 +68,15 @@ Before we jump in, let's discuss what you need in order to access the OpenAI API
 
 Both use the same API but how you authenticate is different. OpenAI uses a single API Key, while Azure OpenAI uses a connection string.
 
-> #### @icon-info-circle Azure OpenAI and Dall-E-3? Not yet!
-> At the time of writing Azure OpenAI had no working support for Dall-E-3 only Dall-E-2, so I'm not discussing it here for now. Although there's supposed to be beta support in one Azure region, even with a workspace set up in that region I could not make Dall-E-3 calls work. Dall-E-2 works but it produces horrible, unusable results. 
+> #### @icon-info-circle Azure OpenAI and Dall-E 3? Not yet!
+> At the time of writing Azure OpenAI had no working support for Dall-E 3 only Dall-E-2, so I'm not discussing it here for now. Although there's supposed to be beta support in one Azure region, even with a workspace set up in that region I could not make Dall-E 3 calls work. Dall-E-2 works but it produces horrible, unusable results. 
 >
-> I'll post a follow up once Dall-E-3 rolls out to Azure properly and update the library in the samples to make those calls. 
+> I'll post a follow up once Dall-E 3 rolls out to Azure properly and update the library in the samples to make those calls. 
 >
 > The good news is that the REST API is identical, but setup and authorization is different. You need to set up an Azure AI workspace, and then connect to your specific HTTP address for that workspace, plus use a custom HTTP header for the API key rather than OpenAI's simple Bearer token authorization. 
 
 ### You need an API Key
-In this article I discuss using the OpenAI API which is used both by OpenAI and Azure OpenAI. The Azure OpenAI has a different authorization mechanism but otherwise is identical to the OpenAI version (same API protocols). In this article I use only OpenAI because currently there are limitations with Azure's OpenAI Dall-E-3 implementation.
+In this article I discuss using the OpenAI API which is used both by OpenAI and Azure OpenAI. The Azure OpenAI has a different authorization mechanism but otherwise is identical to the OpenAI version (same API protocols). In this article I use only OpenAI because currently there are limitations with Azure's OpenAI Dall-E 3 implementation.
 
 OpenAI and AzureAI both work with **API keys** that you send as part of each request. These API keys are tied to a specific OpenAI account or Azure OpenAI Deployment. For the rest of this article I'll use OpenAI but know that Azure AI works the same except for the endpoint URL and the API Key header used.
 
@@ -85,7 +90,7 @@ Here are the OpenAI sign up and account links you can use:
 Individual accounts are billed for usage so you provide an initial amount which can be manually or auto recharged.
 
 > #### @icon-info-circle Azure AI uses OpenAI API
-> The OpenAI API also works with AzureAI. At the time of writing Azure AI wasn't working with Dall-E-3 yet, but it does work with Dall-E-2. I expected Dall-E-3 support to come soon. 
+> The OpenAI API also works with AzureAI. At the time of writing Azure AI wasn't working with Dall-E 3 yet, but it does work with Dall-E-2. I expected Dall-E 3 support to come soon. 
 > 
 > Both APIs are compatible with the main difference on how you authorize - OpenAI uses only a Bearer toke for the key, Azure uses a deployment specific HTTP URL plus an API key. But the actual REST calls are the same.
 
@@ -97,7 +102,7 @@ In the case of a generic tool like Markdown Monster the key needs to be provided
 If you're building an internal application for your company then you can probably use a shared company API key.
 
 ### Pricing
-For individual Tier 1 pricing, Dall-E-3 Model Pricing is reasonable - at the time of writing pricing for 1024x1024 images is at US 4 cents per image generated, 8 cents for extended formats (16:9/9:16). While that seems pretty cheap keep in mind that the results cost is a bit higher than you might think, because you end up experimenting and the throwing out a lot of generated images. Still it's bargain compared to buying stock art or hiring an artist even for simple things.
+For individual Tier 1 pricing, Dall-E 3 Model Pricing is reasonable - at the time of writing pricing for 1024x1024 images is at US 4 cents per image generated, 8 cents for extended formats (16:9/9:16). While that seems pretty cheap keep in mind that the results cost is a bit higher than you might think, because you end up experimenting and the throwing out a lot of generated images. Still it's bargain compared to buying stock art or hiring an artist even for simple things.
 
 Note that pricing is different for Enterprise tiers which you'll likely need if you're providing a shared key for your application when it's widely used. Make sure you understand pricing and limits before jumping into AI usage and the third party dependency that it entails. 
 
@@ -361,10 +366,15 @@ public async Task ImageGenerationToBase64Test()
 There are two additional methods in the library:
 
 * **GenerateVariation()**  
-Generates an image variation of an existing image. Currently this is not supported for Dall-E-3, and the Dall-E-2 results are basically unusable. This will work better once Dall-E-3 is supported.
+Generates an image variation of an existing image. Currently this is not supported for Dall-E 3, and the Dall-E-2 results are basically unusable. This will work better once Dall-E 3 is supported.
 
 * **ValidateApiKey()**  
 Checks to see whether an API key you have is valid. This is useful in an application that an API key is provided for to not allow accepting an invalid key.
+
+You can check out the full `ImageGeneration` interface and code on GitHub:
+
+* [ImageGeneration Class](https://github.com/RickStrahl/Westwind.Ai/blob/master/Westwind.Ai/OpenAiImageGeneration.cs)
+* [ImagePrompt Class](https://github.com/RickStrahl/Westwind.Ai/blob/master/Westwind.Ai/ImagePrompt.cs)
 
 ##AD##
 
@@ -376,9 +386,9 @@ If you plan on integrating this functionality into a UI based application, eithe
 
 In **Figure 6** you can see what a typical UI looks like and you can probably imagine how it is bound to the various image prompt and the aggregate helper properties shown above. You have an area to input the prompt and various prompt options, an image preview area, plus an area to display previously generated images. The image list is driven by a collection of saved ImagePrompts which looks similar to the JSON trace I showed above.
 
-It's no accident that most image AI sites, use the same basic UI blocks. Which actually begs an interesting question: Do you need to actually integrate this functionality, or can you simply jump to an existing Image Generation site (Dall-E-3, or CoPilot or Bing Image Creator) to perform image generation there and then simple copy images to your clipboard or save them to disk for use in your own applications. While that works and is actually quite functional, it often lacks the tight integration that users often expect. Plus you can offer application specific feature. In Markdown Monster for example images can be directly embedded into Markdown Content, and you can also shell out to open/edit/view the generated image in a number of different ways which offers more flexibility. 
+It's no accident that most image AI sites, use the same basic UI blocks. Which actually begs an interesting question: Do you need to actually integrate this functionality, or can you simply jump to an existing Image Generation site (Dall-E 3, or Copilot or Bing Image Creator) to perform image generation there and then simple copy images to your clipboard or save them to disk for use in your own applications. While that works and is actually quite functional, it often lacks the tight integration that users often expect. Plus you can offer application specific feature. In Markdown Monster for example images can be directly embedded into Markdown Content, and you can also shell out to open/edit/view the generated image in a number of different ways which offers more flexibility. 
 
-I've also noticed that the quality of images generated through the API tend to be better than what the UI sites generate which is interesting given that supposedly they are using the same models. Whther you use OpenAI API, the Dall-E-3 site, CoPilot or Image Creator - all of them use the Dall-E-3 model, but the results are not quite of the same quality in many cases.
+I've also noticed that the quality of images generated through the API tend to be better than what the UI sites generate which is interesting given that supposedly they are using the same models. Whther you use OpenAI API, the Dall-E 3 site, Copilot or Image Creator - all of them use the Dall-E 3 model, but the results are not quite of the same quality in many cases.
 
 ### How to display the Image In-App
 If you want to display the image inside of your application, you can use the WebView2 control.
@@ -685,19 +695,19 @@ If you've not tried out any of the image generation tools you probably should go
 
 There are a lot of image generators out there now and I've tried a few of them and all of them are interesting:
 
-* [Bing Image Creator](https://www.bing.com/images/create) and [CoPilot](https://copilot.microsoft.com/)   
-Free and paid. Image Creator also uses Dall-E-3 for image generation, but it's free to start with. Produces 4 images at a time and works great. Probably the best place to start since it's free and produces good results. This functionality is also integrated into [CoPilot](https://copilot.microsoft.com/) via ChatGpt 4 prompts where you can specify *'Create an image of'* which defers to Image Creator.
+* [Bing Image Creator](https://www.bing.com/images/create) and [Copilot](https://copilot.microsoft.com/)   
+Free and paid. Image Creator also uses Dall-E 3 for image generation, but it's free to start with. Produces 4 images at a time and works great. Probably the best place to start since it's free and produces good results. This functionality is also integrated into [Copilot](https://copilot.microsoft.com/) via ChatGpt 4 prompts where you can specify *'Create an image of'* which defers to Image Creator.
 
-* [OpenAI Dall-E-3](https://openai.com/dall-e-3)  
+* [OpenAI Dall-E 3](https://openai.com/dall-e-3)  
 Paid and uses ChatGPT 4. OpenAI created the original ChatGPT and Dall-E models and you're likely to see the latest and greatest models running on the OpenAI site. <small>*($20/month)*</small>
 
-* [Mid Journey](https://docs.midjourney.com/docs/quick-start) 
+* [Mid Journey](https://docs.midjourney.com/docs/quick-start)  
 Paid. MidJourney is an oddball tool in that it has to be operated through a Discord message prompt. The reason for this odd behavior is that MidJourney tries to be an open platform where images are generated in public for all to see and share - you can see what prompts people are using as well as the output generated which can be very useful to learning prompt optimizations as well as tweaking options. MidJourney is often very imaginative with it's prompt results, making it a great choice for more abstract requests. It also does better than Dall-E for drawing style non-photo realistic results - I see a lot mind blowing graphic novel and game dev designs which explains the Discord usage to some extent.<small>*($10/month)*</small>
 
 * [Gencraft](https://gencraft.com/)  
 Paid and Free. I've only played around a little with GenCraft and it produces decent image output, but I would say it lags in quality behind Dall-E or MidJourney.
 
-* [Stable Diffusion](https://stablediffusionweb.com/)
+* [Stable Diffusion](https://stablediffusionweb.com/)  
 Free and Paid and Offline Local Engine option. Stable Diffusion has an online site where you can generate images - very slowly - for free, or you can pay and get faster access to image generation. Image generation tends to be Ok, but not great - many of the images look very rigid and don't blend together. One interesting point is that Stable Diffusion is open source so you can install and run it on a local machine. It's a big install that requires Python, so it's not easy to package and ship with an application, but it's doable if you just want free local image generation that nobody can snoop in on.
 
 Personally I regularly use:
@@ -705,9 +715,9 @@ Personally I regularly use:
 * OpenAI API
 * MidJourney 
 * Bing Image Generator (because it's free)
-* CoPilot (because it's free)
+* Copilot (because it's free)
 
-Out of these I've gotten the most used results from my own OpenAI API integration, mainly because I can tweak the settings exactly and I can easily go through my prompts and re-run with minor tweaks. Taking advantage of original and revised prompts is what makes the difference here I think. Although it uses Dall-E-3 like Bing IC and CoPilot the API seems to produces better results, but that could just be the luck of the draw. I also found that the security limits are dialed down a bit in the API vs the Microsoft offerings so I can get more subversive and slightly more violent prompts  through than the public AIs (any mention of 'blood' seems to trigger the public AIs).
+Out of these I've gotten the most used results from my own OpenAI API integration, mainly because I can tweak the settings exactly and I can easily go through my prompts and re-run with minor tweaks. Taking advantage of original and revised prompts is what makes the difference here I think. Although it uses Dall-E 3 like Bing IC and Copilot the API seems to produces better results, but that could just be the luck of the draw. I also found that the security limits are dialed down a bit in the API vs the Microsoft offerings so I can get more subversive and slightly more violent prompts  through than the public AIs (any mention of 'blood' seems to trigger the public AIs).
 
 That said while I'm fleshing out ideas for images I often use Bing Image Creator first, then pop it into my API integration where I usually end up with the final result.
 
@@ -792,7 +802,7 @@ To me Image Generation AI's have had a big impact at least in the short term as 
 * [Open AI API Reference (Images)](https://platform.openai.com/docs/api-reference/images)
 * [OpenAI API](https://openai.com/dall-e-3)
 * [Bing Image Creator](https://copilot.microsoft.com/)
-* [CoPilot](https://copilot.micrsoft.com)
+* [Copilot](https://copilot.micrsoft.com)
 * [MidJourney](https://docs.midjourney.com/docs/quick-start)
 * [Markdown Monster Markdown Editor](https://markdownmonster.west-wind.com)
 * [Markdown Monster Image Generator Addin](https://markdownmonster.west-wind.com/docs/_6rz0smzc0.htm)
