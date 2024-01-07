@@ -7,7 +7,7 @@ categories: .NET,AI
 weblogName: West Wind Web Log
 postId: 4146698
 permalink: https://weblog.west-wind.com/posts/2023/Dec/21/Integrating-OpenAI-image-generation-into-your-NET-Application
-postDate: 2023-12-21T12:22:07.7410770-10:00
+postDate: 2023-12-21T14:22:07.7410770-08:00
 postStatus: publish
 dontInferFeaturedImage: false
 dontStripH1Header: false
@@ -780,14 +780,35 @@ Is it worth it? To me - absolutely.
 I've generated a few images that were just absolutely perfect - and yes way more perfect than what I was envisioning. At other times it's taken close to a 100 tries to get something that worked with nearly identical prompts. And on a few occasions I just couldn't get anything generated that worked at all. 
 Nothing is perfect I guess and I'm OK with losing a few if most of my attempts work out. I've had about the same success rate with hiring actual artists, too 😜.
 
-### Ethical Concerns
+### Use it or lose it!
 As cool as the technology it also scares the shit out of me because of what this means. First off it's obviously highly disruptive technology as this will no doubt have an impact on people working in the graphic arts field. This technology won't replace a good artist or designer but it's certainly going to have an impact on the lower end of the pay scale where some traffic that went to designers gets siphoned off to AI.
 
-As to usage I know quite a few people who want to swear off AI in general, thinking of it as a bad thing to replace human labor. That's not wrong, but the reality is that once technology like this is out of the bag, it's not going back in. You either take advantage of it to its fullest, or you get left behind sad as that is. This is true for image generation and especially for the various Chat AIs. Even if you are not in favor of these technologies, understanding what they do and how you can use them is important.
+As to usage I know quite a few people who want to swear off AI in general, thinking of it as a bad thing to replace human labor. That's not wrong, but the reality is that once technology like this is out of the bag, it's not going back in. You either take advantage of it to its fullest, or you get left behind - sad as that is. This is true for image generation and especially for the various Chat AIs. Even if you are not in favor of these technologies, understanding what they do and how you can use them is important.
 
-The other concern is that these technologies are firmly in the hands of big corporations who control everything about these tools. The inputs, the security parameters, the training protocols, the 'ethical' and political leanings and so on. And with that these big entities control what type of reality you can present through the AI generated content. This is more pressing with Chat AIs than images as it's much easier to put bias into words than images, but you can even find this in restrictions being placed on images. Subversive content, often even if mildly so (common themes for punk rock songs for example) or mildly violent content often trigger security warnings. Given our violent movie industry which exposes all of these things in just about every movie or TV series published, it seems laughable to roll these security features out in the name of 'safety'. All the while you know that the companies themselves and likely state actors have and can use this same technology unfettered without any guard rails to feed propaganda purposes without any restrictions. 
+### Ethical Concerns
+The other concern is that these technologies are firmly in the hands of big corporations who control everything about these tools. The inputs, the security parameters, the training protocols, the 'ethical' and political leanings and so on. And with that these big entities control what type of reality you can present through the AI generated content.
 
-The dangers are there, but at this point we have to live what's out there and that means taking advantage of the tools we've been given. They are tools of productivity and I can't stress enough, that it's not a good idea to dismiss this technology; not for personal misgivings, or due to all the exuberant hype. Know what it is, and how you can use it and take advantage - if you won't somebody else will!
+This is more pressing with Chat AIs than images as it's much easier to put bias into words than images, but you can even find this in restrictions being placed on images. Subversive content, often even if mildly so (common themes for punk rock songs for example) or mildly violent content often trigger security warnings. 
+
+Here are a couple of examples:
+
+![Blocked Prompt](BlockedPrompt1.png)
+
+This prompt ironically is specifically **anti-violence** yet triggers the safety protocol.
+
+![Blocked Prompt](BlockedPrompt.png)
+
+This prompt started out harmless as a pirate on the wheel of a tattered ship, but after several iterations of prompt revision **by the AI itself** the prompt no longer runs due to safety violations.
+
+Not only that but it also matters on **where** you run this prompt. The failures are occurring on Azure's Dall-E 3 engine, while the same prompt runs without issue on the OpenAI API.
+
+This demonstrates that the provider is exerting content control here, in addition to the biases that are inherent in the AI model data itself.
+
+Some of this is ironic: Given our ultra-violent movie and media industry which exposes all of these things in just about every movie or TV series published these days, it seems laughable to roll these security features out in the name of 'safety'. 
+
+All the while you know that the provider companies themselves and likely also state actors have and can use this same technology without any guard rails to feed propaganda purposes without any restrictions precisely where it can be used to cause serious societal damage.
+
+The dangers are there and it's important to understand what they are, even if we have little control over it as users. At this point we have to live what's out there and that means taking advantage of the tools we've been given. They are tools of productivity and I can't stress enough, that it's not a good idea to dismiss this technology; not for personal misgivings, or due to all the exuberant hype. Know what it is, and how you can use it and take advantage - if you won't, somebody else will!
 
 ## Summary
 Image AIs are still relatively new, but already they are showing enormous potential for providing tools for non-artistic types like myself to produce quite usable images for every day use. 
