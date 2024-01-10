@@ -7,10 +7,15 @@ categories: WPF, Windows
 weblogName: West Wind Web Log
 postId: 4169641
 permalink: https://weblog.west-wind.com/posts/2024/Jan/03/Working-around-the-WPF-ImageSource-Blues
-postDate: 2024-01-03T19:36:29.5339730-10:00
+postDate: 2024-01-03T21:36:29.5339730-08:00
 postStatus: publish
 dontInferFeaturedImage: false
 dontStripH1Header: false
+customFields:
+  mt_githuburl:
+    id: 
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2024-01/Working%20around%20the%20WPF%20Image%20Control%20Blues/WorkingAroundWPFImageControlBlues.md
 ---
 # Working around the WPF Image Control Blues
 

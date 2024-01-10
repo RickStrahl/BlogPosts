@@ -11,11 +11,6 @@ postDate: 2023-12-21T14:22:07.7410770-08:00
 postStatus: publish
 dontInferFeaturedImage: false
 dontStripH1Header: false
-customFields:
-  mt_githuburl:
-    id: 
-    key: mt_githuburl
-    value: https://github.com/RickStrahl/BlogPosts/blob/master/2023-12/Integrating%20OpenAI%20image%20generation%20into%20your%20.NET%20Application/IntegretingOpenaiImageGenerationIntoYourNetApplication.md
 ---
 # Integrating OpenAI Image Generation into a .NET Applications
 
@@ -36,7 +31,7 @@ So I ended up building an integration using the OpenAI and Dall-E 3 image model 
 
 In this post I'll talk about how to do the actual image generation using the OpenAI Dall-E 3 API integration through OpenAI (and also Azure OpenAI once they roll out Dall-E 3 officially). I'll also talk a bit about the integration itself - there are a number of things that need to happen around the edges in order to work with the generated images especially if you build something similar to what's shown above which is basically an image browser.
 
-I'll talk about the OpenAI (and AzureAI) API because it's by far the easiest to work with. There are obviously other Image AI engines (I really like MidJourney) but they cannot be easily integrated into your own applications. 
+I'll talk about the OpenAI (and Azure OpenAI) API because it's by far the easiest to work with. There are obviously other Image AI engines (I really like MidJourney) but they cannot be easily integrated into your own applications. 
 
 I've broken this article into 2 main parts:
 
@@ -66,19 +61,53 @@ Before we jump in, let's discuss what you need in order to access the OpenAI API
 * OpenAI
 * Azure OpenAI
 
-Both use the same API but how you authenticate is different. OpenAI uses a single API Key, while Azure OpenAI uses a connection string.
+Both use the same API but how you authenticate is different. OpenAI uses a single API Key, while Azure OpenAI uses a Azure hosted AI Deployment URL plus an API Key.
 
-> #### @icon-info-circle Azure OpenAI and Dall-E 3? Not yet!
-> At the time of writing Azure OpenAI had no working support for Dall-E 3 only Dall-E-2, so I'm not discussing it here for now. Although there's supposed to be beta support in one Azure region, even with a workspace set up in that region I could not make Dall-E 3 calls work. Dall-E-2 works but it produces horrible, unusable results. 
+> #### @icon-info-circle Azure OpenAI and Dall-E 3? Not quite yet!
+> At the time of writing Azure OpenAI had very limited support for Dall-E 3 via a single Azure region (Sweden Central). Even using that region frequently results in *Server Too Busy* errors. All regions support Dall-E 2 but don't bother with Dall-E 2 - it's very inferior in quality and basically unusable.
 >
-> I'll post a follow up once Dall-E 3 rolls out to Azure properly and update the library in the samples to make those calls. 
->
-> The good news is that the REST API is identical, but setup and authorization is different. You need to set up an Azure AI workspace, and then connect to your specific HTTP address for that workspace, plus use a custom HTTP header for the API key rather than OpenAI's simple Bearer token authorization. 
+> The tests in the GitHub repo show both OpenAI and Azure OpenAI examples, so you can run the samples against either API. 
 
 ### You need an API Key
-In this article I discuss using the OpenAI API which is used both by OpenAI and Azure OpenAI. The Azure OpenAI has a different authorization mechanism but otherwise is identical to the OpenAI version (same API protocols). In this article I use only OpenAI because currently there are limitations with Azure's OpenAI Dall-E 3 implementation.
+In this article I discuss using the OpenAI API which is used both by OpenAI and Azure OpenAI. The Azure OpenAI has a different authorization mechanism but otherwise is identical to the OpenAI version (same API protocols). In this article I use only show OpenAI to keep things simple, except for this section where I point out the differences for authorization/initialization.
 
-OpenAI and AzureAI both work with **API keys** that you send as part of each request. These API keys are tied to a specific OpenAI account or Azure OpenAI Deployment. For the rest of this article I'll use OpenAI but know that Azure AI works the same except for the endpoint URL and the API Key header used.
+The difference is how URLs are used and how the API key is applied.
+
+#### OpenAI
+
+Using the Helper Class discussed below:
+
+```cs
+var generator = new OpenAiImageGeneration(Configuration.OpenAiApiKey);
+```
+
+For raw API calls OpenAI simply uses a key for a Bearer Authorization token on the request:
+
+```http
+Authorization: Bearer sk-epDCUinnBWglcAYbK5OWT1BlbkFJidAXMZ48F9yz9Pay4fKn
+```
+
+#### Azure OpenAI
+
+Using the helper class:
+
+```cs
+var generator = new OpenAiImageGeneration(TestConfiguration.Current.AzureOpenAiEndPoint, TestConfiguration.Current.AzureOpenAiApiKey);
+```
+
+Azure uses a custom deployment URL - you basically provide the base URL which consists of your resource set Azure Url plus a deployment name.  It looks something like this:
+
+```
+https://myopenaisample.openai.azure.com/openai/deployments/MyImageGenerations
+```
+
+Azure then needs a custom `api-key` HTTP header on the request.
+
+```http
+api-key: 159c85e9fe8d462f92fc101b898534aa
+```
+
+For the rest of this article I'll use OpenAI, but know that Azure AI works the same except for this initial URL and Authorization dance.
 
 Here are the OpenAI sign up and account links you can use:
 
@@ -88,11 +117,6 @@ Here are the OpenAI sign up and account links you can use:
 * [Usage Limits](https://platform.openai.com/account/limits)
 
 Individual accounts are billed for usage so you provide an initial amount which can be manually or auto recharged.
-
-> #### @icon-info-circle Azure AI uses OpenAI API
-> The OpenAI API also works with AzureAI. At the time of writing Azure AI wasn't working with Dall-E 3 yet, but it does work with Dall-E-2. I expected Dall-E 3 support to come soon. 
-> 
-> Both APIs are compatible with the main difference on how you authorize - OpenAI uses only a Bearer toke for the key, Azure uses a deployment specific HTTP URL plus an API key. But the actual REST calls are the same.
 
 ### Per User or Per Application Keys?
 If you plan on using AI of any sort, one thing that you need to decide is who will bear the costs of the AI API requests. If you integrate into your own application do you use a common key for all users, or do you have each user provide their own key? 
@@ -134,7 +158,7 @@ Additional optional parameters:
 * **quality** - *standard* or *hd*
 * **response_format** - *url* or *b64_json*
 
-Here's what that the raw REST request looks like (in [West Wind WebSurge](https://websurge.west-wind.com)):
+Here's what that the raw REST request looks like (shown here in [West Wind WebSurge](https://websurge.west-wind.com)):
 
 ![Raw Rest Call](RawRestCall.png)
 <small>**Figure 3** - Raw OpenAI HTTP REST call </small>
@@ -696,7 +720,7 @@ If you've not tried out any of the image generation tools you probably should go
 There are a lot of image generators out there now and I've tried a few of them and all of them are interesting:
 
 * [Bing Image Creator](https://www.bing.com/images/create) and [Copilot](https://copilot.microsoft.com/)   
-Free and paid. Image Creator also uses Dall-E 3 for image generation, but it's free to start with. Produces 4 images at a time and works great. Probably the best place to start since it's free and produces good results. This functionality is also integrated into [Copilot](https://copilot.microsoft.com/) via ChatGpt 4 prompts where you can specify *'Create an image of'* which defers to Image Creator.
+Free and paid. Image Creator also uses Dall-E 3 for image generation, but it's free to start with. Produces 4 images at a time and works great. Probably the best place to start since it's free and produces good results. This functionality is also integrated into [Copilot](https://copilot.microsoft.com/) via ChatGpt 4 prompts where you can specify *'Create an image of'* which then defers to Image Creator. The downside is that you can't easily iterate images with CoPilot as you constantly have to re-enter the prompt text.
 
 * [OpenAI Dall-E 3](https://openai.com/dall-e-3)  
 Paid and uses ChatGPT 4. OpenAI created the original ChatGPT and Dall-E models and you're likely to see the latest and greatest models running on the OpenAI site. <small>*($20/month)*</small>
@@ -712,20 +736,22 @@ Free and Paid and Offline Local Engine option. Stable Diffusion has an online si
 
 Personally I regularly use:
 
-* OpenAI API
+* OpenAI API, Azure OpenAI (less so)
 * MidJourney 
 * Bing Image Generator (because it's free)
 * Copilot (because it's free)
 
-Out of these I've gotten the most used results from my own OpenAI API integration, mainly because I can tweak the settings exactly and I can easily go through my prompts and re-run with minor tweaks. Taking advantage of original and revised prompts is what makes the difference here I think. Although it uses Dall-E 3 like Bing IC and Copilot the API seems to produces better results, but that could just be the luck of the draw. I also found that the security limits are dialed down a bit in the API vs the Microsoft offerings so I can get more subversive and slightly more violent prompts  through than the public AIs (any mention of 'blood' seems to trigger the public AIs).
+Out of these I've gotten the most used results from my own OpenAI API integration, mainly because I can tweak the settings exactly and I can easily go through my prompts and re-run with minor tweaks.
+
+Taking advantage of original and revised prompts is what makes the difference here I think. Although it uses Dall-E 3 like Bing IC and Copilot the API seems to produces better results, but that could just be the luck of the draw. I also found that the security limits are dialed down a bit in the API vs the Microsoft offerings so I can get more subversive and slightly more violent prompts  through than the public AIs (any mention of 'blood' seems to trigger the public AIs).
 
 That said while I'm fleshing out ideas for images I often use Bing Image Creator first, then pop it into my API integration where I usually end up with the final result.
 
-I really like MidJourney as a counter point to Dall-E because it usually produces very different output. I often use it when I'm playing with new ideas and variations. I also **love** the fact that you can see what other people are doing - reviewing other people's prompts and seeing the generated output has been really informative and inspirational. 
+I really like MidJourney as a counter point to Dall-E because it usually produces very different output. I often use it when I'm playing with new ideas and variations. I also **love** the fact that you can see what other people are doing - reviewing other people's prompts and seeing the generated output has been really informative and inspirational.
 
-The OpenAI API and MidJourney are not free so expect to put a little money into this as you experiment and use these tools, but if you actually use them the cost is well worth it.
+The OpenAI API and MidJourney are not free so expect to put a little money into this as you experiment and use these tools, but if you actually use any images, the cost is well worth it.
 
-MidJourney's basic plan is $10 a month and that's roughly 200 image generations (4 at a time) and you can top off if you run out. I've used it quite a bit experimenting and have not hit the limit. 
+MidJourney's basic plan is $10 a month and that's roughly 200 image generations (4 at a time ie 800 images) and you can top off if you run out. I've used it quite a bit experimenting and have not hit the limit.  
 
 OpenAI API usage has been more expensive - you can create an account and do $10 increments for fixed price per use usage ($0.04/image). I've gone overboard in the last month as I've worked on the Markdown Monster integration, but even so ended up racking up barely over $20 in the course of a month. Given that I ended up with at least 20 images that I actually used for something (album art, blog post banners, a couple of library logos, a couple of event banners etc.) that's money well spent in my book. OpenAI's pricing is per use, so it's easy to top off the account to a certain amount and not worry about since there's no recurring auto-payment which makes it a better deal than a subscription you may use infrequently.
 
@@ -822,6 +848,7 @@ To me Image Generation AI's have had a big impact at least in the short term as 
 * [Sample and Library Code for this Article](https://github.com/RickStrahl/Westwind.Ai)
 * [Open AI API Reference (Images)](https://platform.openai.com/docs/api-reference/images)
 * [OpenAI API](https://openai.com/dall-e-3)
+* [Azure OpenAI Dall-E Docs](https://learn.microsoft.com/en-us/azure/ai-services/openai/dall-e-quickstart)
 * [Bing Image Creator](https://copilot.microsoft.com/)
 * [Copilot](https://copilot.micrsoft.com)
 * [MidJourney](https://docs.midjourney.com/docs/quick-start)
