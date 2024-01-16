@@ -1,5 +1,5 @@
 ---
-title: Sharing Tab Missing in Windows Folder Properties
+title: Sharing Tab Missing in Windows 11 Folder Properties
 featuredImageUrl: https://weblog.west-wind.com/images/2024/Sharing-Tab-Missing-in-Windows-Folder-Properties/BrokenConnectionBanner.jpg
 abstract: For some unfathomable reason, Windows 11 has removed the Sharing Tab on the Explorer Properties Context menu by default. The Sharing Tab allows you to shared folders and drives for remote access. In this post I discuss how to get the Sharing Tab back and also touch on how to make sure your machine can actually accept remote connections so you can share your folders and drives.
 keywords: Folder Sharing,Sharing Tab,Remote Access
@@ -12,7 +12,7 @@ postStatus: publish
 dontInferFeaturedImage: false
 dontStripH1Header: false
 ---
-# Sharing Tab Missing in Windows Folder Properties
+# Sharing Tab Missing in Windows 11 Folder Properties
 
 ![Broken Connection Banner](BrokenConnectionBanner.jpg)
 
@@ -26,20 +26,27 @@ From which you can then create a shared folder/drive and set permissions:
 
 ![Shared Folder And Permissions](SharedFolderAndPermissions.png)
 
-This tab by default is not visible, and without it it's not exactly easy UI mechanism to create a shared folder/drive that you can access over the network which is just... weird.
+This tab by default is not visible, and without it it's not exactly easy UI mechanism to create a shared folder/drive that you can access over the network which is just... weird. 
 
-There are ways you can do this via the command line using `net share`, but AFAIK there's no other UI based way to share a folder.
+Here's what it looks like without the tab:
+
+![No Sharing Tab](NoSharingTab.png)
+
+There are ways you can do this via the command line using CMD `net share` and Powershell `New-SMBShare` command, but AFAIK there's no other UI based way to share a folder.
 
 Here's what using the `net share` command looks like:
 
 ![Net Share Command](NetShareCommand.png)
 
-> **Note:** Make sure you run this command **as Administrator**.  
-*(I'm using [gsudo](https://github.com/gerardog/gsudo) to elevate  within the prompt)*
+Using PowerShell you can use `New-SMBShare` and friends:
+
+![Power Shell New Smb Share](PowerShellNewSmbShare.png)
+
+> **Note:** Make sure you run these commands **as Administrator** using an Admin shell or using a tool like [gsudo](https://github.com/gerardog/gsudo) to elevate  within the prompt.
 
 Command line is easy enough but using a rarely used command like this is easy to forget. 
 
-So, how do we get the Sharing Tab back?
+Despite command line options, how do we get the Sharing Tab back?
 
 ## Enabling Folder/Drive Sharing in the Registry
 If this Tab is not showing in your Explorer Properties the easiest way is via a registry update:
