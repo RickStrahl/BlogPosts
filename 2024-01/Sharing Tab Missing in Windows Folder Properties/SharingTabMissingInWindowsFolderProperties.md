@@ -28,7 +28,7 @@ From which you can then create a shared folder/drive and set permissions:
 
 This tab by default is not visible, and without it it's not exactly easy UI mechanism to create a shared folder/drive that you can access over the network which is just... weird. 
 
-Here's what it looks like without the tab:
+Here's what it looks like without the tab :
 
 ![No Sharing Tab](NoSharingTab.png)
 
