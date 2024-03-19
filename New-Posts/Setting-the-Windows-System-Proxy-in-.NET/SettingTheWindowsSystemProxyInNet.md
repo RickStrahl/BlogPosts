@@ -11,6 +11,7 @@ dontInferFeaturedImage: false
 dontStripH1Header: false
 ---
 # Setting the Default Windows System Proxy in .NET
+
 If you are building a client application that uses HTTP connections to interact with remote data, you've likely run into a scenario where you would like to examine what the content that you're sending and receiving actually looks like by hooking up an HTTP proxy like [Fiddler](https://www.telerik.com/fiddler/fiddler-classic) or some other proxy tooling that can capture request and response data as it is sent. I find myself needing this all the time and I tend to use Fiddler for Windows (Classic) for this task.
 
 Unfortunately, **using proxies in .NET is not automatic** and by default HTTP connections bypass the default Windows System proxy settings. Instead the proxy has to be set explicitly in code, or in an old school `app.config` (yes, this works even for .NET Core on Windows).

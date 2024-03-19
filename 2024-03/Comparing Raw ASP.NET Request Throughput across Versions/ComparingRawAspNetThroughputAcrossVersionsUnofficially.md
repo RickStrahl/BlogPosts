@@ -12,9 +12,12 @@ postStatus: publish
 dontInferFeaturedImage: false
 dontStripH1Header: false
 ---
+
 #  Comparing Raw ASP.NET Request Throughput across Versions
 
 ![New And Old Computers](NewAndOldComputers.jpg)
+
+[[_TOC_]]
 
 It's that time of year again to upgrade to a new machine, and one of the first things I often do once the machine is set up is run some performance tests of a simple ASP.NET application that tests raw request throughput of a couple of JSON do-nothing requests.
 
@@ -23,6 +26,7 @@ Mind you, this isn't indicative of any kind of real world application performanc
 To me this is one of those apples to apples comparison when running the same app, on the same type of environment. It's not going to compare to anything other than that - so take what I write here in that context, and you can run these tests yourself on your own machines and setups and compare. This is a very simple project with literally 4 requests - 2 minimal API endpoints and 2 controller API endpoints.
 
 * [Project on GitHub](https://github.com/RickStrahl/HighPerformanceAspNet)
+    
 
 Stupidly simple but I find this very practical to go through, even though this doesn't qualify as 'scientific' testing. It's merely a yardstick I can calibrate performance to, by comparing past and present results. 
 
