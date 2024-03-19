@@ -1,16 +1,16 @@
 ---
 title: Accepting Raw Request Body Content in ASP.NET Core API Controllers
+featuredImageUrl: https://weblog.west-wind.com/images/2022/POSTing-Raw-Body-Text-to-ASP.NET-Core-API-Controllers/Raw-Data.jpg
 abstract: When posting raw body content to ASP.NET Core the process is not very self-explanatory. There's no easy way to simply retrieve raw data to a parameter in an API method, so a few extra steps are provided using either manual handling of the raw request stream, or by creating custom formatter that can handle common 'raw' content types in your APIs via standard Controller method parameters. In this post I look at various permutations and how you can access the raw data in your code.
-categories: ASP.NET Core
 keywords: Raw Content, POST, ASP.NET Core, Plain Text, Byte Array, Data
+categories: ASP.NET Core
 weblogName: West Wind Web Log
 postId: 398834
-dontInferFeaturedImage: false
-dontStripH1Header: false
-postStatus: publish
-featuredImageUrl: https://weblog.west-wind.com/images/2022/POSTing-Raw-Body-Text-to-ASP.NET-Core-API-Controllers/Raw-Data.jpg
 permalink: https://weblog.west-wind.com/posts/2017/Sep/14/Accepting-Raw-Request-Body-Content-in-ASPNET-Core-API-Controllers
 postDate: 2022-04-23T10:28:51.0125876-10:00
+postStatus: publish
+dontInferFeaturedImage: false
+dontStripH1Header: false
 ---
 # Accepting Raw Request Body Content in ASP.NET Core API Controllers
 
@@ -403,6 +403,13 @@ The sample HTTP requests are setup in West Wind Web Surge and ready to test agai
 
 * [West Wind Web Surge for Http Testing](https://websurge.west-wind.com)
 
+### Reading Request.Body Multiple times
+If you need to read `Request.Body` multiple times you'll find that you can only read request data once and get data back. That's because the `Request.Body` stream is read-once by default. It's not often that this is needed but it comes up if you need to do custom logging or auditing that requires capturing or accessing data from the incoming POST data.
+
+For more information on how you can read `Request.Body` multiple times please see this follow up post:
+
+* [Reading Raw ASP.NET Request.Body Multiple Times](https://weblog.west-wind.com/posts/2024/Feb/20/Reading-Raw-ASPNET-RequestBody-Multiple-Times)
+
 ### Summary
 Accepting raw data is not something you have to do all the time, but occassionally it is required for API based applications. ASP.NET MVC/Web API has never been very direct in getting at raw data, but once you understand how the pipeline manages request data and deals with content type mapping it's easy to get at binary data.
 
@@ -414,6 +421,10 @@ In this post I showed two approaches:
 The former is easy to use but doesn't describe the API behavior via the method interface. The latter is a little more work and requires hooking up a custom formatter, but it allows keeping the API's contract visible as part of the controller methods which to me simply feels cleaner.
 
 All of this is making me hungry for some **raw Sushi**...
+
+### Resources
+
+* [Reading Request.Body Multiple Times](https://weblog.west-wind.com/posts/2024/Feb/20/Reading-Raw-ASPNET-RequestBody-Multiple-Times)
 
 <div style="margin-top: 30px;font-size: 0.8em;
             border-top: 1px solid #eee;padding-top: 8px;">
