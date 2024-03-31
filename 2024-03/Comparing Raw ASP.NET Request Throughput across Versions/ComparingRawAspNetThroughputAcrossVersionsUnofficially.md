@@ -17,8 +17,6 @@ dontStripH1Header: false
 
 ![New And Old Computers](NewAndOldComputers.jpg)
 
-[[_TOC_]]
-
 It's that time of year again to upgrade to a new machine, and one of the first things I often do once the machine is set up is run some performance tests of a simple ASP.NET application that tests raw request throughput of a couple of JSON do-nothing requests.
 
 Mind you, this isn't indicative of any kind of real world application performance, but it's a pretty good yardstick to compare rough performance across .NET versions and my local computers, and how well it performs across versions and machines. 
