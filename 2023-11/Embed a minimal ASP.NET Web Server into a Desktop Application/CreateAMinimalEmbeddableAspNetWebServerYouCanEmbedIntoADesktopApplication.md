@@ -14,12 +14,12 @@ dontStripH1Header: false
 ---
 # Embedding a minimal ASP.NET Web Server into a Desktop Application
 
-![Web Server in a Box Banner](EmbeddedBanner.jpg)
+![Web Server in a Box Banner](EmbeddedBanner.jpg) 
 
 Have you ever wanted to embed a Web Server into another application like a Desktop app for example? It's not a common scenario but I've had a number of occasions where I've had a need for this:
 
 * **[Markdown Monster Markdown Editor](https://markdownmonster.west-wind.com)**  
-Provide an application server REST API that can be used for Web and other desktop applications to communicate with the running app. 
+Provide an application server REST API that can be used for Web and other desktop applications to communicate with the running app.
 
 * **Help Builder (Documentation)**  
 Run a background Web Server to display rendered Http content for live previews of real time generated HTML content.

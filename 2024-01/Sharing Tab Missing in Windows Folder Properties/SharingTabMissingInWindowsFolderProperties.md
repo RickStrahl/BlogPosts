@@ -18,6 +18,8 @@ dontStripH1Header: false
 
 For unfathomable reasons, Windows 11 is actively discouraging the Sharing Tab on the Windows Explorer `Properties` Context Menu, where it used to sit by default.
 
+> The new sharing UI in Windows uses the `Give Access to` in the Explorer context menu.
+
 I'm talking about this tab when you select a drive or folder:
 
 ![Sharing Tab in Windows](SharingTabInWindows.png)  
@@ -81,11 +83,19 @@ But... you may not be done yet! The Sharing Tab or the command line equivalents 
 
 You need to also make sure that Windows **File and Printer Sharing** is enabled and ensure that you don't have **Firewall Rules** that block access.
 
+### Enabling Sharing UI in Explorer
+By default Explorer is set to use the Sharing Wizard (recommended). I'm not even sure what the sharing Wizard is - I've never seen it, but I know you **don't want it**!
+
+To disable it open Explorer and click on the options, the find the 
+
+![Don't use the Sharing Wizard](DontuseSharingWizard.png)  
+<small>**Figure 7** - Disable the Sharing Wizard in the Explorer Options which enable the Sharing UI</small>
+
 ### Set Network Adapter Network Profile to **Private**
 The first setting you should set is the network adapter's **Network Profile** and set it to **Private network**.
 
 ![Private Network Setting](PrivateNetworkSetting.png)  
-<small>**Figure 7** - Setting your network to Private enables File and Printer sharing and makes your computer discoverable. </small>
+<small>**Figure 7.5** - Setting your network to Private enables File and Printer sharing and makes your computer discoverable. </small>
 
 This setting acts as a **high level setting** that sets multiple sub settings. It makes the network **adapter connection discoverable** on the network and **enables File and Printer Sharing**. 
 

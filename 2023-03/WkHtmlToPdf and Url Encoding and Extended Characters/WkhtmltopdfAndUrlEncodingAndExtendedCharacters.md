@@ -1,16 +1,16 @@
 ---
 title: 'WkHtmlToPdf: Dealing with broken Url Encoded and Extended Character Links'
+featuredImageUrl: https://weblog.west-wind.com/images/2023/WkHtmlToPdf-and-Url-Encoding-and-Extended-Characters/UrlEncodedMessBanner.png
 abstract: WkHtmlToPdf is a commonly used tool to create PDF documents from HTML files or Urls. Unfortunately it's a bit cranky and one of the problems you can run into is that links that include URL encoding won't work in your output PDF. In this post I describe the problem and a hacky workaround to make broken PDF links work by hacking the HTML file prior to conversion.
-categories: Web, .NET
 keywords: wkpdftohtml, PDF, Conversion, Link, Url Encoding, Extended Characters
+categories: Web, .NET
 weblogName: West Wind Web Log
 postId: 3756667
-dontInferFeaturedImage: false
-dontStripH1Header: false
-postStatus: publish
-featuredImageUrl: https://weblog.west-wind.com/images/2023/WkHtmlToPdf-and-Url-Encoding-and-Extended-Characters/UrlEncodedMessBanner.png
 permalink: https://weblog.west-wind.com/posts/2023/Mar/15/WkHtmlToPdf-and-Url-Encoding-and-Extended-Characters
 postDate: 2023-03-15T21:53:03.2192246-10:00
+postStatus: publish
+dontInferFeaturedImage: false
+dontStripH1Header: false
 customFields:
   mt_githuburl:
     id: 
@@ -21,7 +21,7 @@ customFields:
 
 ![](UrlEncodedMessBanner.png)
 
-[WkHtmlToPdf](https://wkhtmltopdf.org/) is a command line utility based on an old version of the Chromium engine that can be used to create PDF output from HTML documents. It's an Open Source tool with [source code on GitHub](https://github.com/wkhtmltopdf/wkhtmltopdf) that's been around for a long time and is used by many other tools and components both online and offline. It has many options for customizing the PDF output and does a fairly good job of converting documents. 
+[WkHtmlToPdf](https://wkhtmltopdf.org/) is a command line utility based on an old version of the Chromium engine that can be used to create PDF output from HTML documents. It's an Open Source tool with [source code on GitHub](https://github.com/wkhtmltopdf/wkhtmltopdf) that's been around for a long time and is used by many other tools and components both online and offline. It has many options for customizing the PDF output and does a fairly good job of converting documents.
 
 But - it's definitely dated and the code base has basically been frozen 8 years or so ago. It's based on an old version of the Chromium engine, which means there are new HTML/CSS features that are not supported, along with a number of issues that don't look like they are going to get fixed.
 
@@ -238,7 +238,7 @@ When generating PDFs I often alternate between using the above WkHtmlToPdf gener
 No perfect solutions - always trade offs.
 
 In a nutshell for large documents I prefer WkHtmlToPdf. For things like invoices or short one or two pagers Save to PDF often works and looks better.
- if (te.mm && !te.isEditorSimple) 
+
 For now this URL Decoding hack for WkHtmlToPdf allows me to plod on with this option...
 
 <div style="margin-top: 30px;font-size: 0.8em;

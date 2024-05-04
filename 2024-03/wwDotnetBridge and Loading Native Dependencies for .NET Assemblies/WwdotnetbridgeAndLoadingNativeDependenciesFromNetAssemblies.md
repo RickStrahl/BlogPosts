@@ -15,6 +15,8 @@ dontStripH1Header: false
 
 ![Loading Banner](Loading-Banner.png)
 
+
+
 When using wwDotnetBridge to access .NET components you may run into .NET components that have native binary dependencies. When I say 'native' here I mean, non-.NET Win32/C++ dependencies that are generally not following the same assembly loading rules as the .NET host.
 
 ## An Example: NHunspell, Spellchecking and Word Suggestions

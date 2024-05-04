@@ -1,4 +1,5 @@
 ---
+more: this is a test my changes xxxx zzzz
 title: Integrating OpenAI Image Generation into a .NET Application
 featuredImageUrl: https://weblog.west-wind.com/images/2023/Integrating-OpenAI-image-generation-into-your-.NET-Application/ImageGeneratorBanner.jpg
 abstract: Image Generation AIs are proving to be very good at creating images that can be used for all sorts of purposes. In this article I discuss how you can integrate image generation right into your own .NET applications using the OpenAI REST API. In addition I'll show how you can integrated this functionality into a larger application and discuss some general thoughts on image AI usage based on some of the experiences from a developer/non-designer user perspective.

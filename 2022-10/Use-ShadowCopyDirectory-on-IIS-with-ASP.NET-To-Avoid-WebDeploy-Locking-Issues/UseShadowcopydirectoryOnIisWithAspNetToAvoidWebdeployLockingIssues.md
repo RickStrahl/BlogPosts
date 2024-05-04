@@ -14,7 +14,7 @@ dontStripH1Header: false
 ---
 # Avoid WebDeploy Locking Errors to IIS with Shadow Copy for ASP.NET Core Apps
 
-*<small style="color: red">Updated for .NET 7.0 - Feb 9, 2023</small>*
+*<small style="color: red">Updated for .NET 8.0 - April 30th, 2024</small>*
 
 ![Rocky Deployment - boat sliding off launch ramp](DeployBoat.jpg)
 
@@ -112,7 +112,7 @@ Because Shadow Copy is not an application feature, it's not set in your .NET Cor
  <handlerSettings>
    <handlerSetting name="enableShadowCopy" value="true" />
    <handlerSetting name="shadowCopyDirectory"       
-                   value="../ShadowCopyDirectory/" />
+                   value="../ShadowCopyDirectories/WebStore" />
  </handlerSettings>
  
 </aspNetCore>
@@ -136,6 +136,17 @@ Each application and each 'change' in the application generates a new shadow cop
 All of this works very well and has eliminated any publish errors for me due to file locking. This is a simple fix for an annoying problem and I'm very glad to see Shadow Copying again supported for publishing.
 
 Again: **Yay!**
+
+### Caveat: For multiple Apps, Use Dedicated Folders for Each App!
+Although the documentation doesn't mention it and WebDeploy creates unique folder for each shadow copied application that it applies to, it's a good idea that if you have **multiple Web applications that use Shadow Copy** to **use separate folders for each application**. 
+
+[I recently ran into some problems related to this very issue](https://weblog.west-wind.com/posts/2024/Apr/28/ASPNET-Core-Module-with-Shadow-Copy-Not-Starting-Separate-your-Shadow-Copy-Folders) where I had 4 applications all using the same Shadow Copy Directory folder. In this scenario I ended up with startup problems in all 4 applications as they each corrupted the others by copying and deleting files in the other folders.
+
+While that particular problem might have been due to a (hopefully shortlived) regression bug in the ANCM, it's safe to say that using separate folders - perhaps under a common base folder - is **guaranteed to sidestep any unintentional file deletion or corruption**. Plus: It also makes it easier to clean up the Shadow directory folders for a specific application or quickly double check the folder for actual executing files.
+
+As you can see in the screen shot above I put my shadow copy folders all below a common `ShadowCopyDirectories` folder and then have application specific subfolders below that folder.
+
+![Shared Shadow Copy Root Folder](SharedShadowCopyRootFolder.png)
 
 ### Caveat: Permissions Required for ShadowCopy Folder!
 In order for shadow copying to work you have to make sure that the IIS Application Pool Identity account has full access to create folders, and write files in the ShadowCopy folder. 

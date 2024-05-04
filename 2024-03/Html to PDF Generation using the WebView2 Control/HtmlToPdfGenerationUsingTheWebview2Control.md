@@ -7,7 +7,7 @@ categories: .NET ASP.NET Windows
 weblogName: West Wind Web Log
 postId: 4319131
 permalink: https://weblog.west-wind.com/posts/2024/Mar/26/Html-to-PDF-Generation-using-the-WebView2-Control
-postDate: 2024-03-26T21:59:52.7789421-10:00
+postDate: 2024-03-27T00:59:52.7789421-07:00
 postStatus: publish
 dontInferFeaturedImage: false
 dontStripH1Header: false
@@ -50,7 +50,7 @@ The Window requirement turned out to be a major sticking point - I had started w
 After a lot of digging and experimenting however, I managed to figure out a way to host the control **without requiring an explicit Window context/desktop** that allows the PDF generation to work even in service based application, such as running inside of IIS. More on that later...
 
 ### Chromium Print and PDF Output UI
-If you've used the WebView2 control in your desktop apps, you probably know that it's basically a full featured instance of Microsoft Edge and as such it has native UI support for Printing and PDF Exporting through that interface. Here's the WebView2 control in a Windows Desktop application (Markdown Monster) displaying a document and popping up the Print dialog with Ctrl-P to ""
+If you've used the WebView2 control in your desktop apps, you probably know that it's basically a full featured instance of Microsoft Edge and as such it has native UI support for Printing and PDF Exporting through that interface. Here's the WebView2 control in a Windows Desktop application (Markdown Monster) displaying a document and popping up the Print dialog with Ctrl-P as shown in **Figure 2**.
 
 ![Web View2 Print U I](WebView2PrintUI.png) 
 <small>**Figure 2** - The WebView Print UI allows for PDF Exports just as in any Chromium browser.</small>
@@ -153,6 +153,8 @@ Targets:
 * **net8.0-windows**
 * **net472**
 
+> Yes you need to use the `-windows` targets on your host application - it will not work with `net8.0` or `net6.0`, because the WebView requires the .NET Windows Runtime!
+
 In addition it has two dependencies in order to run:
 
 * [.NET Windows Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)  
@@ -179,16 +181,19 @@ Here are some examples that demonstrate each variation of operations:
 #### Async Call Syntax for Stream Result
 
 ```csharp
-// Fully qualified File path or URL
 var outputFile = Path.GetFullPath(@".\test3.pdf");
 var htmlFile = Path.GetFullPath("HtmlSampleFileLonger-SelfContained.html");
-File.Delete(outputFile);
 
 var host = new HtmlToPdfHost();
 var pdfPrintSettings = new WebViewPrintSettings()
 {
     ShouldPrintHeaderAndFooter = true,
-    HeaderTitle = "Blog Post Title"
+    HeaderTitle = "Blog Post Title",
+
+    ScaleFactor = 0.9F,
+    //ShouldPrintBackgrounds = false
+    //PageRanges = "1-3,5-8"
+    //ColorMode = WebViewColorMode.Monochrome // this is broken in WebView - always color
 };
 
 // We're interested in result.ResultStream
@@ -197,16 +202,16 @@ var result = await host.PrintToPdfStreamAsync(htmlFile, pdfPrintSettings);
 Assert.IsTrue(result.IsSuccess, result.Message);
 Assert.IsNotNull(result.ResultStream); // THIS
 
-Debug.WriteLine($"Stream Length: {result.ResultStream.Length}");
-
 // Copy resultstream to output file
 File.Delete(outputFile);
-using var fstream = new FileStream(outputFile, FileMode.OpenOrCreate, FileAccess.Write);
-result.ResultStream.CopyTo(fstream);
-result.ResultStream.Close(); // Close returned stream!
-
-ShellUtils.OpenUrl(outputFile);
+using (var fstream = new FileStream(outputFile, FileMode.OpenOrCreate, FileAccess.Write))
+{
+    result.ResultStream.CopyTo(fstream);
+    result.ResultStream.Close(); // Close returned stream!
+}
+ShellUtils.OpenUrl(outputFile);  // display it
 ```
+
 
 #### Async Call for PDF File Generation Result
 
@@ -217,37 +222,20 @@ var outputFile = Path.GetFullPath(@".\test2.pdf");
 File.Delete(outputFile);
 
 var host = new HtmlToPdfHost();
-var pdfPrintSettings = new WebViewPrintSettings()
-{
-    // margins are 0.4F default
-    MarginTop = 0.3f,
-    MarginBottom = 0.3F,
-    MarginLeft = 0.2f,
-    MarginRight = 0.2f,                
-    ScaleFactor = 0.9F,
+var result = await host.PrintToPdfAsync(htmlFile, outputFile); // options omitted - use defaults
 
-    // no effect
-    Copies = 2,
-    PagesPerSide = 4, 
-    ColorMode = WebViewPrintColorModes.Grayscale,
-    Collation = WebViewPrintCollations.UnCollated,
-     Duplex = WebViewPrintDuplexes.TwoSidedShortEdge
-};
-var result = await host.PrintToPdfAsync(htmlFile, outputFile, pdfPrintSettings);
-
-Assert.IsTrue(result.IsSuccess, result.Message);
-ShellUtils.OpenUrl(outputFile);
+Assert.IsTrue(result.IsSuccess, result.Message);  // success means file created
+ShellUtils.OpenUrl(outputFile);                   // display it
 ```
 
 #### Event Syntax to Stream
 
 ```csharp
 // File or URL
-var htmlFile = Path.GetFullPath("HtmlSampleFile-SelfContained.html");                       
-var host = new HtmlToPdfHost();
+var htmlFile = Path.GetFullPath("HtmlSampleFile-SelfContained.html");
 
-// Callback on completion
-host.OnPrintCompleteAction = (result) =>
+var host = new HtmlToPdfHost();
+var onPrintComplete = (PdfPrintResult result) =>
 {
     if (result.IsSuccess)
     {
@@ -255,52 +243,21 @@ host.OnPrintCompleteAction = (result) =>
         var outputFile = Path.GetFullPath(@".\test1.pdf");
         File.Delete(outputFile);
 
-        using var fstream = new FileStream(outputFile, FileMode.OpenOrCreate, FileAccess.Write);
-        result.ResultStream.CopyTo(fstream);
+        using (var fstream = new FileStream(outputFile, FileMode.OpenOrCreate, FileAccess.Write))
+        {
+            result.ResultStream.CopyTo(fstream);
 
-        result.ResultStream.Close(); // Close returned stream!
-
-        ShellUtils.OpenUrl(outputFile);
-        Assert.IsTrue(true);
+            result.ResultStream.Close(); // Close returned stream!                        
+            Assert.IsTrue(true);
+            ShellUtils.OpenUrl(outputFile);
+        }
     }
     else
     {
         Assert.Fail(result.Message);
     }
-};
-var pdfPrintSettings = new WebViewPrintSettings()
-{
-    MarginBottom = 0.2F,
-    MarginLeft = 0.2f,
-    MarginRight = 0.2f,
-    MarginTop = 0.4f,
-    ScaleFactor = 0.8f,
-};
-host.PrintToPdfStream(htmlFile, pdfPrintSettings);
-```
 
-
-#### Event Syntax to PDF File
-
-```csharp
-var htmlFile = Path.GetFullPath("HtmlSampleFile-SelfContained.html");
-var outputFile = Path.GetFullPath(@".\test.pdf");
-File.Delete(outputFile);
-
-var host = new HtmlToPdfHost();            
-
-// Callback when complete
-host.OnPrintCompleteAction = (result) =>
-{
-    if (result.IsSuccess)
-    {
-        ShellUtils.OpenUrl(outputFile);
-        Assert.IsTrue(true);
-    }
-    else
-    {
-        Assert.Fail(result.Message);
-    }
+    tcs.SetResult(true); 
 };
 var pdfPrintSettings = new WebViewPrintSettings()
 {
@@ -310,9 +267,40 @@ var pdfPrintSettings = new WebViewPrintSettings()
     MarginRight = 0.2f,
     MarginTop = 0.4f,
     ScaleFactor = 0.8f,
-    PageRanges = "3-6"
+    PageRanges = "1,2,5-8"
 };
-host.PrintToPdf(htmlFile, outputFile, pdfPrintSettings);
+
+// doesn't wait for completion
+host.PrintToPdfStream(htmlFile, onPrintComplete, pdfPrintSettings) ;
+```
+
+#### Event Syntax to PDF File
+
+```csharp
+// File or URL
+var htmlFile = Path.GetFullPath("HtmlSampleFile-SelfContained.html");
+var outputFile = Path.GetFullPath(@".\test.pdf");
+File.Delete(outputFile);
+
+
+var host = new HtmlToPdfHost();           
+var onPrintComplete = (PdfPrintResult result) =>
+{
+    if (result.IsSuccess)
+    {                   
+        Assert.IsTrue(true);
+        ShellUtils.OpenUrl(outputFile);
+    }
+    else
+    {
+        Assert.Fail(result.Message);
+    }
+
+    tcs.SetResult(true);
+};
+
+// doesn't wait for completion
+host.PrintToPdf(htmlFile,  outputFile, onPrintComplete);
 ```
 
 You can see that the code to use the component is pretty simple - create the `HtmlToPdfHost` and call the appropriate method and deal with the returned result - either as a direct async return value, or as a result parameter in a callback handler.
@@ -439,7 +427,7 @@ Why not just use tasks? The Webview requires is essentially a UI component so th
 
 The STA thread however is not enough - in addition you still need Windows message loop that's running in order for even the WebView headless mode to work. Without the message loop trying to create the CoreWebView2 controller just hangs. `Application.Run()`, and `SynchronizationContext.Post()` are the operations I use to accomplish this as I'm trying to stick to Windows forms constructs. You could also use `Dispatcher.Run()` and `Dispatcher.Invoke()` to achieve the same with WPF constructs.
 
-> It would be nice if there was a way to do this without requiring dependencies on `<UseWindowsForms>` or `<UseWpf>` as these require `net8.0-windows` target frameworks which would be preferrable. But I not sure if that's possible. If you can think of native ways to do this without Windows Forms or WPF, please leave a comment.
+> It would be nice if there was a way to do this without requiring dependencies on `<UseWindowsForms>` or `<UseWpf>` as these require `net8.0-windows` target framework which is... undesirable. If you can think of native ways to do this without Windows Forms or WPF, please leave a comment.
 
 The  relevant top level code (modified) that handles this Task over Thread over Windows Event loop flow looks like this:
 
@@ -485,11 +473,12 @@ SynchronizationContext.Current.Post( async (state)=>
     try
     {
         IsComplete = false;
-        
+        IsCompleteTaskCompletionSource = new TaskCompletionSource<bool>();
+
         var host = new CoreWebViewHeadlessHost(this);
         await host.PrintFromUrlStream(url);
 
-        await WaitForHostComplete(host);  // spin until IsComplete = true                          
+        await IsCompleteTaskCompletionSource.Task;  
 
         if (!host.IsComplete)
         {
@@ -508,8 +497,7 @@ SynchronizationContext.Current.Post( async (state)=>
                 ResultStream = host.ResultStream,
                 LastException = host.LastException
             };
-        }
-        OnPrintCompleteAction?.Invoke(result);
+        }                        
         tcs.SetResult(result);
     }
     catch (Exception ex)
@@ -525,30 +513,14 @@ SynchronizationContext.Current.Post( async (state)=>
         Application.ExitThread();  // now kill the event loop and thread
     }
 }, null);                
-Application.Run();  // Windows Event loop needed for WebView in system context!
+Application.Run();
 ```
 
-You'll probably notice at the top of the code there's are several `IsComplete` properties that are used to keep track of state of execution. In several places there is code that basically does:
+The jist of the code above is basically to create an instance of the `CoreWebViewHeadlessHost` and wait for printing to complete. To coordinate the state changes and waiting for completion a `TaskCompletionSource` is used to notify us when the internal CoreWebView2 controller completes the actual print operation. I always struggle to think of using a `TaskCompletionSource` (and in fact I started off with Task.Delay wait loops) to handle state flow, but once I remembered this greatly simplified the overall logic and improved performance as `TaskCompletionSource` can notify without any wait intervals.
 
-```cs
-private async Task WaitForHostComplete(CoreWebViewHeadlessHost host)
-{
-    for (int i = 0; i < RenderTimeoutMs / 20; i++)
-    {
-        if (host.IsComplete)
-            break;
-        await Task.Delay(10);
-    }
-}
-```
+At the end of the Pdf generation process, a `PdfPrintResult` is assembled and returned back, and the `IsSuccess` status and an error message if there was an error are set. If the result is a stream (rather than an output file), the `ResultStream` is captured and stored on the result.
 
-I feel dirty! But this works surprisingly well and beats some of the other alternatives of dealing with low level locks and reset events. 
-
-The jist of the code above is basically to create an instance of the `CoreWebViewHeadlessHost` and wait for printing to complete. 
-
-Once complete the `PdfPrintResult` is assembled and returns back the `IsSuccess` status and an error message if there was an error. If the result is a stream (rather than an output file), the stream is captured and stored on the result.
-
-Note that `ResultStream` is a `MemoryStream` that captures the entire response. This isn't optimal but due the way this new thread and synchronization context is set up we want to get in get the content and release everything, so creating the captured stream is the cleanest way to do that. Unfortunately this can mean a large memory hit if you're printing a large PDF.
+Note that `ResultStream` is a `MemoryStream` that captures the entire response. This isn't optimal as the Pdf binary data can be big, but due the way this new thread and synchronization context is set up we can't really pass a dynamic stream back unless we keep the entire control state and thread alive. Since that's a lot of resources, the option is to capture the output and then shut everything down. A nice future improvement might be transparently write to a temporary file if the Pdf size gets over a certain size to prevent excessive memory usage.
 
 #### WebView Eventing
 When I originally started this project I used a Windows Form with a WebView control on it. That worked fine, but as it turns out you can't instantiate a Windows form (or a dialog via `ShowDialog()`) without an active Desktop. So while the Windows form worked in Desktop and Console apps running in an Interactive Windows session, it failed when run from within a service.
@@ -576,9 +548,12 @@ protected async void InitializeAsync()
     // Create a Headless WebView
     var controller = await environment.CreateCoreWebView2ControllerAsync(HWND_MESSAGE);
     WebView = controller.CoreWebView2;   // the WebView instance (not the control)
-    
-    _IsInitialized = true;
-    WebView.DOMContentLoaded += CoreWebView2_DOMContentLoaded;      
+
+    // intercept DOMloaded event and once loaded we can initiate PDF Printing from there
+    WebView.DOMContentLoaded += CoreWebView2_DOMContentLoaded;     
+        
+    // we need to signal that it's OK to navigate the control now
+    IsInitializedTaskCompletionSource.SetResult(true);
 }
 ```
 
@@ -601,10 +576,8 @@ The problem here is this: You can't navigate the control until it's been initial
 ```csharp
 public async Task PrintFromUrlStream(string url)
 {
-    // wait for _IsInitialized=true
-    await WaitForInitialized();
+    await IsInitializedTaskCompletionSource.Task; // wait for initialization (see InitializeAsync)
 
-    // only now can we navigate
     PdfPrintOutputMode = PdfPrintOutputModes.Stream;
     WebView.Navigate(url);
 }
@@ -625,9 +598,12 @@ private async void CoreWebView2_DOMContentLoaded(object sender, Microsoft.Web.We
     finally
     {
         IsComplete = true;
+        HtmlToPdfHost.IsCompleteTaskCompletionSource.SetResult(true);
     }
 }
 
+// Actual PDF printing is a single method call - easy.
+// All the set up to get here is what's a pain!
 internal async Task<Stream> PrintToPdfStream()
 {
     var webViewPrintSettings = SetWebViewPrintSettings(); // map settings
@@ -640,7 +616,7 @@ internal async Task<Stream> PrintToPdfStream()
         await stream.CopyToAsync(ms);
         ms.Position = 0;
         
-        ResultStream = ms;
+        ResultStream = ms;  // don't Close()/Dispose()!
         IsSuccess = true;
         return ResultStream;
     }
@@ -653,59 +629,159 @@ internal async Task<Stream> PrintToPdfStream()
 }
 ```
 
-The key here is  `IsComplete` being set to `true` which now triggers the `HtmlToPdfHost` to continue processing and pick up the result from the CoreWebView host:
-
+The key here is  `IsCompleteTaskCompletionSource.SetResult(true)` to signal to the calling Host that the print operation has completed and that we can retrieve the result state from the `CoreWebViewHeadlessHost` instance:
 
 ```csharp
-IsComplete = false;
-var host = new CoreWebViewHeadlessHost(this);
-await host.PrintFromUrlStream(url);
-
-// wait for WebView to finish
-await WaitForHostComplete(host);                        
-
-// now pick up the results that we can return
-if (!host.IsComplete)
+try
 {
-    result = new PdfPrintResult()
-    {
-        IsSuccess = false,
-        Message = "Pdf generation timed out or failed to render inside of a non-Desktop context."
-    };
+  IsComplete = false;
+  
+  // wait for completion of printing
+  IsCompleteTaskCompletionSource = new TaskCompletionSource<bool>();
+
+  // host populates properties we can harvest when done
+  var host = new CoreWebViewHeadlessHost(this);
+  await host.PrintFromUrlStream(url);
+
+  await IsCompleteTaskCompletionSource.Task;   // 
+
+  if (!host.IsComplete)
+  {
+      result = new PdfPrintResult()
+      {
+          IsSuccess = false,
+          Message = "Pdf generation timed out or failed to render inside of a non-Desktop context."
+      };
+  }
+  else
+  {
+      result = new PdfPrintResult()
+      {
+          IsSuccess = host.IsSuccess,
+          Message = host.IsSuccess ? "PDF was generated." : "PDF generation failed: " + host.LastException?.Message,
+          ResultStream = host.ResultStream,
+          LastException = host.LastException
+      };
+  }                        
+  tcs.SetResult(result);  // success result to return
 }
-else
+catch (Exception ex)
 {
-    result = new PdfPrintResult()
-    {
-        IsSuccess = host.IsSuccess,
-        Message = host.IsSuccess ? "PDF was generated." : "PDF generation failed: " + host.LastException?.Message,
-        ResultStream = host.ResultStream,
-        LastException = host.LastException
-    };
+  result.IsSuccess = false;
+  result.Message = ex.ToString();
+  result.LastException = ex;
+  tcs.SetResult(result);  // failure result to return
 }
-
-// Also fire the event action if set
-OnPrintCompleteAction?.Invoke(result);
-
-// return as a Task result
-tcs.SetResult(result);
+finally
+{
+  IsComplete = true;         
+  Application.ExitThread();  // now kill the event loop and thread
+}
 ```
 
-In these steps I've shown one of the operational modes with the Async Stream result flow. The output file flow looks slightly different - rather than returning the stream it simply writes the file and returns `IsSuccess` in the result structure.
+As you can see in all of this code, the actual Pdf printing is ridiculously simple. What's hard is the entire control flow to get the control load in all environments via the Threading environment, and get the control initialized and finally loaded with Html. Once the control is read, the Pdf conversion is literally a single line of code! But man what a journey to get here!
 
 ##AD## 
 
-Exceptions are captured in all cases, since they won't flow across threads - if they weren't handled they'd blow up the thread and fail silently. So rather than failing silently we capture exceptions and return the error state, message and last exception as part of the result message.
+A few more notes in light of this code:
+
+Exceptions are captured in all cases, since they won't flow across threads - if they weren't handled they'd blow up the thread and fail silently. So rather than failing silently we capture exceptions and return it as part of the `PdfPrintResult` instance which includes the error state, message and last exception.
 
 You can check out the entire code for these two components on GitHub:
 
 * [HtmlToPdfHost.cs](https://github.com/RickStrahl/WestWind.WebView.HtmlToPdf/blob/master/Westwind.WebView.HtmlToPdf/HtmlToPdfHost.cs)
 * [CoreWebViewHeadlessHost](https://github.com/RickStrahl/WestWind.WebView.HtmlToPdf/blob/master/Westwind.WebView.HtmlToPdf/CoreWebViewHeadlessHost.cs)
 
+## Important: WebView Environment Requirements
+Since this control depends on a WebView2 control and the WebView runtime, it's important to understand how a WebView operates. It's basically an instance of MsEdge and as such each WebView instance runs as a browser instance. It's a full WebView environment which supports all the related concepts like Cookies, Application State, Security, etc. All of this surrounding infrastructure and browser state is stored in a **WebView Environment Folder** which is created or checked for when the WebView starts. If the folder exists it uses the existing folder and settings, otherwise the folder is created.
+
+The folder is sizable, so first time startup can be slow. The WebView caches environment settings in the running process so first time rendering tends to be slower than subsequent rendering. If the folder has to be created it takes a little longer yet.
+
+### Environment Location
+By default this WebView Environment is stored in the Application's install folder in a `WebView_Environment` folder. If you are running your application out of a folder that doesn't have the appropriate permissions, the environment folder can't be created and the WebView will fail to instantiate.
+
+### Customizing Environment Location
+The `HtmlToPdfHost` component includes a property to let you specify the folder for the WebView environment, and it defaults it to the Windows `Temp` folder:
+
+```csharp
+/// <summary>
+/// The location of the WebView environment folder that is required
+/// for WebView operation. Uses a default in the temp folder but you
+/// can customize to use an application specific folder.
+/// 
+/// (If you already use a WebView keep all WebViews pointing at the same environment: 
+/// https://weblog.west-wind.com/posts/2023/Oct/31/Caching-your-WebView-Environment-to-manage-multiple-WebView2-Controls
+/// </summary>
+public string WebViewEnvironmentPath { get; set; } = Path.Combine(Path.GetTempPath(), "WebView2_Environment");
+```
+
+which should by default work in most environments to create the folder. You can however customize this folder **explicitly** in case you want to keep it local with your application or environment and not pollute the system temp structure. 
+
+The default configuration should work in most scenarios, but regardless I would recommend using an Application specific **writable** location. You can continue to use the temp folder but maybe name the folder with an Application specific prefix. Using your own custom folder guarantees there isn't any cross talk or version conflict from another application.
+
+## More to Come!
+Since I wrote this long post a week ago, I've spent some more time trying to figure out how to add some of the missing features to the control. 
+
+* TOC Generation
+* CSS Injection
+* Page Break support (via above CSS Injection)
+
+These features have been implemented via an additional package. A new package because these features add to the footprint of the solution with several added NuGet packages, as well as print overhead time as the input file and output stream/file have to be updated and be read and written multiple times.
+
+The added package is:
+
+```ps
+dotnet add package westwind.webview.htmltopdf.extended
+```
+
+which uses the same interface as the original, but provides additional options. For now you can find out more on the GitHub repo:
+
+* [WestWind.WebView.HtmlToPdf](https://github.com/RickStrahl/WestWind.WebView.HtmlToPdf)
+
+
+## Other Options
+There are other solutions available if you're willing to put up with explicit runtime installations and large runtime distributions. This might be specifically useful for non-Windows server deployments or server deployments in general where a one-time installation might not be a big deal. The advantage of the WebView based solution is that you literally need nothing else to install - you just include this small library. 
+
+### Chromium Dev Tools Automation Tools
+The following two are basically Chromium based automation tools that also provide the ability to print to pdf. These tools basically run the Chromium devtools as a server and then automate chromium through the DevTools API. 
+
+* [Microsoft PlayWright](https://playwright.dev/dotnet/docs/intro)
+* [Pupeteer Sharp](https://github.com/hardkoded/puppeteer-sharp)
+
+### Chromium Command Line
+You can also use the command line for any Chromium based browser to generate Html to Pdf, albeit with limited options. This works with Chrome, Brave, and on Windows with MS Edge which is a pre-installed Windows component now so guaranteed to be installed.
+
+The following converts an Html file to Pdf using Edge on Windows (single line):
+
+```ps
+& "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" 
+   --headless 
+   --generate-pdf-document-outline 
+   --print-to-pdf="c:\temp\test.pdf" 
+   "D:\projects\..\Westwind.HtmlToPdf.Test\SampleFiles\HtmlSampleFile-SelfContained.html"
+```
+
+The same with Chrome:
+
+```ps
+& "C:\Program Files\Google\Chrome\Application\chrome.exe"
+   --headless 
+   --generate-pdf-document-outline 
+   --print-to-pdf="c:\temp\test.pdf" 
+   "D:\projects\..\Westwind.HtmlToPdf.Test\SampleFiles\HtmlSampleFile-SelfContained.html"
+```
+
+There are number of Pdf and print related parameters available as well, but the options are much more limited than what you can pass to the Dev Tools or WebView (which likely uses the Dev Tools Api) print interfaces. For example, you can't easily specify margins or document scaling, or page ranges as you can with the API. Still for some scenarios this is actually a quick and dirty solution.
+
+### Commercial Libraries
+There are also dozens of commercial Pdf libraries out there many of which also support printing Html to Pdf as one of many Pdf manipulation and generation features. They all use the same concept of automating a Chromium browser for Html to Pdf conversion. For many of these libraries Html to Pdf conversion is just one of many features related to Pdf manipulation. Be forewarned though - most of these libs are insanely expensive especially if you plan on distributing a vertical application or run on a server, so if you're only after Html to Pdf conversion you probably want to take a hard look at some of the solutions and tools described in the article or the links above or heck even automating Chrome or Edge via the command line.
+
 ## Summary
 It's been a long journey to get here, but at this point I have a generic PDF to HTML engine that works on Windows. It uses standard Windows components that in most cases doesn't require a huge runtime distribution and... last but not least it's free to use and open source.
 
 It'd be cool to see if we can provide some of the functionality that wkHtml2Pdf provided. I could see optionally injecting CSS for improved page-breaking and perhaps using a third party library to add the PDF TOC/Bookmarks to the document (PdfPig?).
+
+> Update: I've added code to the component on GitHub that provides TOC creation and exposed it as a separate component. The GitHub repo has more details and there will be a follow up post.
 
 If you find this tool useful, please consider supporting with contributions or by using the [Sponsor link on Github](https://github.com/sponsors/RickStrahl). Value for Value.
 
