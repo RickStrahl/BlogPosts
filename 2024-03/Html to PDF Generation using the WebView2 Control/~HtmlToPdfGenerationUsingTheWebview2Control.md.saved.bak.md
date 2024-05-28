@@ -1,4 +1,4 @@
----
+    ---
 title: Programmatic Html to PDF Generation using the WebView2 Control with .NET
 featuredImageUrl: https://weblog.west-wind.com/images/2024/Html-to-PDF-Generation-using-the-WebView2-Control/Banner.jpg
 abstract: In this post I describe how to use the Microsoft WebView2 control to automate HTML to PDF generation generically for any kind of Windows application, including services. We'll look at the WebView and it's printing functionality and some of the intricacies that are involved in hosting the WebView control outside of a desktop application context to provide unattended mode even in service context.

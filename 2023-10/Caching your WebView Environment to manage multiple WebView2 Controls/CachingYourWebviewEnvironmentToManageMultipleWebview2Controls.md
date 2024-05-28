@@ -7,7 +7,7 @@ categories: WebView,WPF,Windows
 weblogName: West Wind Web Log
 postId: 4068979
 permalink: https://weblog.west-wind.com/posts/2023/Oct/31/Caching-your-WebView-Environment-to-manage-multiple-WebView2-Controls
-postDate: 2023-10-31T12:10:59.9015254-10:00
+postDate: 2023-10-31T15:10:59.9015254-07:00
 postStatus: publish
 dontInferFeaturedImage: false
 dontStripH1Header: false
