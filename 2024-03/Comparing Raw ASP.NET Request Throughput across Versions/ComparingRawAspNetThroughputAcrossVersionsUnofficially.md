@@ -7,7 +7,7 @@ categories: ASP.NET
 weblogName: West Wind Web Log
 postId: 4285010
 permalink: https://weblog.west-wind.com/posts/2024/Mar/08/Comparing-Raw-ASPNET-Request-Throughput-across-Versions
-postDate: 2024-03-08T00:21:08.3552799-10:00
+postDate: 2024-03-08T02:21:08.3552799-08:00
 postStatus: publish
 dontInferFeaturedImage: false
 dontStripH1Header: false
@@ -27,6 +27,8 @@ To me this is one of those apples to apples comparison when running the same app
     
 
 Stupidly simple but I find this very practical to go through, even though this doesn't qualify as 'scientific' testing. It's merely a yardstick I can calibrate performance to, by comparing past and present results. 
+
+##AD##
 
 ## Another Day another New Machine
 All of this has been brought on by my need to get a new dev machine recently. I've been having issues with my 12th gen Dell XPS laptop which is a few years old now. It's an I7 12th gen machine, with 32gb and a fast hard drive. It runs well enough for most day to day tasks, but for development and some testing tasks like this, the XPS runs into serious issues with overheating and CPU throttling. Extended use of Visual Studio and Resharper too, will often bring the XPS to its knees to where even typing becomes a problem.
@@ -112,6 +114,8 @@ You'll want to make sure you run your tests in `Production` mode to avoid overhe
 To test request I use [West Wind WebSurge](https://websurge.west-wind.com) (yes I'm biased :grin:), but you can use any other load testing tool like [Bombardier](https://github.com/codesenberg/bombardier), [JMeter](https://jmeter.apache.org/), Visual Studio Test etc.
 
 Load testing always depends on the specific environment that you're testing and that what you are testing from and with, so especially with an unscientific test like this, keep in mind that the performance numbers only mean anything in relation to each other. They give you a general idea of what a given set of hardware is capable of running the test.
+  
+##AD##
 
 I broke out these tests into four sets on each machine:
 
@@ -166,6 +170,8 @@ A couple of things jump out of the results:
 * .NET 8.0 handles roughly 10% more than .NET 7.0
 * This is a lot of requests handled on a local laptop!
 * The I7 Dell show the Thermal throttling kicking in 1/4 of the way into tests
+
+##AD## 
 
 #### A little more info on the Test Run
 Remember this all running on a local machine: both the server and the load tester are running on the same box. The test isn't particularly optimized either - finding an optimal set of simultaneous sessions (seems around 1.5-2x logical CPU count is usually optimal) could bump those numbers higher but it gets weird if there's too much load in the tester as it starts to interfere with the server CPU usage. 
