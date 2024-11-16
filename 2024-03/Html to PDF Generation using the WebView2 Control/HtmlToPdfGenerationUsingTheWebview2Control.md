@@ -27,8 +27,8 @@ In this post I dig into how to use this WebView2 PDF automation interface and ho
 If you just want to dig into the code:
 
 * [Using Westwind.WebView.HtmlToPdf](#using-the-library)
-* [Westwind.WebView.HtmlToPdf GitHub Repository](https://github.com/RickStrahl/WestWind.WebView.HtmlToPdf)
-* [Westwind.WebView.HtmlToPdf NuGet](https://www.nuget.org/packages/Westwind.WebView.HtmlToPdf)
+* [Westwind.WebView GitHub Repository](https://github.com/RickStrahl/WestWind.WebView)
+* [Westwind.WebView NuGet](https://www.nuget.org/packages/Westwind.WebView)
 
 For more detail,keep reading...
 
@@ -52,7 +52,7 @@ After a lot of digging and experimenting however, I managed to figure out a way 
 ### Chromium Print and PDF Output UI
 If you've used the WebView2 control in your desktop apps, you probably know that it's basically a full featured instance of Microsoft Edge and as such it has native UI support for Printing and PDF Exporting through that interface. Here's the WebView2 control in a Windows Desktop application (Markdown Monster) displaying a document and popping up the Print dialog with Ctrl-P as shown in **Figure 2**.
 
-![Web View2 Print U I](WebView2PrintUI.png) 
+![Web View2 Print UI](WebView2PrintUI.png) 
 <small>**Figure 2** - The WebView Print UI allows for PDF Exports just as in any Chromium browser.</small>
 
 The output this generates is based on standard Chromium PDF generation, using a common print UI that is used by every Chromium based browser like [Brave](https://brave.com/), [Vivaldi](https://vivaldi.com/), [Edge](https://www.microsoft.com/en-us/edge),  [Chrome](https://www.google.com/chrome/) and many more. The print dialog that pops up sports a preview and has customization options for margins, color or gray scale, headers and footers, pages to print, and more.
@@ -137,27 +137,27 @@ The [Westwind.WebView.HtmlToPdf](https://github.com/RickStrahl/Westwind.WebView.
 
 This library uses the built-in **WebView2 Runtime in Windows so it has no external dependencies for your applications** assuming you are running on a recent version of Windows that has the WebView2 Runtime installed.
 
-You can grab this component from [NuGet](https://www.nuget.org/packages?q=Westwind.webview.htmltopdf):
+You can grab this component from [NuGet](https://www.nuget.org/packages?q=Westwind.webview):
 
 ```ps
-dotnet add package westwind.webview.htmltopdf
+dotnet add package westwind.webview
 ```
 
 or you can grab the source code from Github
 
-* [Westwind.WebView.HtmlToPdf on GitHub](https://github.com/RickStrahl/Westwind.WebView.HtmlToPdf?tab=readme-ov-file)
+* [Westwind.WebView on GitHub](https://github.com/RickStrahl/Westwind.WebView?tab=readme-ov-file)
 
 Targets:
 
-* **net6.0-windows**
+* **net9.0-windows**
 * **net8.0-windows**
 * **net472**
 
-> Yes you need to use the `-windows` targets on your host application - it will not work with `net8.0` or `net6.0`, because the WebView requires the .NET Windows Runtime!
+> Yes you need to use the `-windows` targets on your host application - it will not work with `net9.0` or `net8.0`, because the WebView requires the .NET Windows Runtime!
 
 In addition it has two dependencies in order to run:
 
-* [.NET Windows Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)  
+* [.NET Windows Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/9.0)  
 This runtime is required by the WebView2 .NET SDK and also by the code that makes it work in server environments (dependency on Windows Forms basically). And yes you can install that on a server as a one time installation.
 
 * [Microsoft Edge WebView2 Runtime](https://developer.microsoft.com/en-us/microsoft-edge/webview2/)  
@@ -789,12 +789,12 @@ Enjoy.
 
 ## Resources
 
-* [Westwind.WebView.HtmlToPdf GitHub Repository](https://github.com/RickStrahl/WestWind.WebView.HtmlToPdf)
-* [Westwind.WebView.HtmlToPdf NuGet](https://www.nuget.org/packages/Westwind.WebView.HtmlToPdf)
+* [Westwind.WebView GitHub Repository](https://github.com/RickStrahl/WestWind.WebView)
+* [Westwind.WebView NuGet](https://www.nuget.org/packages/Westwind.WebView)
 * [WebView2 Feedback](https://github.com/MicrosoftEdge/WebView2Feedback)
 * [wkHtml2Pdf](https://wkhtmltopdf.org/)
-* [HtmlToPdfHost.cs](https://github.com/RickStrahl/WestWind.WebView.HtmlToPdf/blob/master/Westwind.WebView.HtmlToPdf/HtmlToPdfHost.cs)
-* [CoreWebViewHeadlessHost](https://github.com/RickStrahl/WestWind.WebView.HtmlToPdf/blob/master/Westwind.WebView.HtmlToPdf/CoreWebViewHeadlessHost.cs)
+* [HtmlToPdfHost.cs](https://github.com/RickStrahl/WestWind.WebView/blob/master/Westwind.WebView/HtmlToPdf/HtmlToPdfHost.cs)
+* [CoreWebViewHeadlessHost](https://github.com/RickStrahl/WestWind.WebView/blob/master/Westwind.WebView/HtmlToPdf/CoreWebViewHeadlessHost.cs)
 * [CoreWebView2Environment.CreateCoreWebView2ControllerAsync](https://learn.microsoft.com/en-us/dotnet/api/microsoft.web.webview2.core.corewebview2environment.createcorewebview2controllerasync?view=webview2-dotnet-1.0.2210.55)
 
 <div style="margin-top: 30px;font-size: 0.8em;

@@ -70,9 +70,9 @@ Another way that lets you add folders more easily in bulk is via the `.gitconfig
 The file lives in the your user directory:
 
 ```ps
-code c:\users\<username>\.gitinfo
+code c:\users\<username>\.gitconfig
 # or
-code ~\.gitinfo
+code ~\.gitconfig
 ```
 
 Inside of the file you have:
@@ -133,7 +133,7 @@ To do this:
 > #### @icon-info-circle Don't use Ownership on Shared Drives
 > If you're using some sort of shared drive you might want to avoid this option as ownership is likely to vary across machines. 
 > 
-> For example, I'm currently using a `d:` drive that I move between machines and by setting ownership on the folder to the non-generic account, I would set ownership to a machine specific account that may not exist on another machine that I plug my drive into. For those scenarios it's better to use the other approaches of explictly specifying folder. If necessary you can copy or diff the `[safe]` folders from `.gitinfo` and move them to another machine.
+> For example, I'm currently using a `d:` drive that I move between machines and by setting ownership on the folder to the non-generic account, I would set ownership to a machine specific account that may not exist on another machine that I plug my drive into. For those scenarios it's better to use the other approaches of explictly specifying folder. If necessary you can copy or diff the `[safe]` folders from `.gitconfig` and move them to another machine.
 
 ## Does this fix the Security Issue? Yes...
 So this fixes a fairly obscure security issue that is unlikely to apply to most people. But alas even if it applies to a small subset it has to be taken serious, right? Unfortunately, that the state of security these days - everything requires an extra step here, and another there - it's annoying as heck! 
@@ -144,11 +144,10 @@ But this hassle ensures that you have to be very explicit about green lighting y
 
 At least that's what I tell myself at night :smile: 
 
-
 ##AD##
 
 ## Summary
-The good news is once you know how to work around this the solutions are easy if somewhat tedious. Being able to assign folders in bulk either via `.gitinfo` or via setting folder Ownership makes the process a bit easier and can be a *one and done* task.
+The good news is once you know how to work around this the solutions are easy if somewhat tedious. Being able to assign folders in bulk either via `.gitconfig` or via setting folder Ownership makes the process a bit easier and can be a *one and done* task.
 
 This has been discussed elsewhere but I wanted to write this up for my own reference with the things that have worked for me so my future self can find it again. Maybe it's useful to a few of you as well - if you read this far it probably is...
 

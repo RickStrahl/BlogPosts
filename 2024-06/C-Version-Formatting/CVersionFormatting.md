@@ -139,7 +139,6 @@ verString = version.FormatVersion(2,3);
 
 both of which get you `8.0`.
 
-
 Here are some more examples. With the default default 2 min and max component tokens:
 
 ```csharp
@@ -193,15 +192,14 @@ Assert.AreEqual(verString, "8.3.0.2");
 
 Note that example #3 in the last might seem like it go several ways. The way this code works, `maxTokens` determines the how many tokens are read and worked on. So if a non-zero value exists beyond the `maxTokens` value it's ignored completely. So if the last value is zero it can be stripped regardless of the non-zero value past the `maxTokens` value.
 
-
 ##AD##
 
 ## Summary
-Obviously not anything earth shattering here, and perhaps a very limited use case, but in every end user application I build I display versions to the user and having them display nicely formatted is definitely a bonus. And not having to figure this out all over again and not think about it again is even better!
+Obviously not anything earth shattering, and perhaps a very limited use case, but in every end user application I build I display versions to the user and having them display nicely formatted is definitely a bonus.
 
-Nothing complicated here, but it might save you a few minutes trying to get a version string formatted correctly and with some options for multiple scenarios. I'll probably be back here and maybe I'll even remember I added this as a utility helper to [Westwind.Utilities](https://learn.microsoft.com/en-us/dotnet/api/system.version.tostring?view=net-8.0#system-version-tostring(system-int32)) 😄
+And not having to figure this out all over again and not think about it again is even better!
 
-adsasdasdasdadaddasd asdasd
+This might save you a few minutes trying to get a version string formatted correctly and with some options for multiple scenarios. I'll probably be back here and maybe I'll even remember I added this as a utility helper to [Westwind.Utilities](https://learn.microsoft.com/en-us/dotnet/api/system.version.tostring?view=net-8.0#system-version-tostring(system-int32)) 😄
 
 ## Resources
 

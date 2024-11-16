@@ -1,16 +1,16 @@
 ---
 title: 'Back to Basics: Add an ASP.NET Runtime Information Startup Banner'
+featuredImageUrl: https://weblog.west-wind.com/images/2021/ASP.NET-Runtime-Information-Banner/LaunchBanner.png
 abstract: In almost every .NET Core Console application I end up adding a startup banner with some basic runtime information so I can see at a glance what environment I'm running in. I also add the URLs and any other application specific information that might be useful. In this short post I show a few things I display and how I reuse this functionality since it practically goes into every application I run.
-categories: Asp.Net, .NET, Visual Studio
 keywords: ASP.NET, .NET, Console, Startup, Runtime Information, Code Snippet, Visual Studio
+categories: Asp.Net, .NET, Visual Studio
 weblogName: West Wind Web Log
 postId: 2781483
+permalink: https://weblog.west-wind.com/posts/2021/Nov/09/Add-an-ASPNET-Runtime-Information-Startup-Banner
+postDate: 2021-11-09T13:44:54.8535599-08:00
+postStatus: publish
 dontInferFeaturedImage: false
 dontStripH1Header: false
-postStatus: publish
-featuredImageUrl: https://weblog.west-wind.com/images/2021/ASP.NET-Runtime-Information-Banner/LaunchBanner.png
-permalink: https://weblog.west-wind.com/posts/2021/Nov/09/Add-an-ASPNET-Runtime-Information-Startup-Banner
-postDate: 2021-11-09T11:44:54.8535599-10:00
 ---
 # Back to Basics: Add an ASP.NET Runtime Information Banner
 
@@ -46,7 +46,9 @@ Obviously nothing ground breaking here, but still quite useful.  Note that in Wi
 ## Gathering Runtime Information in .NET 6.0
 If you're using .NET 6.0 and specifically the new minimal API startup that uses a single `program.cs` file for both service and application configuration you'll find that the base objects that previously had to be injected into the `Configure()` method are now available either on the `builder` or `app` instance.
 
-To create the banner above the following code is used at the bottom of `program.cs` just before the `app.Run()`:
+The key is in order to get the Urls reliably you have to do it after the server has started and the Urls have been assigned. This means you can't use `app.Run()` which combines `app.Start()` and `app.WaitForShutdown()` into a single command. 
+
+Instead you have to use these two commands explicitly and put the Url retrieval between these two in `program.cs`:
 
 ```cs
 using System.Runtime.InteropServices;
@@ -57,6 +59,9 @@ app = builder.Build();
 
 ... 
 
+// Can't use app.Run() to get Urls reliably
+app.Start();
+
 // this code can go anywhere after `app` is created...
 Console.ForegroundColor = ConsoleColor.DarkYellow;
 Console.WriteLine($@"---------------------------------
@@ -64,20 +69,20 @@ West Wind License Manager Service
 ---------------------------------");
 Console.ResetColor();
 
-var urls = builder.WebHost
-                  .GetSetting(WebHostDefaults.ServerUrlsKey)?
-                  .Replace(";", " "); // make clickable
+var urlList = app.Urls;
+string urls = string.Join(" ", urlList); // clickable
+
 Console.Write($"    Urls: ");
 Console.ForegroundColor = ConsoleColor.DarkCyan;
-Console.WriteLine($"{urls}", ConsoleColor.DarkCyan);
+Console.WriteLine(urls, ConsoleColor.DarkCyan);
 Console.ResetColor();
 
 Console.WriteLine($" Runtime: {RuntimeInformation.FrameworkDescription} - {app.Environment.EnvironmentName}");
 Console.WriteLine($"Platform: {RuntimeInformation.OSDescription}");
 Console.WriteLine();
 
-
-app.Run();
+// no app.Run() so wait explicitly
+app.WaitForShutDown();
 ```
 
 Notice that in 6.0 the builder and app objects host many common *'system'* components that previously had to be injected. Specifically things like  `builder.Host`, `builder.WebHost`, `builder.Environment`, `app.Configuration`, `app.Lifetime` all live as properties on these objects.
@@ -86,20 +91,6 @@ Notice that in 6.0 the builder and app objects host many common *'system'* compo
 
 The `RuntimeInformation` has a lot of useful information about the platform you're running on. So glad this has been added (I think in 3.1) as it was a royal pain to get this information prior.
 
-### Getting App Urls via Configuration
-The only non-transparent setting are the startup URLs which is a bit difficult to discover. 
-
-Startup URLs are set by the default `WebHostConfiguration` or can be manually overridden via the `ASPNETCORE_URLS` environment variable or the `--urls` command line option (and a few more. See [Andrew Locke's post](https://andrewlock.net/5-ways-to-set-the-urls-for-an-aspnetcore-app/)). 
-
-The Urls value isn't explicitly exposed anywhere and has to be retrieved from settings which are buried in the `builder.WebHost` configuration:
-
-```cs
-var urls = builder.WebHost
-                  .GetSetting(WebHostDefaults.ServerUrlsKey)?
-                  .Replace(";", " "); // make clickable
-```
-
-The `.GetSetting()` method gives you access to a lot of the default and overridden configuration values that are set by the default `WebHostConfigurationBuilder` which can be useful for a number of things that you might know about the application.
 
 ## Create a Visual Studio Snippet
 Since I want to add this type of banner to all of my Console applications, I also created a Visual Studio Snippet for it that can inject it into my startup code with a `aspnetRuntimeInfo` snippet:
@@ -135,7 +126,10 @@ $AppName$
 ---------------------------------");
 Console.ResetColor();
 
-var urls = builder.WebHost.GetSetting(WebHostDefaults.ServerUrlsKey)?.Replace(";", " ");
+// Make sure to put this code between app.Start() and app.WaitForShutdown()
+var urlList = app.Urls;
+string urls = string.Join(" ", urlList); // clickable
+
 Console.Write($$"    Urls: ");
 Console.ForegroundColor = ConsoleColor.DarkCyan;
 Console.WriteLine($$"{urls}", ConsoleColor.DarkCyan);

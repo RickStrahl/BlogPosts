@@ -1,15 +1,16 @@
 ---
 title: Deploying and Configuring West Wind Web Connection Applications
+featuredImageUrl: https://west-wind.com/wconnect/weblog/imageContent/2022/Deploying-Web-Connection-Applications/Shipping.jpg
 abstract: Need to know how to publish a Web Connection application to a new Web Server? This article takes you end to end through all the steps from setting a new Virtual Machine Server, to installing the Web Server, configuring the machine and setting up your Web application. If you're coming from an older version of Web Connection pre-7.0 you'll find that the process is a lot more automated than it has been in the past.
-categories: West Wind Web Connection
 keywords: Deployment, Web Connection, Vultr, Hosting, LetsEncrypt, FoxPro
-weblogName: Web Connection Weblog
+categories: West Wind Web Connection
+weblogName: West Wind Web Log
 postId: 956
+permalink: https://weblog.west-wind.com/posts/2004/Oct/09/Deploying-and-Configuring-West-Wind-Web-Connection-Applications
+postDate: 2019-12-05T20:45:17.0566758-08:00
+postStatus: publish
 dontInferFeaturedImage: false
 dontStripH1Header: false
-postStatus: publish
-featuredImageUrl: https://west-wind.com/wconnect/weblog/imageContent/2022/Deploying-Web-Connection-Applications/Shipping.jpg
-postDate: 2019-12-05T18:45:17.0566758-10:00
 ---
 # Deploying and Configuring West Wind Web Connection Applications
 
@@ -491,23 +492,34 @@ Yay! Success.
 
 Now, go to the Administration page at:
 
-http://publishing.west-wind.com/admin/admin.aspx  
+http://publishing.west-wind.com/Administration.wc   
 <small>* no you won't have access to mine at this address</small>
 
-Then to **Web Connection Module Administration** and **File -> Switch** to toggle into COM mode. Go back to the home page and hit those two links again and if all goes well the application should still work the same as in file mode.
+Then find the Mode switch and switch from file to COM: **File -> Switch** to toggle into COM mode. Go back to the site home page and hit those two links again and if all goes well the application should still work the same as in file mode.
 
 Hoorah again!
 
 ### Create a Free TLS Certificate with LetsEncrypt 
 You may notice in the picture above that Chrome is complaining that the site is *Not secure*. This is because the site is running without HTTPS - there's no Server Certificate installed. In order to make the link display less scary, you need to install a TLS certificate so the site can run over HTTPS.
 
-A few years ago LetsEncrypt - an consortium of various Internet Service Providers - created a certificate authority not beholden to a commercial company with the goal to provide free SSL/TLS certificates. It was a huge success, and LetEncrypt is now serving billions of certificates. This organization which is supported solely through donations and sponsorships not only has made certificates free, but also provided the tools that make it possible to completely automate the process of installing and renewing certificates.
+A few years ago LetsEncrypt - a consortium of various Internet Service Providers - created a certificate authority not beholden to a commercial company with the goal to provide free SSL/TLS certificates. It was a huge success, and LetEncrypt is now serving billions of certificates. This organization which is supported solely through donations and sponsorships not only has made certificates free, but also provided the tools that make it possible to completely automate the process of installing and renewing certificates.
 
 Using these tools it literally takes two minutes or less to create a certificate and install it in IIS including a setup that auto-renews the certificate when it expires in 90 days or so.
 
 On Windows there's an easy to use tool called [Win-Acme](https://pkisharp.github.io/win-acme/) that makes this process trivially simple via a command line tool.
 
-Download the tool and copy the files into a location of your choice. I use `\utl\LetsEncrypt`. Open a command window in that location and run `.\wacs.exe` to bring up the command line based interface.
+> ### What do you need for using LetsEncrypt
+> Your server needs to be:
+> 
+> * Connected to the Internet with a public IP address
+> * Your DNS Host Name(s) need to be configured for your IP Address   
+> <small>*(ie. `www.west-wind.com`, `support.west-wind.com`, `store.west-wind.com`, `west-wind.com` etc.)*</small>
+> * You need to be able to access the non-Http site via DNS host name
+> * If you're using multiple sites on your server make sure each is configured in IIS Bindings
+>
+> Make sure you have your ducks in a row before you run the LetsEncrypt tooling to create certificates.
+
+If your site is all configured, download the tool and copy the files into a folder of your choice. I use `\utl\LetsEncrypt`. Open a Powershell or Command window in that location and run `.\wacs.exe` to bring up the command line based interface.
 
 ![](LetsEncrypt.png)
 
@@ -520,7 +532,7 @@ Select:
 * Pick your new Web Site
 * Agree to the terms
 
-Let it 'er rip - and you're done! Yup that's it. Then navigate to your site via SSL.
+Let 'er rip - and you're done! Yup that's it. Then navigate to your site via SSL.
 
 https://publishing.west-wind.com
 
