@@ -6,8 +6,8 @@ keywords: Html To Pdf, WebView, CoreWebView2, CreateCoreWebView2ControllerAsync
 categories: .NET ASP.NET Windows
 weblogName: West Wind Web Log
 postId: 4319131
-permalink: https://weblog.west-wind.com/posts/2024/Mar/26/Html-to-PDF-Generation-using-the-WebView2-Control
-postDate: 2024-03-27T00:59:52.7789421-07:00
+permalink: https://weblog.west-wind.com/posts/2024/Mar/26/Programmatic-Html-to-PDF-Generation-using-the-WebView2-Control-with-NET
+postDate: 2024-03-26T21:59:52.7789421-10:00
 postStatus: publish
 dontInferFeaturedImage: false
 dontStripH1Header: false

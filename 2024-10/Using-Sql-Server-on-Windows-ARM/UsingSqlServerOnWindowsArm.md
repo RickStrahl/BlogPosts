@@ -255,11 +255,3 @@ Regardless of complexity and discovery overhead, I'm glad that this solution wor
 * [MSSQLEXPRESS-M1-Install Github Repo (customized SQL Server installer for ARM)](https://github.com/jimm98y/MSSQLEXPRESS-M1-Install)
 
 
-<div style="margin-top: 30px;font-size: 0.8em;
-            border-top: 1px solid #eee;padding-top: 8px;">
-    <img src="https://markdownmonster.west-wind.com/favicon.png"
-         style="height: 20px;float: left; margin-right: 10px;"/>
-    this post created and published with the 
-    <a href="https://markdownmonster.west-wind.com" 
-       target="top">Markdown Monster Editor</a> 
-</div>
