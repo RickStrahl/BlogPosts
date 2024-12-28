@@ -12,7 +12,9 @@ dontStripH1Header: false
 ---
 # Embedding YouTube Videos into Markdown Documents
 
-Surprisingly embedding YouTube videos into Markdown can be surprisingly unintuitive depending on what the Markdown rendering platform supports.
+Surprisingly embedding YouTube videos into Markdown can be surprisingly unintuitive depending on what the Markdown rendering platform supports. If the platform you're publishing your Markdown to - your own blog engine, a commercial CMS site, Wordpress, or something less 
+
+[West Wind Site](https://west-wind.com)
 
 There are a number of ways you can embed YouTube videos and in this post I'll discuss the following three ways:
 

@@ -12,8 +12,6 @@ dontStripH1Header: false
 ---
 # Comparing Raw ASP.NET Request Throughput across Versions: 8.0 to 9.0 Edition
 
-[[_TOC_]]
-
 Whenever a new release of .NET comes out I run a comparison test of versions using some of my own tools. The iteration of this was from .NET 7.0 to 8.0:
 
 [Comparing Raw ASP.NET Request Throughput across Versions](https://weblog.west-wind.com/posts/2024/Mar/08/Comparing-Raw-ASPNET-Request-Throughput-across-Versions)
@@ -124,12 +122,11 @@ As said the results of these test runs are surprising:
 
 ### .NET 8.0 Minimal APIs
 
-![NET80 Minimaal Apis](NET80-Minimaal-Apis.png)
+![NET80 Minimal Apis](NET80-Minimal-Apis.png)
 
 ### .NET 8.0 Controllers
 
 ![NET80 Controllers](NET80-Controllers.png)
-
 
 
 Yup - it actually looks like .NET 9.0 is slightly **slower** than .NET 8.0.
@@ -158,7 +155,7 @@ It's interesting here that the differences between UI and CLI are quite substant
 ### 9.0 UI vs 8.0 UI
 For kicks I also re-ran these tests with the last version of WebSurge that runs on .NET 8.0. Performance of the .NET 9.0 client improved by about 7% on repeated runs. 
 
-This seems to suggest that there's more improvement that occured for client side applications, and that matches up with my experience.
+This seems to suggest that there's more improvement that occurred for client side applications, and that matches up with my experience.
 
 For my desktop applications I've noticed:
 
@@ -171,11 +168,6 @@ These things are hard to quantify because they are touchy feely, but I run my ap
 For WebSurge I also wonder if improvements with the UTF-8 string handling and in HttpClient have an effect on the improved performance since that's the meat of usage.
 
 With the 7% improvement it's worth mentioning that  **the ratio between the .NET 8.0 and 9.0 applications stayed roughly the same** as shown with the main test shown earlier.
-
-
-
-
-
 
 
 

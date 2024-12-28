@@ -26,16 +26,33 @@ I've been wanting to get my hands on an ARM machine to check how some of my Wind
 When I picked this machine up and started installing my typical developer and productivity workload on it, I was expecting a lot of stuff to not work or work badly through emulation.  
 
 ### Just about everything works!
-I've been pleasantly surprised in that just about everything works - either via many native ARM applications that are now becoming available, or via the built in and *'not bad at all'* x64 emulation. I even was able to run some old legacy Visual Basic and FoxPro applications without any hiccups.
+I've been **pleasantly surprised in that just about everything works** - either via many native ARM applications that are now becoming available, or via the built in and *'not bad at all'* x64 emulation. I even was able to run some old legacy Visual Basic and FoxPro 32 bit applications without any hiccups.
 
-There are a few things that don't work well - older versions of SnagIt for example don't want to capture windows correctly and my audio software was having problems keeping the external audio interface connected. Mostly edge cases, but be aware there are somethings - especially hardware or low level windows stuff - that can have problems. 
+Even more exciting is the fact that my own desktop .NET Applications run natively in ARM mode without any issues whatsoever. This is advertised by Microsoft, but it's still something else to see it actually running on live hardware without any issues!
 
-The one let down is that performance is not quite as impressive as ~~advertised~~ hyped. It feels like there's quite a bit of lag, especially loading applications initially. Performance overall feels at best like a mid-level laptop, certainly not something that would replace a higher end developer I7/I9 laptop for me. Even AI operations which is what these machines were supposed to be best at are only barely better for local AI processing compared to my I9 and low-midrange nVidia card equipped laptop do.
+### Some minor Problems
+But there are a few things that don't work well - older versions of SnagIt for example don't want to capture windows correctly and my audio software was having problems keeping the external audio interface connected. Mostly edge cases, but be aware there are somethings - especially hardware or low level windows stuff - that can have problems. 
 
-In summary - much better than I expected, but still not ready as a replacement for high end laptop, both in terms of performance and compatibility.
+#### Networking Issues
+Also there's something really funky going on with the network card or drivers - whenever this machine comes on the WiFi network it takes forever to connect and when it does it's very slow at first. While this is happening other network clients also are struggling to connect. The problem seems to be that DNS is not responding but all of my machines on the network are configured using the exact same setup. It's possible this has to do with syncing of some sort, but even after a week with this machine everything should be up to date and the network issues persist.
+
+#### Performance - Good but not anything to get excited about
+The one let down is that performance is not quite as impressive as ~~advertised~~ hyped. Microsoft and Qualquom have been promoting how well these machines perform, but I don't think this particular machine lives up to that hype.
+
+The most noticable thing is that there's quite a bit of lag when launching applications. All sorts, but especially .NET applications. On my x64 laptop my .NET apps launch very fast (even largish WPF apps), but on the ARM machine it literrally takes several seconds just to get to the banner screen that gets thrown up before the app really starts running. Other apps including native apps and utilities too have similar lag.
+
+My first thought was that perhaps this is related to Defender doing something funky and because this thing came with Windows Home there aren't a lot of options for disabling it. But this feels almost like there's some sort of runtime/processing engine starting up before the actual applications are running. 
+Note **these are native ARM apps** and I would expect something like this for emulated apps, but not for native ones. 
+
+Performance overall feels at best like a mid-level laptop, certainly not something that would replace a higher end developer I7/I9 laptop for me. Even AI operations which is what these machines were supposed to be best at are only marginally better for local AI processing compared to my I9 and low-midrange nVidia card equipped laptop do.
+
+In summary - overall I think the machine's behavior and performance is better than I expected, but not anywhere ready as a replacement for high end laptop, both in terms of performance and compatibility.
+
+But probably to be expected from a v1 type of release. I still think this is impressive and given the discounted pricing for this machine it seems like a pretty good value. At full price though - not so much. 
 
 ### .NET Applications - Just Run Natively!
-What is quite impressive though is that all of my .NET apps, - including a several complex Windows Desktop applications - ran without even recompiling, natively under ARM64. [Markdown Monster](https://markdownmonster.west-wind.com/) and [West Wind WebSurge](https://websurge.west-wind.com/) both run **without any changes** and I have yet to find any problems on ARM. All of my Web apps also 'just run' under ARM64 and I have yet to see any errors or operational differences. That's impressive - especially for the desktop apps which use a ton of P/Invoke and native code in addition to raw .NET code. And it... just... works!
+As mentioned what is quite impressive is that all of my .NET apps, - including a several complex Windows Desktop applications - ran without even recompiling, natively under ARM64. [Markdown Monster](https://markdownmonster.west-wind.com/) and [West Wind WebSurge](https://websurge.west-wind.com/) both run **without any changes** and I have yet to find any problems on ARM. All of my Web apps also 'just run natively'  under ARM64 and I have yet to see any errors or operational differences. That's impressive - especially for the desktop apps which use a ton of P/Invoke and native code in addition to raw .NET code. And it all... just... works!
+
 
 ### Full Versions of SQL Server won't install on ARM
 But... there is one thing that did not work without a major headache: Getting SQL Server to run locally on the ARM machine. And yes, I need a local SQL Server instance because I want to take this machine with me to beach where I have no connectivity  in my time between sessions on the water. 😄
@@ -48,7 +65,7 @@ In the end there are solutions, but none of them were what I would call smooth s
 
 * ~~Running SQL Server Linux Docker Images~~
 * [LocalDb v16](#what-works-localdb---v16-or-latest-version)
-* [Using unsupported SQL Server Installer Hacks](#unofficial-sql-server-express-and-developer-builds)
+* [Using unsupported SQL Server Installer Hacks](#what-works-localdb---v16-or-latest-version)
 
 ### SQL Server on Docker - no luck for me
 I also didn't have much luck with running a local Docker image of SQL Server for Linux. The Docker images Microsoft provides are for AMD64 architecture (ie. x64 based) and Docker would not start those images on this ARM device. Apparently this works on Macs, but not on Windows (go figure).
@@ -61,7 +78,9 @@ For me this **did not work** - I didn't get a running instance from this Docker 
 docker run --cap-add SYS_PTRACE -e 'ACCEPT_EULA=1' -e 'MSSQL_SA_PASSWORD=superseekrit1' -p 1433:1433 --name azuresqledge -d mcr.microsoft.com/azure-sql-edge
 ```
 
-No idea how to debug that, so I gave up. *(if you have any ideas leave comment, please)*
+No idea how to debug the TCP/IP port issue, so I gave up. I suspect the issue is the same as I found with LocalDb and the custom installers, which is that installation on ARM apparently doesn't work with TCP/IP. It probably would work using Named Pipe ports, but again I didn't want to spend time on how to get that configured.
+
+*(if you have any ideas on making the SQL Server Docker Images works please leave comment)*
 
 ## What works: LocalDb - v16 (or latest version!)
 After a lot of digging and some help from an X discussion I managed to get LocalDb to work locally. LocalDb is a minimal, non-service version of SQL Server that can be started from the Terminal. It also installs with Visual Studio if you install ASP.NET payloads. 
@@ -253,5 +272,3 @@ Regardless of complexity and discovery overhead, I'm glad that this solution wor
 * [Azure Sql Edge Docker Image](https://hub.docker.com/r/microsoft/azure-sql-edge)
 * [Azure Data Studio](https://azure.microsoft.com/en-us/products/data-studio/)
 * [MSSQLEXPRESS-M1-Install Github Repo (customized SQL Server installer for ARM)](https://github.com/jimm98y/MSSQLEXPRESS-M1-Install)
-
-
