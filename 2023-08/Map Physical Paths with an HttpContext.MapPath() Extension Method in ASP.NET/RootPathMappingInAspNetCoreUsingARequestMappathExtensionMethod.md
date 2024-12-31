@@ -20,7 +20,11 @@ In classic ASP.NET - and even class ASP before it - there used to be a handy fun
 
 This can be useful if you need to access a local file, or need to map a folder during configuration for example. I find myself needing this functionality frequently in middleware for various folder mapping operations or when I write out/read local files for logging or configuration tasks.
 
-It's not a very common need but when it happens I always end up digging for the right settings to retrieve in order to retrieve the base folder, and then combine paths etc. To make this a little easier I created a small helper extension method called `HttpContext.MapPath()` to  *just get 'er done*.
+Unfortunately, there's **no matching functionality for MapPath() in ASP.NET Core**.
+
+It's not a very common need, but when it happens I always end up digging for the right settings to retrieve in order to retrieve the base folder, and then combine paths etc. 
+
+So, to make this a little more consistent and easier to find, I created a small helper extension method called `HttpContext.MapPath()` to  *just get 'er done*.
 
 ## ASP.NET Core and Physical Paths
 In classic ASP.NET startup paths were pretty cut and dried: A Web site was bound to a physical folder and IIS actually provided an internal ISAPI function that ASP.NET called into to resolve the base folder. The root server was both the application and web root with both binary and content files in the same location.

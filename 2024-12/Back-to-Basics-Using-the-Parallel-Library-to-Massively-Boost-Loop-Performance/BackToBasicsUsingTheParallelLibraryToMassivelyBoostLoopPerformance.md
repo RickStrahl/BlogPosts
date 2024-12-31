@@ -11,17 +11,22 @@ postDate: 2024-12-27T13:37:19.3612416-10:00
 postStatus: publish
 dontInferFeaturedImage: false
 dontStripH1Header: false
+customFields:
+  mt_location:
+    id: 
+    key: mt_location
+    value: Maui, Hawaii
 ---
 # Back to Basics: Using the Parallel Library to Massively Boost Loop Performance
 
-![Parallell Faces](ParallellFaces.jpg)
+![Parallel Faces](ParallellFaces.jpg)
 
 A few days ago I posted a [quick note on X](https://x.com/RickStrahl/status/1870959837443657896) about a specific use case of using the Parallel library in .NET to **massively optimize a link look up operation** in Markdown Monster with very little code. That tweet turned out to be surprisingly popular, so I decided to do a follow up post to describe the specific scenario and talk about using the Parallel library to speed up loop operation.
 
 <blockquote class="twitter-tweet" data-theme="dark"><p lang="en" dir="ltr">Always nice to get an easy win: Switching to a Parallel loop with literally a couple of lines of code and getting massive perf improvements.<br><br>Link checking one of my old blog posts with lots of links went from 20 seconds to 2.5 seconds. <a href="https://t.co/OSXqU2LaLx">pic.twitter.com/OSXqU2LaLx</a></p>&mdash; Rick Strahl (@RickStrahl) <a href="https://twitter.com/RickStrahl/status/1870959837443657896?ref_src=twsrc%5Etfw">December 22, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 ## Scenario: Link Checking Markdown Documents
-The specific scenario I'm going to talk about is a Markdown link checker in my [Markdown Monster editor](https://markdownmonster.west-wind.com/) that collects all links in a Markdown document and then checks those links - both local and online - for validity. As you can imagine, larger documents can have a lot of links, so this link validation operation can be very time consuming and, using the original linear albeit `async` code,  it was in fact slow. However, after updating to using parallel code checking all links is drastically faster taking roughly the amount of time of the slowest link to process.
+The specific scenario I'm going to talk about is a Markdown link checker in my [Markdown Monster editor](https://markdownmonster.west-wind.com/) that collects all links in a Markdown document and then checks those links - both local and online - for validity. As you can imagine, larger documents can have a lot of links, so this link validation operation can be very time consuming and, using the original linear albeit `async` code,  it was in fact slow. However, after updating to parallel code, checking all links is drastically faster taking roughly the amount of time of the slowest link to process.
 
 ##AD##
 
@@ -31,27 +36,25 @@ Here's what the end result looks like with Parallelization:
 
 You can see the link checks taking a few seconds here - prior to updating to parallel code the check was considerably slower. Link checking went from 25+ seconds for one of the pages with 52 links down to ~2.3 seconds - more than a 10x improvement! Talk about bang for your buck!
 
-To make this even more enticing is that changing the code over from the original, linear `foreach()` processing to using `Parallel.ForeachAsync()` literally involved **changing two lines of code**, which netted this major performance improvement. The level of improvement obviously varies based on many factors including the number of links, how long they process and how long the longest request takes.
+To make this even more enticing is that changing the code from the original, linear `foreach()` processing to using `Parallel.ForeachAsync()` literally involved **changing three lines of code**, which netted this major performance improvement. The level of improvement can obviously vary based on many factors including the number of links, how long they process and how long the longest request takes.
 
 > ##### @icon-warning Choose Parellization Carefully!
 > Note that **not every loop is a good candidate for parallelization** - you have to be very careful with state of the objects in the loop as each loop iteration winds up on a separate thread. Any state  that gets touched inside of the parallel loop should be treated as potentially thread unsafe. More on this later.
 
-Because code is parallelized, it essentially takes roughly as long as the slowest request as all the http requests and local file lookups run simultaneously waiting for completion of them all. Well up to a point anyway as there are options to limit the level of parallelization set to 50 simultaneous operations.  More on that later.
-
-FWIW, running many HTTP requests for me at least is a common scenario. Markdown Monster does this in a number of places - The Addin Manager for example, pulls detailed addin info from the Addin's GitHub site in the background while the list is being loaded and displayed in the Addin Manager.
+Because code is parallelized, it essentially takes roughly as long as the slowest request as all the http requests and local file lookups run simultaneously waiting for completion of them all. Well, up to a point anyway as there are options to limit the level of parallelization set to 50 simultaneous operations.  More on that later.
 
 ## A very specific Example
-So let's look at the code for the to get an idea of the before and after for linear and paralleized code.
+So let's look at some code to get an idea of the before and after for linear and parallelized code.
 
-The logic for this process involves multiple steps which is one of the reasons that the parallelization worked so easily.
+The logic for this process involves multiple steps which is one of the reasons that the parallelization worked so easily:
 
-* Parse out the links from the document (using [MarkDig's](https://github.com/xoofx/markdig) Document model)
+* Parse out the links from the document (using [MarkDig's](https://github.com/xoofx/markdig) Document model) into a list that won't be modified
 * Loop through each link and check if it's valid
-* Update each item's status properties 
+* Update each **item's** status properties 
 
-The initial code did this sequentially. Even though the original code was checking links asynchronously for making the HTTP calls and reading file info, the code was still sequential, processing one link after the other.
+The initial code did this sequentially and even though it was doing asynchronous link checks making the HTTP calls and reading file info, the code was still sequential, processing one link after the other.
 
-I'll post only the relevant code here for this initial comparison and the full loop code afterwards to avoid confusing the implementation issue.
+> I'll post truncated code that only shows the relvant bits here for this initial comparison, but I'll show the full loop code at the end of this article.
 
 ### for each Logic
 Here's the original linear `foreach` code:
@@ -362,10 +365,11 @@ Additionally this code also has logic to check for `HasListChanged()` to determi
 
 
 ## Complete code for the Parallel Iteration
-The initial code I showed above is truncated a bit, to keep it somewhat focused. But for completeness sake here is the full List Validation method code:
+For completeness sake and to properly compliment the truncated code I posted above for the looping code, here's the full list looping code for the `ValidateLinks()` method:
 
 ```csharp
-public async Task ValidateLinks(List<LinkInfo> links, bool onlyChangedLinks = false, 
+public async Task ValidateLinks(List<LinkInfo> links, 
+                                bool onlyChangedLinks = false, 
                                 string docHtml = null)
 {
     if (string.IsNullOrEmpty(docHtml))
@@ -477,9 +481,9 @@ public async Task ValidateLinks(List<LinkInfo> links, bool onlyChangedLinks = fa
 ##AD##
 
 ## Summary
-The Parallel library has been around for some time, but I think it's underappreciated for optimizing easpecially IO heavy operations like many Http requests. The library functions are relatively easy to use, although you have to be aware of potential multi-threading pitfalls. However, if you can manage your state updates well, and specifically only update items that are passed in, it offers a nearly seamless alternative to linear `foreach()` or `for()` loops that can be converted with just a few lines of code.
+The Parallel library has been around for some time, but I think it's underappreciated for optimizing especially IO heavy operations like many Http requests. The library functions are relatively easy to use, although you have to be aware of potential multi-threading pitfalls. However, if you can manage your state updates well, and specifically only update items that are passed in, it offers a nearly seamless alternative to linear `foreach()` or `for()` loops that can be converted with just a few lines of code.
 
-In Markdown Monster I have several other use cases that use Parallel. Some examples include the Addin Manager that pulls detailed Addin descriptions from their respective GitHub sites in the background, and the AI Image generator that run multiple AI requests for image generation at the same time. Each of these greatly benefit from Parallel operation and they work in a similar manner updating one specific 'data item' from a list iteration.
+In Markdown Monster I have several other use cases that use Parallel. Some examples include the Addin Manager that pulls detailed Addin descriptions from their respective GitHub sites in the background, and the AI Image generator that runs multiple AI requests for image generation at the same time. Each of these greatly benefit from Parallel operation and they work in a similar manner updating one specific 'data item' from a list iteration.
 
 Nothing new, but for me at least it's good to be reminded to think of the Parallel library, or even `Task.WhenAll()` in more scenarios to optimize simultaneous IO operations.
 
