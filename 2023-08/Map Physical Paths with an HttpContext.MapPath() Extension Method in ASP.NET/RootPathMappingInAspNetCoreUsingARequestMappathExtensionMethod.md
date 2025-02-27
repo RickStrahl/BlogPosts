@@ -7,10 +7,10 @@ categories: ASP.NET Core, ASP.NET
 weblogName: West Wind Web Log
 postId: 3964818
 permalink: https://weblog.west-wind.com/posts/2023/Aug/15/Map-Physical-Paths-with-an-HttpContextMapPath-Extension-Method-in-ASPNET
-postDate: 2023-08-15T16:02:14.9303013-07:00
+postDate: 2023-08-15T13:02:14.9303013-10:00
 postStatus: publish
 dontInferFeaturedImage: false
-dontStripH1Header: false
+dontStripH1Header: true
 ---
 # Map Physical Paths with an HttpContext.MapPath() Extension Method in ASP.NET
 

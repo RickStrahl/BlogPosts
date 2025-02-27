@@ -15,7 +15,9 @@ dontStripH1Header: false
 # Runtime C# Code Compilation Revisited for Roslyn
 
 ![](LibraryBanner.jpg)
- 
+
+Runtime Compilation
+
 A long time ago (~2008 or so) I built a dynamic runtime compilation library in [WestWind.Scripting](https://github.com/rickstrahl/westwind.scripting), which allows for runtime C# compilation of code expressions, code blocks and as of late templates script expansion in a small and lightweight library. I built this tool primarily for my own use in order to support user authored application automation and - more commonly - for a drop-in  template C# based scripting engine for text editor expansions in various applications.
 
 At some point in 2014 I ended up [releasing it on GitHub](https://github.com/RickStrahl/Westwind.Scripting) along with a NuGet package which have been updated a bit over the years. One limitation and a frequent request that came up in issues was that up until recently this library used the old **CodeDom C# compiler APIs** limited to .NET Framework - CodeDom doesn't work in .NET Core. Last month I finally got around to updating the code use the latest Roslyn APIs.

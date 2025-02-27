@@ -10,6 +10,7 @@ permalink: https://weblog.west-wind.com/posts/2024/Feb/20/Reading-Raw-ASPNET-Req
 postDate: 2024-02-20T13:08:09.2764614-10:00
 postStatus: publish
 dontInferFeaturedImage: false
+stripH1Header: true
 dontStripH1Header: false
 ---
 # Reading Raw ASP.NET Request.Body Multiple Times
@@ -322,8 +323,8 @@ public Task<UserInfo> Authenticate([FromBody] AuthenticateRequest authenticateRe
 because ASP.NET has already read the request. If I want this to work I have to add some explicit middleware prior to the controller processing to enable buffering separately:
 
 ```cs
-app.Use(app.Use(async (context, next) => { 
-    context.Request.EnableBuffering = true;
+app.Use(async (context, next) => { 
+    context.Request.EnableBuffering();
     await next();
 }
 ```

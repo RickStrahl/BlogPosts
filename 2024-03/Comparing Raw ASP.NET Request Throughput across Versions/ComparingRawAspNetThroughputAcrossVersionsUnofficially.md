@@ -25,6 +25,7 @@ To me this is one of those apples to apples comparison when running the same app
 
 * [Project on GitHub](https://github.com/RickStrahl/HighPerformanceAspNet)
     
+Running Tests
 
 Stupidly simple but I find this very practical to go through, even though this doesn't qualify as 'scientific' testing. It's merely a yardstick I can calibrate performance to, by comparing past and present results. 
 
