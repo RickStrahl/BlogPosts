@@ -11,6 +11,11 @@ postDate: 2025-03-24T18:33:00.1371806-10:00
 postStatus: publish
 dontInferFeaturedImage: false
 stripH1Header: true
+customFields:
+  mt_githuburl:
+    id: 
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2025-03/Using-Windows-Media-SpeechRecognition-in-WPF/UsingWindowsMediaSpeechrecognitionInWpf.md
 ---
 # Using Windows.Media SpeechRecognition in WPF
 
@@ -23,7 +28,7 @@ In this post I get specific about using the Windows Media speech recognition and
 ![Voice Dictation Basics in Markdown Monster](https://github.com/RickStrahl/ImageDrop/raw/refs/heads/master/MarkdownMonster/VoiceDictation.mp4)
 
 
-The other big issue I'll cover here relates to using the WinSdk in WPF and specifically using the Windows.Media feature many of which require the old WinRT runtime. Those components were not ported to more the more modern runtime and this further complicates accessing SDK features from .NET and I'll talk in some detail about that because it caused me a lot of pain trying to get these features integrated into my application properly.
+The other big issue I'll cover here relates to using the WinSdk in WPF and specifically using the Windows.Media feature, many of which require the old WinRT runtime. Those components were not ported to the more modern runtime, and this further complicates accessing SDK features from .NET. I'll talk in some detail about that, because it caused me a lot of pain trying to get these features integrated reliably.
 
 ##AD##
 
@@ -169,9 +174,9 @@ Always fired at the very end of a listening operation. Use this to detect when t
 ##AD##
 
 ## Starting and Stopping Dictation
-Before you can start recording the engine needs to 'compile' the specified listener for the given configuration and language. This is a one time operations, but because the operation is `async` I don't want to fire it from the constructor where I can't easily control completion. You don't want to start listening before the engine is ready.
+Before you can start recording, the engine needs to 'compile' the specified listener for the given configuration and language. This is a one-time operation, but because the operation is `async`, I don't want to fire it from the constructor, where I can't easily control completion. You don't want to start listening before the engine is ready.
 
-Instead this method is fired only once from within `StartAsync()` so that we can properly `await` the initialization. The code then calls `StartAsync` on the recognizer that starts the actual listening operation. Subsequent calls then run straight through to `StartAsync()` and fire up a bit quicker.
+Instead, this method is fired only once from within `StartAsync()` so that we can properly `await` the initialization. The code then calls `StartAsync` on the recognizer, which starts the actual listening operation. Subsequent calls then run straight through to `StartAsync()` and fire up a bit quicker.
 
 `StartAsync()` is pretty straight forward then:
 ```csharp
@@ -214,12 +219,12 @@ public async Task StartAsync(DictationListenModes listenMode = DictationListenMo
  }
 ```
 
-A couple of things of note: 
+A couple of things of note:
 
-The class keeps track of the current state via `IsDictating` which is turned on in `StartAsync()` and turned off in `Stop()`. This is important both for internally knowing when dictation can be started again, as well as externally for the application so it can properly show options on the Menu for enabling `Start` and `Stop` operation menu choices.
+The class keeps track of the current state via `IsDictating`, which is turned on in `StartAsync()` and turned off in `Stop()`. This is important both for internally knowing when dictation can be started again, as well as externally for the application so it can properly show options on the Menu for enabling `Start` and `Stop` operation menu choices.
 
 ### Windows Speech Features: Make sure they are enabled
-It's important that Speech recognition has the Windows Speech Recognition features enabled. If not enabled, the `StartAsync()` call to the recognizer fails with a specific error. If it is a Privacy Features error we know that the privacy settings are not enabled, and we can jump  directly to the Windows configuration topic with:
+It’s important that Speech recognition has the Windows Speech Recognition features enabled. If not enabled, the `StartAsync()` call to the recognizer fails with a specific error. If it is a Privacy Features error, we know that the privacy settings are not enabled, and we can jump directly to the Windows configuration topic with:
 
 ```csharp
 Process.Start("ms-settings:privacy-speech");
@@ -247,16 +252,16 @@ but it does not work in my WPF app with both SDK and WinRT references:
 
 ![Dueling References](DuellingReferences.png)
 
-The workaround - that took me some time to figure out - involves having to create a custom `.AsTask()` method on the `VoiceDictation` class, that uses Reflection to access the SDK specific version indirectly which works in WPF:
+The workaround - that took me some time to figure out - involves creating a custom `.AsTask()` method on the `VoiceDictation` class, that uses Reflection to access the SDK specific version indirectly which works in WPF:
 
 ```csharp
 var action = _recognizer.ContinuousRecognitionSession.StartAsync(); 
 await AsTask(action);
 ```        
 
-The code for this is pretty ugly and I'll have more on this later. For now just know that all async operations use this custom `AsTask()` method instead of the native extension methods that I was unable to resolve at compile/link time.
+The code for this is pretty ugly and I'll have more on this later. For now just know that all async operations use this **custom** `AsTask()` method instead of the native extension methods that I was unable to resolve at compile/link time.
 
-Initially when I couldn't get these methods to work,  I just ignored the task results, but I found that especially for the `CompileConstraintsAsync()` awaiting the result is critical or you may end up listening before the engine is ready. I ended up using `Task.Delay()` which helped but results in wasteful wait time.  Awaiting is also important in case there are exceptions as background threads otherwise crash silently, which, as I found out, definitely can destabilize the audio engine - not just in my app, but on the whole system. Initially - without the custom await logic I added later - I had to frequently reset the Speech Recognition engine by turning off the feature and turning it back on.
+Initially, when I couldn’t get these methods to work, I just ignored the task results, but I found that, especially for `CompileConstraintsAsync()`, awaiting the result is critical, or you may end up listening before the engine is ready. I ended up using `Task.Delay()`, which helped but resulted in wasteful wait time. Awaiting is also important in case there are exceptions as background threads otherwise crash silently, which, as I found out, definitely can destabilize the audio engine — not just in my app, but on the whole system. Initially, without the custom await logic I added later, I had to frequently reset the Speech Recognition engine by turning off the feature and turning it back on.
 
 Back in the code, the `Stop()` method is similar to the `StartAsync()` method:
 
@@ -293,7 +298,7 @@ The method delays a bit in order to account for pre-mature exits when being too 
 
 Another thing is that you don't want to stop the engine when it's already idle. In theory this should never happen because when the engine automatically goes idle due to a no-speaking timeout, the `Completed` event should capture that and shut down the listening engine. For those odd cases we want to ensure that `IsDictating` is **always** cleared on the cancel action.
 
-The `Completed` event is a pretty simple one that simply checks if we're still in dictation mode and if so stopping on the timeout operation:
+Therefore the`Completed` event is pretty simple - it checks if we're still dictating and if so shuts it down:
 
 ```csharp
 private void ContinuousRecognitionSession_Completed(SpeechContinuousRecognitionSession sender, SpeechContinuousRecognitionCompletedEventArgs args)
@@ -305,12 +310,16 @@ private void ContinuousRecognitionSession_Completed(SpeechContinuousRecognitionS
 }
 ```
 
-Note this is **not the event that handles results** it simply is a sort of `finally` operation that we can  use to capture the cases where the engine decides to stop listening or timing out. But this event fires also when manually stopping and after a result has been generated, but in both of those cases `IsDictating` should already have been set to `false` so the `Stop()` call isn't duplicated. You want to avoid stopping when the engine is already stopped.
+**Note**,  this is **not the event that handles results** it simply is a sort of `finally` operation, that we can use to capture cases where the engine decides to stop listening or where the silence timeout is triggered. 
 
-This covers the start and stop operations.
+But this event also fires when explicitly stopping via one of code actions. It fires after a result has been generated and the `ResultGenerated()` has fired in which case we should already have turned off dictation and `IsDictating` so the code just passes through.
+
+Alright, so all of this covers initialization and starting and stopping operations. Next is the key bit: Capturing the captured speech result.
 
 ### Speech Recognition
-But what we're really interested in is the actual speech results, which are captured in the `ResultGenerated()` event handler:
+When the Speech Recognition engine detects a break in your speech or you stop the the speech engine, a result of the captured text is generated and passed to the `ResultGenerated()` event handler. This is where the fun happens and we get to look at the incoming text, massage it a little bit and then embed it into the editor or UI control.
+
+Here is the preliminary Editor implementation I use in MM:
 
 ```csharp
 private async void ContinuousRecognitionSession_ResultGenerated(SpeechContinuousRecognitionSession sender, SpeechContinuousRecognitionResultGeneratedEventArgs args)
@@ -356,9 +365,9 @@ private async void ContinuousRecognitionSession_ResultGenerated(SpeechContinuous
 }
 ```
 
-This code first makes sure we have a valid response and if we do, it uses a Dispatcher to ensure we can access the UI thread which we need to do to dump the captured text either into an active text control on the Window, or in my specialized case inside of the Markdown editor. 
+This code first makes sure we have a valid response and if we do, it uses a Dispatcher to ensure we can access the UI thread which we need to do to dump the captured text either into an active text control on the Window, or in my specialized case into the Markdown editor. 
 
-For a textbox control that has focus, the text is just pushed directly into the textbox.
+For a textbox control that has focus, the text is just pushed directly into the textbox. For the editor a bit more formatting is required.
 
 ### Spacing Punctuation and Keywords
 For the editor, there's a bit more fix up of the result text that handles a few custom keywords and commands in the `FixupDictatedText()` method:
@@ -411,18 +420,20 @@ private async Task<string> FixUpDictatedText(string text, MarkdownDocumentEditor
     }
     
     return text;
-}
+Gra}
 ```
 
-This code handles a few things that are not immediately obvious when you start with voice recognition: The voice engine doesn't know about your context, so whenever a result is generated it's generated as its own self-contained block of text. This means that more often than not the text doesn't handle leading spacing between blocks correctly. Instead, you end up having words run together or with no spaces between a period and the first word of the next sentence.
+This code handles a few things that are not immediately obvious when you start with voice recognition: The voice engine doesn't know about your context, so whenever a result is generated it's generated as its own self-contained block of text. This means that more often than not the text doesn't handle leading spacing between blocks correctly. Instead, you end up having words run together or with no spaces between a period and the first word of the next sentence or the last word dictated. **Generally that's not what you want**.
 
-The code above tries to fix most scenarios by looking at the insertion point and taking a shot at fixing up the newly added text based on the last sentence/block. For example, the code checks whether we are after a sentence is finished with a period, question mark or exclamation point and if so the new text  insert text is padded with a leading space. If you stopped in the middle of a sentence a space is also added so that new text never runs off the previous word.
+The code above attempts to fix most of these situations by looking at the insertion point and taking a shot at fixing up the newly added text based on the last sentence/block. For example, the code checks whether we are at the end of a sentence that ends in a period, question mark or exclamation point. If so the new text  insert text is padded with a leading space. If you stopped in the middle of a sentence a space is also added so that new text never runs off the previous word. If there's already a space at the end of the preceeding text - well then don't add it and so on. It's not complicated but there are quite a few combinations and I'm sure I probably run into more in the future.
 
-The base Windows engine understands punctuation like `period`, `comma`, `question mark` etc. and that's very useful. But it doesn't know about **space** or **return** etc. But it's pretty straight forward to implement these keywords in code **as long as they come in as distinct** results of their own. 
+The base Windows engine understands punctuation like `period`, `comma`, `question mark` etc. and that's very useful. But it doesn't know about whitespace like **space** or **return** etc. But it's pretty straight forward to implement these keywords in code **as long as they come in as distinct** results of their own. 
 
-The engine returns results when there's a pause in speaking or when the engine is stopped. So in order for single keywords like **space** or **return** or **stop recording** to work, a pause is first required - basically you wait for the previous text to show up in the editor and **then** you speak the next word(s).
+The engine returns results when there's a pause in speaking or when the engine is stopped. So in order for single trigger keyword like **space** or **return** or **stop recording** to work from code, a pause is first required to isolate that command. Basically, you wait for the previous text to show up in the editor and **then** you speak the next word(s) or command.
 
-Another useful word sequence is **Stop Recording** which stops recording. I end up using that a lot even though pressing `ESC` isn't exactly a chore.
+**Stop Recording** is an especially useful command which I end up using, even though  pressing `ESC` isn't exactly a chore it just feels nice to say.
+
+There are ways to define custom 'grammar' commands with the SpeechRecognizer, but I haven't gotten around to that just yet. Using Grammars you can create more complex commands like **Delete Line** and handle it more explicitly.
 
 ##AD##
 
@@ -477,7 +488,7 @@ Here's the example I ran into with the `.AsTask()` method that's needed to turn 
 
 ![Win Rt Reference Problems](WinRtReferenceProblems.png)
 
-Because some of these methods are static extension methods there's no easy way to disambiguate the identical type names. I got part of the way using NuGet Aliases, and explicit type prefixes, but in the end I couldn't call these `.AsTask()` methods using standard .NET syntax.
+Because some of these methods are static extension methods, there's no easy way to disambiguate the identical type names. I got part of the way using NuGet aliases and explicit type prefixes, but in the end, I couldn't call these `.AsTask()` methods using standard .NET syntax.
 
 Visual Studio can tell the difference when trying to navigate:
 
@@ -485,7 +496,7 @@ Visual Studio can tell the difference when trying to navigate:
 
 but in code there seems to be no good way to differentiate these methods.
 
-After spending hours on this problem and a lot of back and forth with CoPilot which yielded only failure I gave and decided to go the Reflection route. Reflection allows me to start with the specific assembly and then pull out the specific type and call each method. 
+After spending hours on this problem and a lot of back and forth with CoPilot, which yielded only failure, I gave up and decided to go the Reflection route. Reflection allows me to start with the specific assembly and then pull out the specific type and call each method.
 
 In the end that worked but it's some really shitty code:
 
@@ -556,7 +567,7 @@ Task AsTask<T>(object action)
 }
 ```
 
-I've never been so happy to get this code this shitty to work :smile:
+I've never been so happy to get code this shitty to work :joy:
 
 The end result is that now I can call and await the async methods by using my wrappers:
 
@@ -575,12 +586,12 @@ await AsTask<SpeechRecognitionCompilationResult>(action);
 Yay!
 
 ### Code Improvements
-Yeah this class is pretty rough in that it is not well encapsulated and mixes some UI elements into the utility features. But it's very focused on a specific task which is handling editor insertion. I could abstract out the messages and add better isolated error handling but it's not really necessary at this point. I may do so in the future, but for now I'm happy enough that it works well.
+Yeah, this class is pretty rough in that it is not well encapsulated and mixes some UI elements into the utility features. But it's very focused on a specific task, which is handling editor insertion. I could abstract out the messages and add better isolated error handling, but it's not really necessary at this point. I may do so in the future, but for now, I'm happy enough that it works well.
 
 ## What about Win-H?
-One thing I should mention is that Windows has built in support and tooling for capturing Speech to text in any application natively. If you can live with a non-integrated solution using `Win-H` to bring up the media recorder gives direct text input into any application without any sort of custom integration.
+One thing I should mention is that Windows has built-in support and tooling for capturing speech to text in any application natively. If you can live with a non-integrated solution, using `Win-H` to bring up the media recorder provides direct text input into any application without any sort of custom integration.
 
-However, without the integration you end up with the problems I discussed in the article that text may not line up properly and it's a bit more awkward to start and stop recording. Direct application integration is a much better experience, but in a pinch `Win-H` works reasonably well without any code.
+However, without the integration, you end up with the problems I discussed in the article, which state that the text may not line up properly and it's a bit more awkward to start and stop recording. Direct application integration is a much better experience, but in a pinch, `Win-H` works reasonably well without any code.
 
 ##AD## 
 
