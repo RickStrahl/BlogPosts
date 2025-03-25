@@ -11,6 +11,11 @@ postDate: 2025-02-26T23:02:10.5808097-10:00
 postStatus: publish
 dontInferFeaturedImage: false
 stripH1Header: true
+customFields:
+  mt_githuburl:
+    id: 
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2025-02/Inline-Confirmations-in-JavaScript-UI/InlineDeletesInJavascriptUi.md
 ---
 
 # Inline Confirmations in a JavaScript UI
@@ -128,3 +133,7 @@ Assuming you are using a reactive framework, the code for this is minimal as you
 The in-place implementation requires literally a single add-on property and a few binding attributes on the button that conditionally draw the button in the right mode. You take this a little further too, by actually creating a more complex inline UI that displays and hides the button instead. This might be useful if you have to display a message, rather than a simple `Confirm?` prompt I'm using here. 
 
 I know I'll be using this approach in a lot more places in the future in my own apps...
+
+## Resources
+
+* [CodePen Example: Inline Delete Button Confirmation](https://codepen.io/rstrahl/pen/yyLVweL)

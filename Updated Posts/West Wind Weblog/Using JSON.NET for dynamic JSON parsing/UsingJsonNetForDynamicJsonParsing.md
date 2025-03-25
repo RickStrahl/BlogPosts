@@ -1,13 +1,20 @@
 ---
 title: Using JSON.NET for dynamic JSON parsing
+featuredImageUrl: https://weblog.west-wind.com/images/2025/Using-JSON.NET-for-dynamic-JSON-parsing/JsonScreen.jpg
 abstract: Parsing JSON dynamically rather than statically serializing into objects is becoming much more common with today's applications consuming many services of varying complexity. Sometimes you don't need to map an entire API, but only need to parse a few items out of a larger JSON response. Using JSON.NET and JObject,JArray,JValue makes it very easy to dynamically parse and read JSON data at runtime and manipulate it in a variety of different ways. Here's how.
-categories: .NET,Web Api,AJAX
 keywords: JSON,JSON.NET,Dynamic,JObject,JValue,JArray,JToken
+categories: .NET,Web Api,AJAX
 weblogName: West Wind Web Log
 postId: 1444611
-postDate: 2018-05-01T15:18:35.0166552-07:00
+permalink: https://weblog.west-wind.com/posts/2012/Aug/30/Using-JSONNET-for-dynamic-JSON-parsing
+postDate: 2018-05-01T12:18:35.0166552-10:00
+postStatus: publish
+dontInferFeaturedImage: false
+stripH1Header: true
 ---
 # Using JSON.NET for dynamic JSON parsing
+
+![Json Screen](JsonScreen.jpg)
 
 With the release of ASP.NET Web API as part of .NET 4.5 and MVC 4.0, [JSON.NET](http://json.codeplex.com/) has effectively pushed out the .NET native serializers to become the default serializer for Web API. JSON.NET is vastly more flexible than the built in [DataContractJsonSerializer](http://msdn.microsoft.com/en-us/library/system.runtime.serialization.json.datacontractjsonserializer.aspx) or the older [JavaScript serializer](http://msdn.microsoft.com/en-us/library/system.web.script.serialization.javascriptserializer.aspx). The DataContractSerializer in particular has been very problematic in the past because it can't deal with untyped objects for serialization - like values of type _object,_ or anonymous types which are quite common these days. The JavaScript Serializer that came before it actually does support non-typed objects for serialization but it can't do anything with untyped data coming in from JavaScript and it's overall model of extensibility was pretty limited (JavaScript Serializer is what MVC uses for JSON responses).
 
@@ -393,3 +400,5 @@ JSON.NET is a pretty complete JSON implementation with lots of different choices
     <a href="https://markdownmonster.west-wind.com" 
        target="top">Markdown Monster</a> 
 </div>
+
+

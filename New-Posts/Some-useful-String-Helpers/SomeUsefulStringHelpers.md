@@ -76,8 +76,9 @@ That's better, no?
 ## A few String Extensions for 'Many' operations
 To put this to code there are three methods with various overloads:
 
-* ContainsMany()
-* StartsWithMany()
+
+* StartsWithAny()
+* ContainsAny()
 * ReplaceMany()
 
 
