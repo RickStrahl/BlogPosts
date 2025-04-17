@@ -10,6 +10,7 @@ permalink: https://weblog.west-wind.com/posts/2022/Feb/16/Escaping-Markdown-Code
 postDate: 2022-02-16T10:07:33.1733351-10:00
 postStatus: publish
 dontInferFeaturedImage: false
+stripH1Header: true
 dontStripH1Header: false
 ---
 # Escaping Markdown Code Snippets and Inline Code as Markdown
@@ -30,6 +31,8 @@ I'll talk about:
 
 * Escaping Markdown Code Snippets 
 * Escaping Inline Code blocks
+
+##AD## 
 
 ## Markdown in Code Blocks
 A common example that I run into is this:  I want to embed and display a Code Snippet in Markdown and then display the embedded Code Snippet as code in a Markdown document. So, a Code Snippet, displayed as a Markdown Snippet.
@@ -104,6 +107,7 @@ Ok, cool, that works!
 
 And that's most likely where this story can end for most of you.
 
+##AD##
 
 #### Code Snippet of the Markdown Snippet of a Code Snippet
 But, for this post I actually need to **get one more level deep** into the meta: I need to show the first - already nested -  snippet as a Markdown Snippet. And surprisingly that's possible too by mixing the two different escape types:
@@ -244,6 +248,8 @@ For code snippets the expansion checks to see if the code block selected starts 
 ![Nesting a Code Snippet in a Markdown Code Snippet in Markdown Monster](https://github.com/RickStrahl/ImageDrop/raw/master/BlogPosts/2022/February/CodeSnippetAsCodeSnippet.gif)
 
 Nice - now I don't have to remember how this works and it will handle most of these special situations interactively! Yay!
+
+##AD##
 
 ## Summary
 All kidding about meta nesting aside, I've run into these issues frequently writing documentation. If you write documentation for Markdown - like for a documentation system or code generator - you will often need to show markdown code snippets or code blocks inside of a Markdown document. These escape mechanisms - although pretty terse and abstract to parse, allow you to get around the initial issue of rendering nested back tick based code snippets and inline code.

@@ -53,6 +53,8 @@ delay completed
 
 That may be sufficient, but if you're using an event to handle a hook operation that depends on some sort of result, you need to make sure that the action completes. But it needs to be async.
 
+> You can of course use `.Result` to wait for completion, but that almost always ends in tears in anything but a Console application. My advice: don't do except for highly controlled one-offs.
+
 Bottom line is that there's no easy way that I know of to do this with `Action<T>`. Actions don't return a result an
 
 Instead what you want is `Func<Task>` or one of its derrivatives. The generic task parameter is the result value, and the result value needs to be a `Task`.

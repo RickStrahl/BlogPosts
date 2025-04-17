@@ -87,7 +87,7 @@ The key items in the rendered output are the image loop container (a flexbox lis
                 class="btn btn-sm  float-end" 
                 v-bind:class="{ 'btn-danger': image.deleteConfirm, 
                                 'btn-secondary': !image.deleteConfirm }">
-            <i class="fad fa-trash-alt me-1" ></i>
+            <i class="fad fa-trash-alt me-1 fa-beat" ></i>
             <span v-if="!image.deleteConfirm">Delete</span>
             <span v-if="image.deleteConfirm">Confirm?</span>
         </button> 
@@ -122,6 +122,42 @@ deleteImage(image) {
 
 And that's just about it.
 
+
+### Server Controls or No Framework? No Problem!
+If you'd rather not use some sort of reactive framework, you can also do this with plain HTML and few lines of Javascript code. 
+
+The following is a server submitted form with a Delete button:
+
+```html
+<button  id="btnSubmitDelete"  class="btn btn-secondary mt-3" type="button">
+    <i class="fa fa-xmark-circle "></i>
+    Delete Fundraiser
+</button>
+
+<button name="btnSubmitDelete" id="btnSubmitDeleteConfirm" 
+        class="btn btn-danger mt-3 hidden" type="submit">
+    <i class="fad fa-trash-circle fa-beat"></i>
+    Are you sure?
+</button>
+
+<script>
+    var el = document.getElementById("btnSubmitDelete");                
+    var el2 = document.getElementById("btnSubmitDeleteConfirm");
+
+    el.addEventListener("click",(e)=> {                    
+        el.classList.add("hidden")
+        el2.classList.remove("hidden");
+        setTimeout(()=> {
+            el2.classList.add("hidden")
+            el.classList.remove("hidden");
+        }, 5000);
+    });
+</script>
+```
+
+This code uses two swappable controls that show the desired state. Since this form submits, the original  button is a client side `Button`, while the Confirm button is the actual  `Submit` button. The Confirm button is initially hidden - here via `hidden` CSS class - and then made visible when the initial button is clicked. A few lines of JS code do trick of swapping the two controls to the desired state with the 6 second timeout reverting back to the original state.
+
+You can use similar code for pure client side handling, but you need a second event handler to handle the Confirm click instead of submitting the form to the server.
 
 ##AD##
 
