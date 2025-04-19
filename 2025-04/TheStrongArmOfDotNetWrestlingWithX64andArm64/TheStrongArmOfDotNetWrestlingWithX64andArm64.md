@@ -1,16 +1,17 @@
 ---
-title: Distribution Pain for x64 and Arm64 .NET Desktop Apps
-abstract: 
-keywords: 
-categories: 
+title: 'The Strong ARM of .NET: Wrestling with x64 and Arm64 Desktop App Deployment'
+abstract: .NET is works great for cross-platform development making it easy to build apps that cross-platform and cross-architecture like x64 and Arm64. However, building a distributable application that can install and run out of box on both of these platforms, that's a bit more effort. In this post I discuss some of the gotchas and how to work around them to distribute apps that run out of the gate on both platforms.
+keywords: ARM64, x64, Deploy, AnyCPU, Launcher, Windows, .NET Runtime
+categories: .NET, Windows
 weblogName: West Wind Web Log
 postId: 
-postDate: 2025-04-18T10:48:07.4649050-10:00
+postDate: 2025-04-18T22:35:43.2144324-10:00
 postStatus: publish
 dontInferFeaturedImage: false
 stripH1Header: true
 ---
-# Distribution Pain for x64 and Arm64 .NET Desktop Apps
+
+# The Strong ARM of .NET: Wrestling with x64 and Arm64 Desktop App Deployment
 
 ![The Strong Arm Of The Law Banner](TheStrongArmOfTheLawBanner.jpg)
 <small>*[𝅘𝅥𝅮	 The Strong Arm Of the Law - Saxon](https://open.spotify.com/track/4xwKkJTov5AaJqDmZVSzXn?si=5905b0df8acd42ac)*</small>
@@ -74,11 +75,11 @@ The .NET launcher EXE points at your main application DLL that needs to be launc
 The launcher is not .NET code - it's a native binary, and it acts as a .NET AppHost that loads the .NET runtime. Because it's a native EXE it has a regular Windows PE header that identifies which platform it can run on. For x64 that means it can run on x64 and also on ARM. But on ARM it runs as x64 in Emulation mode which works fine but is slower than native Arm64 execution. If you build an Arm64 exe, it'll only run on an Arm64 installation. Trying to run it on x64 results in a hard fail:
 
 ![Cant Run On This Platform](CantRunOnThisPlatform.png)  
-<small>**Figure 1** - An ARM compiled application launcher on an x64 system.</small>
+<small>**Figure 1** - An ARM compiled application launcher on an x64 system fails to run.</small>
 
 An x64 compiled launcher on an arm64 machine works, but the application then runs in x64 emulation mode:
 
-![Runningx64 On Arm64](Runningx64OnArm64.png)
+![Runningx64 On Arm64](Runningx64OnArm64.png)  
 <small>**Figure 2** - Running an x64 app on ARM results in the app running in x64 Emulation mode which is slow.</small> 
 
 x64 emulation on ARM works and it's how many application run on ARM. It works and performance is not terrible but it's noticably slower than running in native Arm64 mode. More on that later.
@@ -175,7 +176,8 @@ I then copy the EXE into my project directory and set it to `Copy only if newer`
 ### Swap the Arm64 Exe During Install
 The output folder after a build then looks like this:
 
-![Launcher Exes In Distribution Folder](LauncherExesInDistributionFolder.png)
+![Launcher Exes In Distribution Folder](LauncherExesInDistributionFolder.png)  
+<small>**Figure 3** - Distributing an application with both x64 and Arm64 Exes is required to run natively on either platform</small>
 
 You might be Ok with having these two separate EXEs and running the appropriate one on each platform. Perhaps you can set up your Installer to create the appropriate shortcuts to link to the appropriate EXE.
 
@@ -261,7 +263,8 @@ return RuntimeInformation.OSArchitecture == Architecture.Arm64;   // false even 
 
 nor the `PROCESSOR_ARCHITECTURE` environment variables are returning the correct state:
 
-![Net Framework And Process Architecture Is Wrong](NetFrameworkAndProcessArchitectureIsWrong.png)
+![Net Framework And Process Architecture Is Wrong](NetFrameworkAndProcessArchitectureIsWrong.png)  
+<small>**Figure 4** - The `PROCESSOR_ARCHITECTURE` Environment variable doesn't give you what you would expect: It's **Process specific** not machine specific.</small>
 
 Apparently this returns a **Process specific value** and that value is fixed up for .NET Framework executables. IOW, it's not a global OS value which is confusing as hell - especially for the `OsArchitecture` value.
 
@@ -276,11 +279,11 @@ Filename: "{app}\mm.exe"; Parameters: "-runtimeinstall -silent"; Description: "C
 
 And with that I now - finally - have a clean arm64 install out of the box where x64 gets a `AnyCPU` x64 EXE and ARM gets an arm64 EXE:
 
-![Arm64 Working In Markdown Monster](Arm64WorkingInMarkdownMonster.png)
+![Arm64 Working In Markdown Monster](Arm64WorkingInMarkdownMonster.png)  
+<small>**Figure 5** - And finally - a working native Arm64 application out of the box!</small>
 
 Yay!
 
-##AD##
 
 ## Some general ARM Deployment Notes
 Here are a couple of related notes about first deploying and running on Arm64.
@@ -301,6 +304,9 @@ Running in native Arm64 mode the app pops up immediately on the logo screen. Nav
 
 The moral of the story: It's worth putting in the effort to make sure your app can **run natively on ARM** to get this improved performance. Your ARM users will thank you!
 
+
+##AD##
+
 ## Summary
 It's sad that getting an app to run seamlessly both on x64 and Arm64 has to be such a painful process.
 
@@ -309,4 +315,3 @@ This would be so much easier if .NET could produce an executable that could load
 I suppose there's no simple way to get this behavior that would be similar to the way that the `dotnet` command can do it. `dotnet` does some fancy process load juggling to make it work transparently like it does, and that's not something that could be done in a single EXE. So it is what is.
   
 In the end you'll need two EXEs and the best you can do for users is to make this process transparent to users by swapping files depending on the platform. It works and isn't that big of a deal to set up. As is usually the case the biggest hurdle is knowing what needs to be done to get there. I hope this post helps a bit on that front... Now go build something!
-
