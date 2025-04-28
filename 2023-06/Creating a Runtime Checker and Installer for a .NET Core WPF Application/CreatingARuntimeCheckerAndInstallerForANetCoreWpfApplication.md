@@ -6,10 +6,11 @@ keywords: .NET Runtime, Installer, Installation, RollForward, WFP
 categories: .NET, WPF, Windows, Desktop
 weblogName: West Wind Web Log
 postId: 3892897
-permalink: https://weblog.west-wind.com/posts/2023/Jun/21/Creating-a-Runtime-Checker-and-Installer-for-a-NET-Core-WPF-Application
-postDate: 2023-06-21T18:29:41.7388593-07:00
+permalink: https://weblog.west-wind.com/posts/2023/Jun/21/Getting-the-NET-Desktop-Runtime-Installed-with-a-Custom-Runtime-Checker-and-Installer
+postDate: 2023-06-21T15:29:41.7388593-10:00
 postStatus: publish
 dontInferFeaturedImage: false
+stripH1Header: true
 dontStripH1Header: false
 ---
 # Getting the .NET Desktop Runtime Installed with a Custom Runtime Checker and Installer
@@ -20,7 +21,7 @@ I'm in the process of updating the next version of [Markdown Monster](https://ma
 
 Although Markdown Monster has supported .NET Core for some time I've kept it running on .NET Framework for the time being. However, I've gradually moved various parts that needed updates to .NET Core over the last couple of years and recently got the final libraries moved over so that all existing features and built-in addins are now working on .NET 7.0.
 
-The technical aspects of the migration were never a big deal - the move from .NET Framework to .NET Core was surprisingly painless even though MM has a boatload of oddball integrations. For the most part it all just worked or could be fixed with relatively minor updates, although there were a few library dependencies that needed customizations or re-packaging for .NET Core or .NET Standard along the way.
+The technical aspects of the migration were never a big deal - the move from .NET Framework to .NET Core was surprisingly painless even though MM has a boatload of oddball integrations. For the most part it all just worked or could be fixed with relatively minor updates, although there were a few library dependencies that needed customization or re-packaging for .NET Core or .NET Standard along the way.
 
 No, what was holding me back was the issue on **how to distribute the application** without undue bloating of the download installer sizes or effectively getting the shared .NET Core runtimes installed. The Runtime Distribution is the focus of this post:
 
@@ -37,7 +38,7 @@ Let's dive in...
 ## Bennies!
 Moving to .NET Core isn't a major change in terms of product features, but it is one that I had to make at some point as .NET Framework code - while it still works - is slowly but surely falling behind in functionality and features compared to .NET Core.  For desktop applications I'd say most of the improvements are more developer focused, but nevertheless it seems prudent to move forward to the currently recommended platform rather than holding out and hope things don't break or key libraries no longer support full framework (and there are more and more of those!). 
 
-Technically I could have moved to Core quite a while ago as I've long ported the application to run, but my biggest issue has  been balancing the pros of improved tooling, performance and being *'up to date'* vs the increased complexity or potential size penality of runtime distribution.
+Technically I could have moved to Core quite a while ago as I've long ported the application to run, but my biggest issue has  been balancing the pros of improved tooling, performance and being *'up to date'* vs the increased complexity or potential size penalty of runtime distribution.
 
 **Benefits**
 

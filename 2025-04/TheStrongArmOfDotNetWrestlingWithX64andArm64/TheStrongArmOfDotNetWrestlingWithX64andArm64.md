@@ -1,14 +1,21 @@
 ---
 title: 'The Strong ARM of .NET: Wrestling with x64 and Arm64 Desktop App Deployment'
-abstract: .NET is works great for cross-platform development making it easy to build apps that cross-platform and cross-architecture like x64 and Arm64. However, building a distributable application that can install and run out of box on both of these platforms, that's a bit more effort. In this post I discuss some of the gotchas and how to work around them to distribute apps that run out of the gate on both platforms.
+featuredImageUrl: https://weblog.west-wind.com/images/2025/TheStrongArmOfDotNetWrestlingWithX64andArm64/TheStrongArmOfTheLawBanner.jpg
+abstract: .NET  works great for cross-platform development making it easy to build apps that are cross-platform and cross-architecture specifically for x64 and Arm64. However, building a distributable application that can install and run out of box on both of these platforms, that's a bit more effort. In this post I discuss some of the gotchas and how to work around them to distribute apps that run out of the gate on both platforms.
 keywords: ARM64, x64, Deploy, AnyCPU, Launcher, Windows, .NET Runtime
 categories: .NET, Windows
 weblogName: West Wind Web Log
-postId: 
+postId: 4827822
+permalink: https://weblog.west-wind.com/posts/2025/Apr/18/The-Strong-ARM-of-NET-Wrestling-with-x64-and-Arm64-Desktop-App-Deployment
 postDate: 2025-04-18T22:35:43.2144324-10:00
 postStatus: publish
 dontInferFeaturedImage: false
 stripH1Header: true
+customFields:
+  mt_githuburl:
+    id: 
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2025-04/TheStrongArmOfDotNetWrestlingWithX64andArm64/TheStrongArmOfDotNetWrestlingWithX64andArm64.md
 ---
 
 # The Strong ARM of .NET: Wrestling with x64 and Arm64 Desktop App Deployment
@@ -142,9 +149,9 @@ Here are the relevant project file directives:
 
 The idea is that the `PlatformTarget` is changed between `AnyCPU` and `arm64` for the appropriate build. Building this way produces identical output EXCEPT for the launcher EXE which are customized for the specified platform.
 
-The `<Target>` at the bottom then copies the Arm64 exe to `MarkdownMonsterArm64.exe`. I actually copy this into my **project folder** rather than the build folder and set the file to **Copy if newer** which copies the file into the output directory on build. The reason for this is, so I don't have to build the arm64 exe every time. 
+The `<Target>` at the bottom then copies the Arm64 exe to `MarkdownMonsterArm64.exe`. I actually copy this into my **project folder** rather than the build folder and set the file to **Copy if newer** which copies the file into the output directory on build. This may seem odd, but the reason for this is so I don't have to build the arm64 exe every time - I only build when I want to update the version number.
 
-> Remember the launcher doesn't depend on specific versions so you can build your launcher once and continue to use it with newer versions of your project. I like to update the launcher with each minor version which doesn't change very frequently. There are probably 20 release builds within a minor version, and I only have to rev the minor version once for all those builds.
+> Remember the launcher doesn't depend on specific versions of the DLL, so you can build your launcher once and continue to use it with newer versions application. I like to update the launcher with each minor version which doesn't change very frequently. There are probably 20 release builds within a minor version, and I only have to rev the minor version once for all those builds.
 
 To build the two exe's you have a couple of options:
 
@@ -186,8 +193,9 @@ For Markdown Monster this isn't the right choice, because people can and often d
 So I chose to swap the EXEs during the Installation process on ARM swapping out the Main EXE with the Arm64 one.
 
 ##AD##
+
 ### Installer Helper
-To do this I have an [Installer helper that I already use during installation to install the .NET Runtime](https://weblog.west-wind.com/posts/2023/Jun/21/Getting-the-NET-Desktop-Runtime-Installed-with-a-Custom-Runtime-Checker-and-Installer) if it's not present.
+To do this I have an [Installer helper that I already use during installation to install the .NET Runtime](https://weblog.west-wind.com/posts/2023/Jun/21/Getting-the-NET-Desktop-Runtime-Installed-with-a-Custom-Runtime-Checker-and-Installer) if it's not present. There's [a GitHub repo](https://github.com/RickStrahl/DotnetDesktopRuntimeInstaller) with a template project that can you can customized or integrated to use as your own install helper.
 
 The helper is a tiny .NET Framework Console application that is called from the installer with a `-runtimeinstall` command line switch. The helper is a .NET framework app, because its main function is to check if the .NET Core Runtime that the app requires is installed. The .NET Core runtime may not be available yet, hence the `net472` target on the helper.
 
@@ -310,8 +318,12 @@ The moral of the story: It's worth putting in the effort to make sure your app c
 ## Summary
 It's sad that getting an app to run seamlessly both on x64 and Arm64 has to be such a painful process.
 
-This would be so much easier if .NET could produce an executable that could load either an x64 or ARM process. Or even have a `<PlatformTargets></PlatformTargets>` option that let you build for multipe targets. 
+This would be so much easier if .NET could produce an executable that could load either an x64 or ARM process. Or even have a `<PlatformTargets></PlatformTargets>` option that let you build for multiple targets more easily generating postFixes like x64/arm64 perhaps that can then be renamed or moved as needed. 
 
-I suppose there's no simple way to get this behavior that would be similar to the way that the `dotnet` command can do it. `dotnet` does some fancy process load juggling to make it work transparently like it does, and that's not something that could be done in a single EXE. So it is what is.
+I suppose there's no simple way to get this behavior that would be similar to the way that the `dotnet` command can do it. `dotnet` does some fancy process load juggling to make it work transparently like it does, and that's not something that could be done in a single EXE. So for now, it is what is.
   
-In the end you'll need two EXEs and the best you can do for users is to make this process transparent to users by swapping files depending on the platform. It works and isn't that big of a deal to set up. As is usually the case the biggest hurdle is knowing what needs to be done to get there. I hope this post helps a bit on that front... Now go build something!
+In the end you'll need two EXEs and the best you can do for users is to make this process transparent to users by swapping files depending on the platform. It works and isn't that big of a deal to set up. As is usually the case the biggest hurdle is knowing what needs to be done to get there. I hope this post helps a bit on that front... Now go build something!'
+
+## Resources
+
+* [.NET Desktop Runtime Installer (GitHub)](https://github.com/RickStrahl/DotnetDesktopRuntimeInstaller)
