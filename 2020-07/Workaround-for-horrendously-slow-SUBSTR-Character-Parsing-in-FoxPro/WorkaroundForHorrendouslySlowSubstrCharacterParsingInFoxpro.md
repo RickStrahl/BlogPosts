@@ -1,17 +1,25 @@
 ---
 title: Workaround for horrendously slow SUBSTR Character Parsing in FoxPro
+featuredImageUrl: https://west-wind.com/wconnect/weblog/imageContent/2025/Workaround-for-horrendously-slow-SUBSTR-Character-Parsing-in-FoxPro/FoxSlowBanner.jpg
 abstract: FoxPro's string speed is reasonably good for most operations. But one shortcoming is character by character parsing which can only be accomplished via the `SUBSTR()` command, which as it turns out is horribly slow when strings get large. In this post I describe the problem and offer a couple of solutions to get better character by character parsing speed for string iteration.
 keywords: FoxPro, SUBSTR, Performance, Speed, Parser
 categories: FoxPro
 weblogName: Web Connection Weblog
 postId: 962
-postDate: 2020-07-03T10:05:32.9792110-10:00
+postDate: 2020-07-03T13:05:32.9792110-07:00
+postStatus: publish
+dontInferFeaturedImage: false
+stripH1Header: true
 ---
 # Workaround for horrendously slow SUBSTR Character Parsing in FoxPro
+
+![Fox Slow Banner](FoxSlowBanner.jpg)
 
 FoxPro string processing generally is reasonably fast. String processing has always been optimized with a number of optimizations that make FoxPro - despite its age - reasonably competitive when it comes to effective string processing.
 
 But there's an Achilles heel in the string processing support: There's no decent high performance way to iterate a string character by character. If you are building system components like parsers that's a key feature and it's one that FoxPro - and there is no other way to say this - sucks at.
+
+##AD## 
 
 ### SUBSTR(): Slow as Heck
 The FoxPro SUBSTR() function is the only native language function that you can use to iterate over string character by character:
@@ -144,6 +152,7 @@ ENDFOR
 ? "String Splitting: " + TRANSFORM( SECONDS() - lnSecs )  + " " + TRANSFORM(lnCount)
 ```
 
+##AD##
 
 ### A few Results to Compare
 To test this out I set up a small example:
@@ -246,6 +255,9 @@ At smaller sizes `SUBSTR()` performs considerably better than the other solution
 * FREAD: 0.041
 * Split: 0.002
 
+
+
+##AD##
 
 ### Summary
 From the results above it would appear that `SUBSTR()` is reasonably fast up to about 100kb string, but anything larger than that and its performance starts dropping of extremely quickly and if you need to parse character by character you really need to look at other approaches.

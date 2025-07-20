@@ -1,15 +1,16 @@
 ---
 title: Building and Consuming REST API Services with FoxPro
+featuredImageUrl: https://west-wind.com/wconnect/weblog/imageContent/2021/Building-and-Consuming-REST-Services-with-FoxPro/RESTing.jpg
 abstract: REST API Services are no longer a novelty, but have become the standard way for organizations to publishing services for remote access. Whether it's public APIs both free and commercial, as well as SPA apps that use internal APIs for a backend, REST's simplicity and loose suggestions has won out of more complex service architectures  of the past. In this article from Virtual FoxFest 2021 I talk about how you can access REST services from FoxPro and how to create REST services using FoxPro and Web Connection.
-categories: FoxPro, Web Connection
 keywords: REST, Web Connection, FoxPro
+categories: FoxPro, Web Connection
 weblogName: Web Connection Weblog
 postId: 9169
-dontInferFeaturedImage: false
-dontStripH1Header: false
+postDate: 2021-10-20T11:56:54.0241025-07:00
 postStatus: publish
-featuredImageUrl: https://west-wind.com/wconnect/weblog/imageContent/2021/Building-and-Consuming-REST-Services-with-FoxPro/RESTing.jpg
-postDate: 2021-10-20T08:56:54.0241025-10:00
+dontInferFeaturedImage: false
+stripH1Header: true
+dontStripH1Header: false
 ---
 # Building and Consuming REST Services with FoxPro
 
@@ -30,6 +31,8 @@ REST services tend to be much simpler to build and consume than SOAP, because th
 Because of its simplicity REST can also be directly consumed by Web applications rather than going through a server proxy. JSON is a JavaScript native format (essentially an *object literal*) and so any JavaScript applications can easily consume REST services directly. Most languages or platforms also have efficient JSON serializers that make it easy to create and parse JSON from native data structures.
 
 This makes REST useful for double duty both as a **remote data service API** as well as a backend for **internal SPA Web applications**. Often these two tasks can overlap, with applications exposing both the Web application for interactive Web and App use, and a service for remote data API access. Many big services like Twitter, Facebook and Cloud Providers like Azure use APIs to drive their front ends while also exposing those same APIs for remote access.
+
+##AD##
 
 ### Simple, Distributed Concepts
 One of the big reasons of REST's popularity and success in recent years is its simplicity: All you need to consume a REST Service is an HTTP Client and a JSON parser. On the server too no special tools are required beyond a Web Server and the ability to capture HTTP requests and write HTTP responses which means that its easy to create REST service endpoints manually, and there are lots of support frameworks to choose from to provide automated REST service integrations.
@@ -185,6 +188,8 @@ Unlike SOAP, REST clearly separates the content from meta data that describes th
 Every request has a handful of required headers that are always sent by the client and are always returned by the server. These describe the basics of the request or response and include things like the content type, content-length, the accepted types of content, browser and so on. 
 
 But beyond the auto-generated headers, you can also add custom headers of your own to both the client request and the server response. You should use headers to return data that is important to the application, but not directly part of the data. This could be cached state (similar to cookies) that you carry from request to request, or identifying information.
+
+##AD##
 
 ## Calling REST APIs from FoxPro
 Enough theory, let's kick the tires and consume some RESTful APIs from FoxPro.
@@ -1162,6 +1167,7 @@ The code above handles both authentication and the artist update as part of a si
 
 Whether you use `wwJsonServiceClient` or not, **I highly recommend** some mechanism like this for isolating your application code from the underlying service handling. Wrapper methods like this let your application use a natural interface, and push all the system level gunk either in the framework (via `wwJsonServiceClient` or if doing it by hand in the actual method code. This makes the code more re-usable, more maintainable and also in the future replaceable should you decide to change services. 
 
+##AD##
 
 ## Creating a REST Service with Web Connection
 So far I've shown how to consume a REST service from Visual FoxPro using an online .NET based service and that works just fine. Clients consuming a Web API couldn't care less what technology the API is written in. That's one of the benefits of exposing functionality as a service in the first place.
@@ -1757,6 +1763,7 @@ This explicitly allows access to all 'origins' which are essentially domains. Th
 
 Note that this policy is a browser security feature and only applies to Web browser calls to non-local domains. It has no effect on a FoxPro HTTP client for example, but the server has to send these headers regardless to ensure that Web clients can consume the data.
 
+##AD##
 
 ## Summary
 Alright, in this article I've shown you both how to call JSON REST services from FoxPro and how to create JSON REST services with FoxPro code. API Services are very powerful and give you a lot of options for publishing data in a fairly easy to create fashion. JSON as a message format is a great tool as it is relatively easy to create and parse in FoxPro. It has none of the complications that XML and SOAP suffered from - there's no ambiguity about the simple types that JSON provides. 

@@ -1,15 +1,16 @@
 ---
 title: Delaying or Waiting on Code in Web Connection Applications
+featuredImageUrl: https://west-wind.com/wconnect/weblog/imageContent/2023/Waiting-for-a-delayed-time-in-Web-Connection/ComModeUIOperationError.png
 abstract: Sometimes it's necesasry to wait for an external operation to complete, and when using Web Connection you have to be careful to do the right thing to avoid  running into problems with user interface operations that might fail in COM mode. In this post I talk about different types of wait operations that you can use safely and how you should really try hard to minimize wait operations in your applications.
-categories: Web Connection
 keywords: Delay, Wait Window, Web Connection, COM, SYS(2335)
+categories: Web Connection
 weblogName: Web Connection Weblog
 postId: 9172
-dontInferFeaturedImage: false
-dontStripH1Header: false
+postDate: 2023-01-12T17:53:06.1482795-08:00
 postStatus: publish
-featuredImageUrl: https://west-wind.com/wconnect/weblog/imageContent/2023/Waiting-for-a-delayed-time-in-Web-Connection/ComModeUIOperationError.png
-postDate: 2023-01-12T15:53:06.1482795-10:00
+dontInferFeaturedImage: false
+stripH1Header: true
+dontStripH1Header: false
 ---
 # Delaying or Waiting on Code in Web Connection Applications
 
@@ -41,6 +42,8 @@ When running in COM Mode you're likely to get an error like this one:
 ![](ComModeUIOperationError.png)
 
 Not what you want...
+
+##AD##
 
 ## The Problem: No UI Support in COM
 UI support is one of the few things that behave differently in file and COM modes, and while COM mode **can actually support UI operations** if you don't have `SYS(2335, 0)` set, you typically **want to enable that flag** to avoid having your application hang on 'accidental' application or system dialogs that might trigger on file access or locking or other errors.
@@ -111,6 +114,8 @@ Now a short lecture: It's a bad idea to wait in a Web application in general. If
 In addition long running requests tie up Web Connection server instances that while waiting can't process other requests. This can also result in stalling your app, especially if users think the current operation failed and they are retrying - it can quickly becomes self-reinforcing problem. 
 
 For this reason you want to - as much as possible - avoid running requests that take more than a few seconds. My general guideline of *a few seconds* is max 5 seconds for end-user facing operations beyond which you should start thinking about offloading to some external background process using async operations.
+
+##AD##
 
 ## Summary
 Sometimes waiting on an external operation to complete is necessary, and I've shown you a few ways you can deal with waiting. But make sure you are not making the user think your request has failed so keep wait times short or provide some sort of update information that provides information to the user while the long running operation is running. This is a lot more complicated than a single step operation, but it'll ensure both that your server doesn't get bogged down by the long running requests, and that your end user knows that your application is doing what it's supposed to be doing while they wait for their response.

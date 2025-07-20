@@ -6,9 +6,10 @@ keywords: Assembly Loading, Native Dependencies, wwDotnetBridge
 categories: FoxPro .NET
 weblogName: Web Connection Weblog
 postId: 9176
-postDate: 2024-03-23T13:12:11.9919128-10:00
+postDate: 2024-03-23T16:12:11.9919128-07:00
 postStatus: publish
 dontInferFeaturedImage: false
+stripH1Header: true
 dontStripH1Header: false
 ---
 # wwDotnetBridge and Loading Native Dependencies for .NET Assemblies
@@ -18,6 +19,8 @@ dontStripH1Header: false
 
 
 When using wwDotnetBridge to access .NET components you may run into .NET components that have native binary dependencies. When I say 'native' here I mean, non-.NET Win32/C++ dependencies that are generally not following the same assembly loading rules as the .NET host.
+
+##AD##
 
 ## An Example: NHunspell, Spellchecking and Word Suggestions
 Just for context, this is the `NHunspell` Spell checking component I highlighted in a [Southwest FoxSession all the way back in 2016](https://bitbucket.org/RickStrahl/swfox16_wwdotnetbridge_10uses/raw/master/Documents/Strahl_wwdotnetBridge_10Uses.pdf). This library is based on the popular HUnspell native library, for which NHUnspell is basically a .NET wrapper. The .NET wrapper just makes the appropriate interop calls to native C++ library.
@@ -267,6 +270,8 @@ The problem is that I reinstalled VFP 9 and of course **did not remember to inst
 To be clear though - my deployed application that runs the EXE still worked because the installer copies the `hunspellx86.dll` into the install directory - no issue there, but the VFP install is tricky because you're not going to see anything wrong until you run your specialized application a long time after installation. 
 
 Make notes, and hopefully you'll remember to read them... I will and probably won't remember. Ha!
+
+##AD##
 
 ## Summary
 The jist of this post is that when you use a library with native dependencies make sure you understand the native libraries have different load behavior than the .NET libraries, with the default behavior being that it will load out of the startup EXE's startup folder. And remember that for FoxPro applications you typically have two root EXEs that you need to worry about for development in the IDE using VFP9.exe and for development with your own compiled EXE.

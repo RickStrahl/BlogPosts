@@ -1,5 +1,5 @@
 ---
-title: WPF Image Control Local File Locking
+title: Avoiding WPF Image Control Local File Locking
 featuredImageUrl: https://weblog.west-wind.com/images/2025/WPF-Image-Control-Local-File-Locking/LockedImageFiles.jpg
 abstract: WPF locks local images when referenced via a Source attribute. In this post I discuss why this might be a problem and how you can work around it using native XAML and custom binding converter that provides a consolidated approach that includes image caching for better performance of reused images.
 keywords: Image, Lock, WPF, XAML, Binding Converter, LocalFileImageConverter
@@ -11,6 +11,11 @@ postDate: 2025-04-28T12:01:46.4594270-07:00
 postStatus: publish
 dontInferFeaturedImage: false
 stripH1Header: true
+customFields:
+  mt_githuburl:
+    id: 
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2025-04/WPF-Image-Control-Local-File-Locking/WpfImageControlLocalFileLocking.md
 ---
 # Avoiding WPF Image Control Local File Locking
 
@@ -18,14 +23,20 @@ stripH1Header: true
 
 WPF image locking has tripped me up a lot in XAML applications: The WPF image control by default locks image files when directly linking to an image file on disk. When you simply bind or assign an image file, internally WPF uses a stream that is not closed and kept open. In some cases this doesn't matter, for example if your images are rarely or never updated.
 
-But in some cases it does matter: In several of my applications I have **tons of icons** that get loaded into a TreeView control with the icons being related to user defined templates that can and often are updated. The locked files become a problem as these locked files can't be deleted. In one particular use case I update my templates by nuking the original folder, then re-creating the folder and copying the new templates which include the potentially updated icon images. With the default locking behavior that fails as the locked files - and the parent directory can't be deleted.
+But in some cases it does matter: In several of my applications I have **tons of icons** that get loaded into a TreeView control with the icons being related to user defined templates that can and often are updated. The locked files become a problem as these locked files can't be deleted. In one particular use case I update my templates by nuking the original folder, then re-creating the folder and copying the new templates which include the potentially updated icon images. With the default locking behavior that fails as the locked files - and the parent directory can't be deleted or copied over.
 
-There may be other scenarios too - in some cases you might have images that are updated for rendering and you need to ensure that the image is refreshed when the file changes or at least when the image is rebound. You can't update the image if it's locked...
+There may be other scenarios too - in some cases you might use a single image file that is updated by the application and needs to be redisplayed after the change when the image is rebound. 
+
+If you can't update the image, none of that works. There are ways to make this work but unfortunately the default behavior is such that the file is locked. And as is often the case when you start building out a new control or form, you don't think about locking issues - that only comes to bite you later. And in those cases I usually spent a while flailing trying to remember exactly what settings have to be changed.
+
+This blog post is meant to put this all into one place so my aging self can find and remember  more easily :smile:
 
 ##AD##
 
 ## Using the Image Control with an embedded BitmapImage
-It's possible to do this with XAML only. Rather than binding an image like this:
+The first solution is a built-in one that works with XAML only. It's a little verbose but other than that very simple.
+
+Rather than binding an image like this:
 
 ```xml
 <Image Source={Binding TopicState.DisplayTypeIconFile} />
@@ -56,19 +67,19 @@ If you also need to ensure the image is refreshed you need to add:
  />
 ```
 
-This forces the image to reload every time the image is rebound. This is not great as it adds overhead on each rebinding operation.
+This forces the image to reload every time the image is rebound. This is not great for performance so you should be careful with this and only use when necessary, as it adds overhead on each rebinding operation.
 
 ## More Generic: Using a Binding Converter as in Intermediary
 Another way to do this is via an **Binding Converter** that handles this behavior and allows releasing the underlying cached images explicitly to force reloading of the images when the list is rebound.
 
 The idea here is that you can use a converter on an image path. The advantage of the converter is that you have more control over the image creation process and you can do it consistently for many images using the same logic. It can also cache images so that reused images aren't reloaded.
 
-For example, I like to cache images since in my app I reuse tons of icons for tree complex tree views:
+For example, I like to cache images since in my app when I reuse tons of icons for complex tree views:
 
 ![Icons In Tree View](IconsInTreeView.png)  
 <small>**Figure 1** - A TreeView with many repeating images that are cached and reused</small>
 
-The icons are cached, so that each unique icons is essentially loaded from a single `BitmapImage` instance, which saves resources and loads noticeably faster.
+The icons are cached, so that each unique icon is essentially loaded from a single `BitmapImage` instance, which saves resources and loads noticeably faster.
 
 Here's what the image control using the converter looks like used in a XAML form:
 
@@ -174,6 +185,6 @@ It's possible to clear the image cache to force all images to be reloaded from d
 ## Summary
 Loading images from disk is generally frowned upon in WPF. WPF prefers loading things from compiled in resources, but if you have user configurable files like custom icons or custom images, then external files are required to make that work. And in those scenarios it's especially important that files aren't locked when they need to be updated since these external files can and often are updated either individually as part of application operation, or as is in my case in a wholesale operation of updating templates.
 
-The `<Image>` control `<BitmapImage>` have some built-in support to avoid locking but it's pretty verbose and for me at least hard to remember. I personally prefer a converter that universally ensures that images are loaded and cached all in the same way.
+The `<Image>`  and `<BitmapImage>` controls have some built-in support to avoid locking but it's pretty verbose and for me at least hard to remember. I personally prefer a converter that universally ensures that images are loaded and cached all in the same way.
 
-This `LocalFileImageConverter` converter is an old tool, but at this point, I pretty much use this for any application that uses a TreeView or List control with icons, but it also works for other types of images that are loaded from disk... as long as I **remember**. Hopefully this post helps. 😄
+This `LocalFileImageConverter` converter is an old tool, but at this point, I pretty much use this for any application that uses a TreeView or List control with icons. But it also works for other types of images that are loaded from disk... as long as I **remember**. Hopefully this post helps. 😄

@@ -6,9 +6,10 @@ keywords: 'ARM, Foxpro, '
 categories: FoxPro
 weblogName: Web Connection Weblog
 postId: 57035
-postDate: 2024-11-06T22:42:14.5736550-10:00
+postDate: 2024-11-07T00:42:14.5736550-08:00
 postStatus: publish
 dontInferFeaturedImage: false
+stripH1Header: true
 dontStripH1Header: false
 ---
 # FoxPro Running on a Windows ARM Device
@@ -16,6 +17,9 @@ dontStripH1Header: false
 I recently picked up a Windows ARM device in the form of a [Samsung Galaxy Book 4](https://www.samsung.com/us/computing/galaxy-books/galaxy-book4-edge/buy/galaxy-book4-edge-14-qualcomm-snapdragon-x-elite-512gb-sapphire-blue-np940xma-kb1us/) with a SnapDragon X Elite chip. Best Buy had a sale going for $799 at the time, and so I 'snapped' one up. 
 
 I was pleasantly surprised that almost all of my Windows applications run without issues. This is true for both .NET and FoxPro applications as  far as my own apps are concerned, and just about anything else in my typical Windows application and tools collection.
+
+
+##AD##
 
 ## FoxPro and Web Connection
 One of the things I was really curious about was whether FoxPro applications would work. After all FoxPro is a 32 bit application (ie. not x64) and it's based on 30 year old Windows code.
@@ -73,6 +77,8 @@ There are two workarounds that [I discuss in a separate post on my main blog](ht
 * Using a hacked installer to install SQL Express or SQL Developer
 
 If you need to work with a local copy of SQL Server [check out the post](https://weblog.west-wind.com/posts/2024/Oct/24/Using-Sql-Server-on-Windows-ARM) that goes into greater detail.
+
+##AD##
 
 ## Summary
 So, the good news is ARM devices have a lot going for it. There are now many native ARM applications available - most mainstream applications have ARM specific versions or can run under ARM. Most .NET applications can automatically run natively on ARM if they are compiled for `AnyCPU` mode.

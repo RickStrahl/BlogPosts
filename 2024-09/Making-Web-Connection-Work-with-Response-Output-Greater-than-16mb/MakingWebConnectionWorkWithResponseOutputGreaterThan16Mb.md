@@ -9,6 +9,7 @@ postId: 57033
 postDate: 2024-09-30T15:30:22.3951519-07:00
 postStatus: publish
 dontInferFeaturedImage: false
+stripH1Header: true
 dontStripH1Header: false
 ---
 # Making Web Connection Work with Response Output Greater than 16mb
@@ -29,6 +30,8 @@ During the conference I spent some time to create a solution to this problem and
 These features will be shipped with the next release in Web Connection v8.1.
 
 If you're interested, what follows is a discussion on how I worked around this limitation along with a review of how you can create string content that exceeds 16mb in FoxPro in general.
+
+##AD##
 
 ## Making >16mb Output work in Web Connection
 So while at SW Fox I started playing around with some ideas on how to make >16mb content work, and implemented a solution to this problem. 
@@ -156,6 +159,7 @@ Web Connection supports GZip compression of content with just that flag and espe
 
 In the testing I did a bit ago with a huge data set the data went from 18mb down to 2mb with GZipCompression. You get the benefit of a smaller memory footprint, plus vastly reduced transfer time of the data over the wire due to the smaller size. 
 
+##AD##
 
 ## Summary
 16mb for text or even JSON output should be avoid as much as possible. 16mb is a lot of data to either render, or parse as JSON data and I would not recommend doing that under most circumstances. But I know some of you will do it anyway, so this is why we're here :smile:

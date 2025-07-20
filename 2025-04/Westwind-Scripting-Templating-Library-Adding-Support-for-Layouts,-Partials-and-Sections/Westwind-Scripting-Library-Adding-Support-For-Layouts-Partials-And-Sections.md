@@ -17,25 +17,42 @@ stripH1Header: true
 ![Scripting Banner](Scripting-Banner.jpg)
 This is a test of the emergency broadcast system. 
 
-This is a test of the emergency broadcast system. I want to keep typing here and let you know that we have completed this input exercise successfully. I want to thank you for coming out and listening to this communication.
+I'm finally breaking down and updating the C# scripting engine via the `ScriptParser` class in [Westwind.Scripting](https://github.com/RickStrahl/Westwind.Scripting) to support **Layout Pages**. I got fed up with trying to shoehorn other script engines (Razor and Liquid Templates) into my non-Web templating solutions. Razor especially (both hosted and internal) - after having gone down the wrong path several times now, and running into complications that were a pain to resolve and hack around. I've come to the conclusion the only way to use Razor effectively is as part of a full scale ASP.NET application. 
 
-I'm finally breaking down and updating the C# scripting engine via the `ScriptParser` class in [Westwind.Scripting](https://github.com/RickStrahl/Westwind.Scripting) to support layout pages. I got fed up with trying to shoehorn other script engines (Razor and Liquid Templates) into my templating solutions. Razor especially (both hosted and internal) - after having gone down the wrong path several times now, and running into complications that were a pain to resolve and hack around. I've come to the conclusion the only way to use Razor effectively is as part of a full scale ASP.NET application. 
+I  like the idea of having a fully self-contained solution that is easily portable and not dependent on the whims of some big scripting environment or beholden engine like Razor that also doesn't play very well outside of anything but . NET dev IDEs and actual ASP.NET project. I've been through this cycle one too many times :smile:
 
-I  like the idea of having a fully self-contained solution that is easily portable and not dependent on the whims of some big scripting environment or beholden engine like Razor that also doesn't play very well outside of anything but . NET dev IDEs and actual ASP.NET project. I've been through this cycle one to many times :smile:
+## A bit of Westwind.Scripting History
+I've always had a small scripting library as part of my [Westwind.Scripting library](https://github.com/RickStrahl/Westwind.Scripting), which is a C# runtime compilation library plus a [ScriptParser Template Engine](https://github.com/RickStrahl/Westwind.Scripting/blob/master/ScriptAndTemplates.md) that provides basic C# Handlebars style templating. I created **Westwind.Scripting** originally 20 years ago, and it's gone through many, many iterations as the compiler technology in .NET has changed. 
 
-I've always had a small scripting library as part of my [Westwind.Scripting library](https://github.com/RickStrahl/Westwind.Scripting), which is a C# runtime compilation library plus a [ScriptParser Template Engine](https://github.com/RickStrahl/Westwind.Scripting/blob/master/ScriptAndTemplates.md) that provides basic C# Handlebars style templating. I created **Westwind.Scripting** originally 20 years ago, and it's gone through many, many iterations as the compiler technology in .NET has changed. A few years back I [updated the library to support the latest Roslyn compilation APIs](https://weblog.west-wind.com/posts/2022/Jun/07/Runtime-C-Code-Compilation-Revisited-for-Roslyn) and at the time also added a `ScriptParser` class for script template parsing and execution.
+A few years back I [updated the library to support the latest Roslyn compilation APIs](https://weblog.west-wind.com/posts/2022/Jun/07/Runtime-C-Code-Compilation-Revisited-for-Roslyn) and at the time also added a `ScriptParser` class for script template parsing and execution. I created this primarily to support template snippet expansions in Markdown Monster, so you could write snippets that contain embedded expressions and commands using C# syntax.
 
 The `ScriptParser` works with Handlebars like syntax and raw C# code - the parser compiles code at runtime and executes it with support for just about all C# features via Handlebar tags. The latest Roslyn based version has been around for 5 years or so now, and the basic script engine had basic single template parsing support plus the ability to `RenderPartial()` to pull in external content from files.
 
-In this latest iteration which is the focus of this post, **I added support for Layout pages and Sections** which provide a feature I'd been wanting to use for a long time. In the past I'd made do with content pages and partials to simulate this functionality - but it's tedious as you still end up copying a lot of code in each of the content pages. Layout pages fix most of that as you can have a single page with the page chrome with content pages only providing specific content. 
+## Adding Layout Pages and Sections
+In this latest iteration which is the focus of this post, **I added support for Layout pages and Sections** which provide a feature I'd been wanting to use for a long time. In the past I'd made do with content pages and partials to simulate this functionality - but it's tedious as you still end up copying a lot of code in each of the content pages. Layout pages fix most of that as you can have a single page with the page chrome with content pages only providing specific content. If you've used Razor as most of you probably have you know this - it's difficult to think of scripting without a Layout feature for anything that spans multiple pages.
 
-This is relevant to me as I'm creating documentation for a variety of topic types with each topic type using slightly different layout and features. Having a single page consolidating all the base page layout is much preferable than syncing up 20 different topic type templates.
+This is relevant to me as I'm creating a new documentation tool which renders a Web site from documentation topic content  for a variety of topic types with each topic type using slightly different layout and features. Having a single page consolidating all the base page layout is much preferable than syncing up 20 different topic type templates.
 
-So in the latest release of the `ScriptParser` there's now support for Layout Pages and Sections and in this post I'll talk a bit about scenarios when it makes sense to use a tool like this, and also of how it works and how it was built. 
+So in the latest release of the `ScriptParser` there's now proper support for Layout Pages and Sections.
 
-I have integrated the new script engine into the new .NET solution now and it's been a joy to work with. For now this is an internal Add-in for Markdown Monster specifically set up for documentation creation and it's been a fun implementation to build. The application integration is a pretty real-world test case for the scripting engine, as I have some help documents that have thousands of topics and the engine handles that with ease (building Html output for ~4k documents in 5-7 seconds) as well as live previews that regenerate with every few keystrokes without any stutter.
+In this post I'll talk a bit about scenarios when it makes sense to use a tool like this, and also of how it works and how it was built. 
 
-The scripting via Handlebars is not as nice as Razor, but it provides full feature access to just about all C# features in templates. VS Code also manages the HandleBars syntax nicely, even though there's no syntax support for the embedded C# code. But the most useful feature is that the engine is easy to integrate and run: Most of the script compilation and execution logic is wrapped up in a single relatively short method. And because the code has no dependencies outside of the Roslyn compiler APIs it can be easily packaged even into a class library project in this case in the business layer of the application. 
+I have integrated the new script engine into this new .NET documentation tool project now and it's been a joy to work with. The application integration is a pretty real-world test case for the scripting engine, as I have some help documents that have thousands of topics and the engine handles that with ease (building Html output for ~4k documents in 5-7 seconds) as well as live previews that regenerate with every few keystrokes without any stutter.
+
+## Not meant as a Razor Replacement
+Let me be clear - Razor is awesome! As long as you use it in an ASP.NET Web application. But if you use it offline for a templating solution there are lots of problems:
+
+* Requires ASP.NET Runtime (ie. extra deploy size)
+* Terrible Editor Support outside of ASP.NET Projects
+* Non ASP.NET Razor has missing features
+* Razor Engine Implementation is chasing a constantly changing wheel (been there done that for NetFx and it sucked!)
+* Environment setup is insane
+
+By using a small C# based scripting library, it's actually much easier to control the syntax and the hosting is ridiculously simple, while still getting incredibly good performance because like Razor scripts compile down to C# code that is executed.
+
+But there's no doubt that scripting via Handlebars is not nearly as nice as Razor, but it provides full feature access to just about all C# features in templates. And it works reasonably well in any text editor - and most editors have minimal support for Handlebars albeit without the C# support.
+
+The most useful feature is that the engine is easy to integrate and run: Most of the script compilation and execution logic is wrapped up in a single relatively short method. And because the code has no dependencies outside of the Roslyn compiler APIs it can be easily packaged even into a class library project in this case in the business layer of the application. 
 
 So let's dive in.
 
@@ -147,10 +164,12 @@ For example, I can add code here to format an inheritance tree display into my c
 Nothing in all of this is particularly new: These concepts are heavily borrowing from Razor or ASP.NET classic pages or any other MVC style framework. The difference here though is that this isn't a framework - this is simply a template engine that has full support for C# so you can do whatever you want to, in any type of .NET application as it's a small lightweight implementation that relies only on the Roslyn compiler as a dependency.
 
 ### Not meant to replace Razor for Web Applications!
-I want be clear: I'm not pitching this as a replacement for Razor or any other Web script engine. For pure .NET based Web applications that need scripting Razor is a great solution, especially when you pair it with editor tooling that provides the complex syntax coloring and auto-complete. I would never consider replacing Razor with this scripting engine for a Web application. I'd make an exception perhaps for an API that needs a one-off HTML page, or an HTML email confirmation but beyond that, there's no reason for an ASP.NET Web application to not use Razor Pages or MVC with Razor Views.
+I want be clear: I'm not pitching this as a replacement for Razor or any other Web script engine. For .NET based Web applications that need scripting Razor Pages or MVC with Razor is a the best solution, especially when you pair it with editor tooling that provides the complex syntax coloring and C# language support for auto-complete. I would never consider replacing Razor with this scripting engine for a Web application. I'd make an exception perhaps for an API that needs a one-off HTML page, or an HTML email confirmation but beyond that, there's no reason for an ASP.NET Web application to not use Razor Pages or MVC with Razor Views.
 
 ### Razor has major Shortcomings for Non-Web Apps
-But... if you need to **integrate scripting or templating into a non-Web solution**, or even in a Web solution if you need to render output to a string, Razor is a pain in the ass, because it's closely coupled to ASP.NET and the required runtime dependencies. You need the ASP.NET Runtime to use it even in a Desktop or pure Console application. It's also not easy to host Razor in non-Web applications, and even if you use one of the wrapper libraries that support this, there are limitations in what works and some things work differently than the 'full' version of Razor in ASP.NET. 
+But... if you need to **integrate scripting or templating into a non-Web solution**, or even in a Web solution if you need to render output to a string, Razor is a pain in the ass, because it's closely coupled to ASP.NET and the required runtime dependencies. You need the ASP.NET Runtime to use it even in a Desktop or pure Console application.
+
+It's also not easy to host Razor in non-Web applications, and even if you use one of the wrapper libraries that support this, there are limitations in what works and some things work differently than the 'full' version of Razor in ASP.NET. 
 
 Then there's also the hassle of editor support: As much as I like Razor, outside of a Visual Studio or Rider, Razor page code has shit for support in other editors (including Visual Studio Code) or even in Visual Studio if the Razor page is not part of a full ASP.NET project in which case you'll be inundated with compilation errors for missing references. Without proper syntax support and Intellisense, Razor is actually quite ugly to look at!
 
@@ -159,7 +178,7 @@ So the Script Parser tends to be used for offline applications and that's how I'
 
 * Documentation Html Generation - templates with doc content mixed in (in Documentation Monster)
 * String Template expansion in the Markdown Monster editor (Snippet Expansion Addin)
-* Commander Markdown Monster Automation (Extensibility Scripting Addin)
+* Commander Markdown Monster Application Automation (Extensibility Scripting Addin)
 * Mail Merge for software releases (offline)
 * Non UI Text Merging in Web apps (think confirmations, emails etc.)  
 <small>*(doable with Razor but it's a PITA)*</small>
@@ -354,12 +373,17 @@ Note that there's an option to automatically Html Encode all expression tags:
 scriptParser.ScriptingDelimiters.HtmlEncodeExpressionsByDefault = true;
 ```
 
-which makes the `{{: expr }}` syntax redundant. 
+which makes the `{{: expr }}` syntax redundant but you may be required to `{{! expr }}` occasionally to get raw Html rendered.
 
 ### Error Handling
 If compilation errors occur in the code the `.ScriptEngine.ErrorMessage` will have error information pointing at specific line numbers that can be used to debug the code. This can be super useful for scripting solutions: In Markdown Monsters Command Scripting Addin the errors and generated code are displayed so you can glance at the generated code and glean where the error occurred - in there I adjust the line numbers so they match up with the user provided code. 
 
-There are two `.ScriptEngine.ErrorType` values: Compilation, Runtime which you probably want to handle differently. For compilation errors you'd potentially show the code or some variation of the code and potentially a specific line in the code. For runtime errors you likely want to catch the error and either display it or handle it in some generic way.
+There are two `.ScriptEngine.ErrorType` values:
+
+* Compilation
+* Runtime 
+ 
+which you probably want to handle differently. For compilation errors you'd potentially show the code or some variation of the code and potentially a specific line in the code. For runtime errors you likely want to catch the error and either display it or handle it in some generic way.
 
 ### File Template Rendering for More Features
 If you want to render templates from disk, the base features work the same as with templates except you use `ExecuteScriptFile()`.
