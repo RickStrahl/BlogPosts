@@ -1,12 +1,15 @@
 ---
 title: Workflow for using wwDotnetBridge to call .NET Components
-abstract: "In this post I'll describe the common workflow I use when I use wwDotnetBridge to check out the .NET code I'm trying to call first in .NET before actually starting to create the FoxPro code. This helps in discovering the features available on the libraries I'm trying to call, but it also validates that I'm using the .NET code directly before I start adding that extra layer of FoxPro abstraction on top of it. "
-categories: wwDotnetBridge, Web Connection, Client Tools
-keywords: wwDotnetBridge,LinqPad,Test,COM Interop
-weblogName: Local Jekyll Blog
-postId: 9165
 featuredImageUrl: https://jekyll.west-wind.com/assets/2020-11-08-Workflow-for-using-wwDotnetBridge-to-call-NET-Components/BannerLinqPad.png
+abstract: "In this post I'll describe the common workflow I use when I use wwDotnetBridge to check out the .NET code I'm trying to call first in .NET before actually starting to create the FoxPro code. This helps in discovering the features available on the libraries I'm trying to call, but it also validates that I'm using the .NET code directly before I start adding that extra layer of FoxPro abstraction on top of it. "
+keywords: wwDotnetBridge,LinqPad,Test,COM Interop
+categories: wwDotnetBridge, Web Connection, Client Tools
+weblogName: Web Connection Weblog
+postId: 9165
 postDate: 2020-11-08T10:46:42.4793937-10:00
+postStatus: publish
+dontInferFeaturedImage: false
+stripH1Header: true
 ---
 # Workflow for using wwDotnetBridge to call .NET Components
 
@@ -67,7 +70,7 @@ In short having the code to reference in .NET will make it much easier to identi
 
 There are a couple of ways you can do this:
 
-* Use [LinqPad](https://www.linqpad.net/) (get LinqPad5)
+* Use [LinqPad](https://www.linqpad.net/?affiliate=4n4zaa6t) (get LinqPad 9)
 * Create a small .NET Project (Test projects work well)
 
 I'll use LinqPad for the example here.
@@ -76,7 +79,7 @@ I'll use LinqPad for the example here.
 
 
 #### LinqPad
-LinqPad is an awesome little tool that provides immediate execution of .NET code without having to create a project. It's a little bit like the FoxPro command window that just lets you execute commands. Actually it's  an interactive editor with a compiler that lets you run code as a single block. It's more powerful than that, but it's great for testing out little snippets of code.
+[LinqPad](https://www.linqpad.net/?affiliate=4n4zaa6t) is an awesome little tool that provides immediate execution of .NET code without having to create a project. It's a little bit like the FoxPro command window that just lets you execute commands. Actually it's  an interactive editor with a compiler that lets you run code as a single block. It's more powerful than that, but it's great for testing out little snippets of code.
 
 Here's some simple sample code that I'm using to work through the RegEx example mentioned at the start of this post:
 
@@ -195,4 +198,4 @@ You can use this same approach with other RegEx methods like `.Match()` or `.Rep
 ## Summary
 So there you have it... a walk-through how to access simple .NET functionality using wwDotnetBridge. I've been very explicit here to demonstrate some of the thought process that can help make calling .NET code easier without having to guess at what you need to call or pass.
 
-It's a little more work to fire up LinqPad or Reflector or even a full copy of Visual Studio. But I find almost every time I build wwDotnetBridge code in .NET I need to dig into the type structures to figure out exactly what I have to pass and so testing the code first in .NET  almost always makes this much easier.
+It's a little more work to fire up [LinqPad](https://www.linqpad.net/?affiliate=4n4zaa6t) or Reflector or even a full copy of Visual Studio. But I find almost every time I build wwDotnetBridge code in .NET I need to dig into the type structures to figure out exactly what I have to pass and so testing the code first in .NET  almost always makes this much easier.

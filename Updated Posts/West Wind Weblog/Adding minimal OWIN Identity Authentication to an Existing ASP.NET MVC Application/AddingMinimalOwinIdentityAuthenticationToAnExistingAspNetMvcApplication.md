@@ -1,16 +1,17 @@
 ---
 title: Adding minimal OWIN Identity Authentication to an Existing ASP.NET MVC Application
+featuredImageUrl: https://weblog.west-wind.com/images/2015Windows-Live-Writer/Adding-oAuth-Authent.NET-MVC-Application_CC2E/AccountControllerOverview_thumb.png
 abstract: ASP.NET 4 provides a new Identity Authentication/Authorization framework that's very comprehensive and works reasonably well for new applications. However, if you have existing applications or use  custom user management, it's not very clear how to use just the basic OWIN  Authentication/Authorization layer without the full UserManager and Entity Framework implementation. In this post I describe how to use the bare minimum Identity features to hook up a custom domain model for both local and external logins in an ASP.NET MVC application.
-categories: ' ASP.NET,MVC,OWIN'
 keywords: OWIN,Identity,Minimal,SignIn,SignOut,Google,Twitter,GitHub
+categories: ' ASP.NET,MVC,OWIN'
 weblogName: West Wind Web Log
 postId: 1123302
-dontInferFeaturedImage: false
-dontStripH1Header: false
-postStatus: publish
-featuredImageUrl: https://weblog.west-wind.com/images/2015Windows-Live-Writer/Adding-oAuth-Authent.NET-MVC-Application_CC2E/AccountControllerOverview_thumb.png
 permalink: https://weblog.west-wind.com/posts/2015/Apr/29/Adding-minimal-OWIN-Identity-Authentication-to-an-Existing-ASPNET-MVC-Application
-postDate: 2018-05-28T19:33:21.7555082-10:00
+postDate: 2018-05-28T22:33:21.7555082-07:00
+postStatus: publish
+dontInferFeaturedImage: false
+stripH1Header: true
+dontStripH1Header: false
 ---
 # Adding minimal OWIN Identity Authentication to an Existing ASP.NET MVC Application
 
@@ -21,6 +22,8 @@ As of ASP.NET 4, ASP.NET provides a fairly useful identity system. If you create
 However, if you have an existing application, or if the full Entity Framework based identity structure doesn’t work for you, then the process to hook up a minimal and custom implementation that uses your own domain/business model and classes is not exactly as straightforward. You have to either rip out the pieces you don’t need from an full template install, or add the necessary pieces. In this post I hope I can show you how to do the latter, showing only the pieces that you need.
 
 The process is not necessarily hard – but it’s not very well documented. It’s difficult to find the information necessary to just create the necessary handlers that can deal with linking accounts to external oAuth providers like Google, Facebook, GitHub and so on. So in this post I’ll go over this scenario.
+
+##AD##
 
 ### A Real World Use Case
 
@@ -168,6 +171,8 @@ Each provider requires what amounts to an application ID and a secret key that y
 *   [Twitter Application Management](https://apps.twitter.com/app/new "https://apps.twitter.com/app/new")
 
 Note that you can pick and choose your providers. You can use only Cookie authentication, or only externals or both in combination as I’m doing on this site.
+
+##AD##
 
 ### Customizing the AccountController
 
@@ -899,3 +904,13 @@ I hope that this post provides a good summary of what’s required and especiall
 ### Resources
 
 *   [**CodePaste.NET Project on GitHub**](https://github.com/RickStrahl/CodePaste.NET)
+
+
+<div style="margin-top: 30px;font-size: 0.8em;
+            border-top: 1px solid #eee;padding-top: 8px;">
+    <img src="https://markdownmonster.west-wind.com/favicon.png"
+         style="height: 20px;float: left; margin-right: 10px;"/>
+    this post created and published with the 
+    <a href="https://markdownmonster.west-wind.com" 
+       target="top">Markdown Monster Editor</a> 
+</div>

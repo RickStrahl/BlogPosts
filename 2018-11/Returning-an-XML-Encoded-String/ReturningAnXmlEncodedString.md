@@ -1,11 +1,16 @@
 ---
 title: Returning an XML Encoded String in .NET
+featuredImageUrl: https://weblog.west-wind.com/images/2025/Returning-an-XML-Encoded-String/XmlImage.png
 abstract: XML is not as popular as it once was, but there's still a lot of XML based configuration and data floating around today. Today I ran into a recurring issue where I needed to convert a string to a properly encoded XML string. Seems simple enough but it's not as straightforward as you might think to generate an XML Encoded string properly. This post shows a few different ways to retrieve a string and discusses advantages of each.
 keywords: .NET,C#,XML,String,Convert,Conversion
 categories: .NET, C#, XML
 weblogName: West Wind Web Log
 postId: 1043394
+permalink: https://weblog.west-wind.com/posts/2018/Nov/30/Returning-an-XML-Encoded-String-in-NET
 postDate: 2018-11-30T13:11:52.6274494-10:00
+postStatus: publish
+dontInferFeaturedImage: false
+stripH1Header: true
 ---
 # Returning an XML Encoded String
 
@@ -191,7 +196,7 @@ In addition attributes can't represent carriage return and linefeeds (and also t
 CR: &xD; LF: &xA; Tab: &x9;
 ```
 
-The following LINQPad code demonstrates what XML is generated for values by Elements and Attributes:
+The following [LinqPad](https://www.linqpad.net/?affiliate=4n4zaa6t) code demonstrates what XML is generated for values by Elements and Attributes:
 
 ```cs
 void Main()
@@ -236,7 +241,7 @@ This falls into the **pre-mature optimization** bucket, but I was curious how we
 
 I was **very surprised** to find that the fastest and most consistent solution in various sizes of text was `XElement` which was faster than my bare bones string implementation especially for larger strings. For small amounts of text (under a few hundred characters) the string and XElement implementations were roughly the same, but as strings get larger `XElement` started to become considerably faster. 
 
-As an aside, the custom string version also runs considerably faster in **Release Mode** (in LINQPad run with *Optimizations On*) with optimizations enabled rather than debug mode. In debug mode performance was about 3-4x slower. Yikes.
+As an aside, the custom string version also runs considerably faster in **Release Mode** (in [LinqPad](https://www.linqpad.net/?affiliate=4n4zaa6t) run with *Optimizations On*) with optimizations enabled rather than debug mode. In debug mode performance was about 3-4x slower. Yikes.
 
 Not surprisingly `XmlDocument` - even the cached version - was the slower solution. With small strings roughly 50% slower, with larger strings many times slower and incrementally getting slower as the string size gets larger.
 
@@ -246,7 +251,7 @@ Whatever `XElement` is doing to parse the element, it's very efficient and it's 
 
 Take all of these numbers with a grain of salt - all of them are pretty fast for one off parsing and unless you're using manual XML encoding strings in loops or large batches, the perf difference is not of concern here. 
 
-If you want to play around with the different approaches, here's a Gist that you can load into [LINQPad](https://www.linqpad.net/) that you can just run:
+If you want to play around with the different approaches, here's a Gist that you can load into [LinqPad](https://www.linqpad.net/?affiliate=4n4zaa6t) that you can just run:
 
 
 * [XmlString.cs Samples LinqPad Script](https://gist.github.com/RickStrahl/793ea2c912d49f1f026ecbd15791098e)
@@ -260,3 +265,4 @@ XML string encoding is something you hopefully won't have to do much of, but it'
 
 * [`XmlUtils.XmlString()` in Westwind.Utilities](https://github.com/RickStrahl/Westwind.Utilities/blob/master/Westwind.Utilities/Utilities/XmlUtils.cs#L66)
 * [XmlString.cs Samples LinqPad Script](https://gist.github.com/RickStrahl/793ea2c912d49f1f026ecbd15791098e)
+* [LinqPad](https://www.linqpad.net/?affiliate=4n4zaa6t)

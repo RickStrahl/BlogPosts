@@ -1,21 +1,22 @@
 ---
 title: Blank Zero Values in .NET Number Format Strings
+featuredImageUrl: https://weblog.west-wind.com/images/2021/Blank-Zero-Values-in-CSharp-Number-Format-Strings/emptycodesnippet.png
 abstract: "Recently needed a way to display a set of numbers in a WPF List display that required that values with a value of `0` display blank - using no explicit code or model changes. I learnt something new today: There's actually a way to use C# format strings to format numbers separately for positive, negative and zero values. Here's how that works."
-categories: .NET, CSharp
 keywords: String
+categories: .NET, CSharp
 weblogName: West Wind Web Log
 postId: 2205183
-dontInferFeaturedImage: false
-dontStripH1Header: false
-postStatus: publish
-featuredImageUrl: https://weblog.west-wind.com/images/2021/Blank-Zero-Values-in-CSharp-Number-Format-Strings/emptycodesnippet.png
-permalink: https://weblog.west-wind.com/posts/2021/Jan/05/Blank-Zero-Values-in-CSharp-Number-Format-Strings
+permalink: https://weblog.west-wind.com/posts/2021/Jan/05/Blank-Zero-Values-in-NET-Number-Format-Strings
 postDate: 2021-01-05T21:36:24.0813600-10:00
+postStatus: publish
+dontInferFeaturedImage: false
+stripH1Header: true
 customFields:
   mt_githuburl:
     id: 
     key: mt_githuburl
     value: https://github.com/RickStrahl/BlogPosts/blob/master/2021-01/Blank-Zero-Values-in-CSharp-Number-Format-Strings/BlankZeroValuesInCsharpNumberFormatStrings.md
+dontStripH1Header: false
 ---
 # Blank Zero Values in .NET Number Format Strings
 
@@ -109,7 +110,7 @@ Here are a few examples that demonstrate how this syntax works:
 0.ToString("n2;n2;' '").Dump();
 ```
 
-Here's what that looks like if you run the above code in [LinqPad](https://www.linqpad.net/):
+Here's what that looks like if you run the above code in [LinqPad](https://www.linqpad.net/?affiliate=4n4zaa6t):
 
 ![](LinqPadFormats.png)
 

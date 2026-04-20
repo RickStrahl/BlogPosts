@@ -311,4 +311,13 @@ In all of these cases, waiting on document load solved the problem. Initially I 
 ## Resources
 
 * [Westwind.WebView on GitHub (WPF)](https://github.com/rickstrahl/Westwind.WebView)
-* [WebViewHandler.cs source](https://github.com/RickStrahl/Westwind.WebView/blob/master/Westwind.WebView/Wpf/WebViewHandler.cs)
+* [WebViewHandler.cs source](https://github.com/RickStrahl/Westwind.WebView/blob/master/Westwind.WebView/Wpf/WebViewHandler.cs)  
+
+<div style="margin-top: 30px;font-size: 0.8em;
+            border-top: 1px solid #eee;padding-top: 8px;">
+    <img src="https://markdownmonster.west-wind.com/favicon.png"
+         style="height: 20px;float: left; margin-right: 10px;"/>
+    this post created and published with the 
+    <a href="https://markdownmonster.west-wind.com" 
+       target="top">Markdown Monster Editor</a> 
+</div>

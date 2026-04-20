@@ -4,7 +4,7 @@
 
 I'm not sure how I've missed this feature in all those years of working in C#: `String.Format()` supports **Number Formatting Sections** that allow you to show separate values for positive, negative and zero values.
 
-Take a look using [LinqPad](https://www.linqpad.net/):
+Take a look using [LinqPad](https://www.linqpad.net/?affiliate=4n4zaa6t):
 
 ![](formatstring.png)
 

@@ -1,12 +1,16 @@
 ---
 title: Using WSL to Launch Several Bash Commands from an Application
+featuredImageUrl: https://weblog.west-wind.com/images/2025/Using-WSL-to-Launch-Several-Bash-Command-from-an-Application/FailureToLaunch.jpg
 abstract: Struggled today with launching WSL from a Windows application to automate an external build process. Turns out this was a lot harder than it should have been due to some quirks on how the `wsl.exe` and `bash.exe` are registered by the Windows Sub System for Linux.
 keywords: WSL, Windows, .NET
 categories: .NET, Windows, WSL
 weblogName: West Wind Web Log
 postId: 1737405
-permalink: https://weblog.west-wind.com/posts/2020/May/19/Using-WSL-to-Launch-Several-Bash-Command-from-an-Application
+permalink: https://weblog.west-wind.com/posts/2020/May/19/Using-WSL-to-Launch-Several-Bash-Commands-from-an-Application
 postDate: 2020-05-19T14:24:05.2038931-10:00
+postStatus: publish
+dontInferFeaturedImage: false
+stripH1Header: true
 ---
 # Using WSL to Launch Several Bash Commands from an Application
 
@@ -130,7 +134,7 @@ So using that code what I want to do should look something like this to mimic th
 ExecuteCommandLine(@"bash -c ""cd /mnt/c/projects/Test/jekyll/help; bundle exec jekyll serve;"" ");
 ```
 
-This is basically the same command line I used in Powershell, so I expected this to work - **but it doesn't work**  (running in LinqPad 5 32 bit):
+This is basically the same command line I used in Powershell, so I expected this to work - **but it doesn't work**  (running in [LinqPad](https://www.linqpad.net/?affiliate=4n4zaa6t) 5 32 bit):
 
 ![](ExecuteBashin32BitFailure.png)
 
@@ -138,7 +142,7 @@ Well... that sucks!
 
 A lot of false starts and some Twitter help from [Richard Turner](https://twitter.com/richturn_ms) and [Martin Sundhaug](https://twitter.com/sundhaug92) later, I figured out that the problem here is - Processor Architecture. 
 
-Running **the same code** in LinqPad 6 which is 64 bit **works**:
+Running **the same code** in [LinqPad](https://www.linqpad.net/?affiliate=4n4zaa6t) 6 which is 64 bit **works**:
 
 ![](ExecuteBashin64BitSuccess.png)
 

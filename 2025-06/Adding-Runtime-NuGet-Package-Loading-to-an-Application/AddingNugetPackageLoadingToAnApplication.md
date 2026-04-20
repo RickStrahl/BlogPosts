@@ -360,3 +360,12 @@ LiveReloadServer was the first use case for me, but I have a couple of others fo
 
 * [LiveReloadServer Source Code on Github](https://github.com/RickStrahl/LiveReloadServer)
 * [NuGet.Protocol on NuGet](https://www.nuget.org/packages/NuGet.Protocol)
+
+<div style="margin-top: 30px;font-size: 0.8em;
+            border-top: 1px solid #eee;padding-top: 8px;">
+    <img src="https://markdownmonster.west-wind.com/favicon.png"
+         style="height: 20px;float: left; margin-right: 10px;"/>
+    this post created and published with the 
+    <a href="https://markdownmonster.west-wind.com" 
+       target="top">Markdown Monster Editor</a> 
+</div>

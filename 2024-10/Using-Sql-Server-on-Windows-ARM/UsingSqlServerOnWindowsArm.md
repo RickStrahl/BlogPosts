@@ -7,9 +7,10 @@ categories: .NET, SQL Server, Windows
 weblogName: West Wind Web Log
 postId: 4648676
 permalink: https://weblog.west-wind.com/posts/2024/Oct/24/Using-Sql-Server-on-Windows-ARM
-postDate: 2024-10-24T11:59:54.9625001-10:00
+postDate: 2024-10-24T14:59:54.9625001-07:00
 postStatus: publish
 dontInferFeaturedImage: false
+stripH1Header: true
 dontStripH1Header: false
 ---
 # Using SQL Server on Windows ARM
@@ -272,3 +273,12 @@ Regardless of complexity and discovery overhead, I'm glad that this solution wor
 * [Azure Sql Edge Docker Image](https://hub.docker.com/r/microsoft/azure-sql-edge)
 * [Azure Data Studio](https://azure.microsoft.com/en-us/products/data-studio/)
 * [MSSQLEXPRESS-M1-Install Github Repo (customized SQL Server installer for ARM)](https://github.com/jimm98y/MSSQLEXPRESS-M1-Install)
+
+<div style="margin-top: 30px;font-size: 0.8em;
+            border-top: 1px solid #eee;padding-top: 8px;">
+    <img src="https://markdownmonster.west-wind.com/favicon.png"
+         style="height: 20px;float: left; margin-right: 10px;"/>
+    this post created and published with the 
+    <a href="https://markdownmonster.west-wind.com" 
+       target="top">Markdown Monster Editor</a> 
+</div>

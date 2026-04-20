@@ -1,12 +1,16 @@
 ---
 title: Window Activation Headaches in WPF
+featuredImageUrl: https://weblog.west-wind.com/images/2025/Window-Activation-Headaches-in-WPF/WindowActivationBanner.jpg
 abstract: Ran into a problem with properly activating a WPF when launching from Explorer and indirectly trying to activate an already running instance 'from within itself'. It seems simple, but windows focus-stealing restrictions can cause problems with actually getting focus into an application window. Here's how.
-categories: WPF,Windows
 keywords: AttachThreadInput,Focus,WPF,Window,Activate
+categories: WPF,Windows
 weblogName: West Wind Web Log
 postId: 2045438
 permalink: https://weblog.west-wind.com/posts/2020/Oct/12/Window-Activation-Headaches-in-WPF
 postDate: 2020-10-12T12:13:57.9718155-10:00
+postStatus: publish
+dontInferFeaturedImage: false
+stripH1Header: true
 ---
 # Window Activation Headaches in WPF
 
@@ -86,7 +90,7 @@ Yup - clear as mud.
 ## Take 1 - Using SetForegroundWindow()
 After trying a lot of different combinations of `Activate()`, `Focus()`, various `Dispatcher` nesting modes, I found  that **nothing WPF native worked** to bring MM to the front and get it focused. To even get it to the front I had use `Topmost` setting it to `true` and then turning it off with a `Dispatcher` in a separate cycle. And even with that I **still would get no focus** on the window. Yuk!
 
-Desperate I decided to use Windows API calls instead. To be sure I tested this out in [LinqPad](https://www.linqpad.net/) first: 
+Desperate I decided to use Windows API calls instead. To be sure I tested this out in [LinqPad](https://www.linqpad.net/?affiliate=4n4zaa6t) first: 
 
 ```cs
 void Main()
@@ -103,7 +107,7 @@ public static extern IntPtr SetForegroundWindow(IntPtr hWnd);
 public static extern IntPtr FindWindow(IntPtr ZeroOnly, string lpWindowName);
 ```
 
-and that worked! Using the code in LinqPad I was able to activate MM and get the cursor focus into the editor. Promising!
+and that worked! Using the code in [LinqPad](https://www.linqpad.net/?affiliate=4n4zaa6t) I was able to activate MM and get the cursor focus into the editor. Promising!
 
 So then I plugged that code into my `Dispatcher` call:
 

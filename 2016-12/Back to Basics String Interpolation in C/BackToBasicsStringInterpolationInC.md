@@ -8,6 +8,9 @@ weblogName: West Wind Web Log
 postId: 100480
 permalink: https://weblog.west-wind.com/posts/2016/Dec/27/Back-to-Basics-String-Interpolation-in-C
 postDate: 2020-01-13T12:39:05.0226461-10:00
+postStatus: publish
+dontInferFeaturedImage: false
+stripH1Header: true
 ---
 # Back to Basics: String Interpolation in C#
 
@@ -25,7 +28,7 @@ You can think of String Interpolation of compiler sugar around the `string.Forma
 ### String Interpolation - Inline Template Literals
 String Interpolation is like an inlined, much more readable version of `string.Format()`. Rather than using `string.Format()` with `{0}`, `{1}` etc. for value embedding, you can use `{varNameOrExpression}` directly inside of the string content.
 
-To demonstrate let's look at creating an embedded string using string.Format() first. I'm using [LinqPad](https://www.linqpad.net/) here and you can find these examples in a [Gist on GitHub](https://gist.github.com/RickStrahl/ef851ce1597b97ee0c2dba06a858db07):
+To demonstrate let's look at creating an embedded string using string.Format() first. I'm using [LinqPad](https://www.linqpad.net/?affiliate=4n4zaa6t) here and you can find these examples in a [Gist on GitHub](https://gist.github.com/RickStrahl/ef851ce1597b97ee0c2dba06a858db07):
 
 **string.Format()**  
 ```csharp
@@ -156,7 +159,7 @@ string output = $"{name}, you've been here {accesses:n0} times.";
 output.Dump();
 ```	
 
-which turns into this IL code (as decompiled by [LinqPad](https://www.linqpad.net/)):
+which turns into this IL code (as decompiled by [LinqPad](https://www.linqpad.net/?affiliate=4n4zaa6t)):
 
 ```text
 IL_0000:  nop         
@@ -221,9 +224,9 @@ But this is micro optimization at best. If performance is that important to you 
 You can use String Interpolation with C# 6.0, and any post 4.5 version of .NET assuming you are using the C# 6 or later Roslyn compiler. Although Roslyn can compile down to .NET 4, String Interpolation relies on newer features of the framework to work properly - specifically **FormattableString**. You can still use this feature in older versions by [poly filling the missing methods](https://www.thomaslevesque.com/2015/02/24/customizing-string-interpolation-in-c-6/). Thanks to [Thomas Levesque](https://twitter.com/thomaslevesque) for pointing this out in the comments. 
 
 ### Refactoring Concatenated Strings to Interpolated Strings
-Both Resharper and Visual Studio have refactorings for turning concatenated strings into Interpolated Strings.
+Both ReSharper and Visual Studio have refactorings for turning concatenated strings into Interpolated Strings.
 
-If you're using [ReSharper from Jetbrains](https://www.jetbrains.com/resharper/) you can  use the **Convert concatenation to interpolation** Refactoring:
+If you're using [ReSharper from JetBrains](https://www.jetbrains.com/resharper/) you can  use the **Convert concatenation to interpolation** Refactoring:
 
 ![](Refactoring.png)
 
@@ -243,7 +246,7 @@ What do you use String Interpolation for? Chime in in the comments.
 
 ### Resources
 * [String Interpolation Sample Gist](https://gist.github.com/RickStrahl/ef851ce1597b97ee0c2dba06a858db07) (LinqPad)
-* [LinqPad](https://www.linqpad.net/)
+* [LinqPad](https://www.linqpad.net/?affiliate=4n4zaa6t)
 * [Customizing String Interpolation in C# 6](https://www.thomaslevesque.com/2015/02/24/customizing-string-interpolation-in-c-6/)
 
 <small>post created with [Markdown Monster](https://markdownmonster.west-wind.com/)</small>

@@ -65,7 +65,18 @@ CN=ftp.example.com, O=Example Corp, C=US
 
 And that's all it takes. I didn't put those in here and it worked fine without - only the CN entry is required especially for the local admin certificate. 
 
+
+##AD##
+
 ## Summary
 Filezilla isn't known for nice interfaces and the Admin interfaces are clearly very Unix focused and assume a lot of things. This is one of those cases. It's not the first time I've stumbled on this, which is why I'm here writing this trivial bit of information down in the hopes it will help burn it into my brain so I remember next time. 😁 
 
-##AD##
+
+<div style="margin-top: 30px;font-size: 0.8em;
+            border-top: 1px solid #eee;padding-top: 8px;">
+    <img src="https://markdownmonster.west-wind.com/favicon.png"
+         style="height: 20px;float: left; margin-right: 10px;"/>
+    this post created and published with the 
+    <a href="https://markdownmonster.west-wind.com" 
+       target="top">Markdown Monster Editor</a> 
+</div>

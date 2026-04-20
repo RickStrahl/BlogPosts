@@ -29,18 +29,35 @@ Here are a few approaches available:
 
 1. Application Protocols (for launching applications and send minimal data)
 2. Desktop App Web Server hosted for Browser to connect to
-3.  Web Socket Server for Desktop App
 
-In these two articles I'll focus on #1 and #3 first individually and then in combination.
 
 ## What are Application Protocols
 You may not have heard of the term **Application Protocols**, but you've almost surely used them before. I used refer to Application Protocols as **URL Monikers** (dating back the IE protocol handlers) or you might have heard others refer to them as **Url Schemes**.
 
 In a nutshell Application Protocols are the prefix used on a URL that determines the *protocol* used for that URL. The most obvious of these *schemes* are `http:<url>` and `https:<url>`. Others you've used are `mailto:<emailAddress>`, `ftp:<site>`. Others yet you might have seen are application specific handlers like `skype:<number>` or `zoom:<meetingId>` to name a couple.
 
-Application Protocols can be created for **any application**, and so I created a `markdownmonster:` Application Protocol handler. Protocol handlers can be used as:
+Application Protocols can be created for **any application**, and so I created a `markdownmonster:` Application Protocol handler that lets you activate Markdown Monster externally.
 
-* URLs in a browser
-* Can be executed by `ShellExecute`
+Protocol handlers can be invoked from:
 
-it requires entries in the Administrative `HKEY_ROOT` hive of the registry, meaning that you need an installer or at minimum and Admin elevated process to create these handlers.
+* A Url from a Web Browser
+* Via Windows `ShellExecute`
+
+which means that it's possible to do simple interactions from just about any type of application.
+
+## Installation Required
+There's a catch however: Application Protocol handlers have to be registed on the machine. On Windows this means registering via a few Registry keys that define the **Moniker** (ie. `markdownmonster:`) and which application gets invoked. It's somewhat similar to extension mappings in Windows, which map an application extension to a shell command.
+
+Once registered Windows then launches the shell command that is registered for the moniker with a command line that is the entire moniker.
+
+It's up to your application to handle the moniker and to come up with an appropriate moniker syntax to determine what you need to do in response to a given moniker *command*.
+
+There are a couple of approaches I've seen:
+
+1. **Multiple protocol handlers for different operations**  
+This scenario uses multiple separate moniker registrations that all map to your main executable.  So you'd use monikers  like `markdownmonster.open:` and `markdownmonster.new` with multiple sets of registry entries for each.
+
+2. **Single Protocol Handler with Action Commands**  
+Rather than registering several protocol handlers, a single protocol handler includes both the command and the parameter(s) for each operation.
+
+I opted for the latter, since we need to already parse the inbound file moniker string anyway. 

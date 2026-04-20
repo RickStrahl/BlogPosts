@@ -6,10 +6,11 @@ keywords: Version,Formatting
 categories: .NET,C#
 weblogName: West Wind Web Log
 postId: 4445887
-permalink: https://weblog.west-wind.com/posts/2024/Jun/13/C-Version-Formatting
-postDate: 2024-06-13T20:12:37.9215776-07:00
+permalink: https://weblog.west-wind.com/posts/2024/Jun/13/C-Version-String-Formatting
+postDate: 2024-06-13T17:12:37.9215776-10:00
 postStatus: publish
 dontInferFeaturedImage: false
+stripH1Header: true
 dontStripH1Header: false
 ---
 # C# Version String Formatting
@@ -20,7 +21,7 @@ How many times have I sat down trying to get versions formatted correctly for di
 
 For display purposes I don't want to display versions like `8.0.0.0` or even `8.0.0` but rather `8.0`. But if have versions higher like `8.0.1.0` I **do** want to display `8.0.1` - in other words it's not a fixed number of version components. 
 
-At first it all seems easy enough - you can use `version.ToString()` or specific format stringlike  `$"{v.Major}.{v.Minor}.{Build}`. That works, but if you don't want the `.0` at the end. Trimming `.` and `0` also can bite you on a `2.0` release. So there are a few little gotchas, and I've been here one too many times...
+At first it all seems easy enough - you can use `version.ToString()` or specific format string like  `$"{v.Major}.{v.Minor}.{Build}`. That works, but if you don't want the `.0` at the end. Trimming `.` and `0` also can bite you on a `2.0` release. So there are a few little gotchas, and I've been here one too many times...
 
 ## Native Version Display
 For the simple things there are many ways to display version information natively:
@@ -77,7 +78,7 @@ string vs = $"{Major}.{Minor}.{Build}.{Revision}".TrimEnd('.','0');   // 8
 Ooops!
 
 ## Consistent Version Function
-This isn't a critical requirement, but I have so many applications where I display version information to users that I finally decided to create a function that does this generically for me instead of spending a 20 minutes of screwing each time I run into this. It took me quite a bit longer than 20 minutes as i had a false start with pure string parsing before settling on the array token approach used below.
+This isn't a critical requirement, but I have so many applications where I display version information to users that I finally decided to create a function that does this generically for me instead of spending a 20 minutes of screwing with this each time I run into this. It took me quite a bit longer than 20 minutes as i had a false start with pure string parsing before settling on the array token approach used below.
 
 Here's what I ended up with (after some refactoring via *Richard Deeming's* comment):
 
@@ -120,7 +121,7 @@ public static class VersionExtensions
 
 The code is pretty simple - the function is more about *not having to think about how this is supposed to work*, which is a big part of the reason for its existence. 😄
 
-The idea that the first value is preferred display mode. If you specify 2 minimum token the idea is that you use versions like `8.1` or `1.0`. The second value specify how many tokens you can use above that. If any of these 'extra' values are `.0` they are stripped. So if you have:
+The idea that the first value is the preferred display mode. If you specify 2 minimum token the idea is that you use versions like `8.1` or `1.0`. The second value specify how many tokens you can use above that. If any of these 'extra' values are `.0` they are stripped. So if you have:
 
 ```cs
 var version = new Version("8.0.1.2");
@@ -190,7 +191,7 @@ verString = version.FormatVersion(2, 4);
 Assert.AreEqual(verString, "8.3.0.2");
 ```
 
-Note that example #3 in the last might seem like it go several ways. The way this code works, `maxTokens` determines the how many tokens are read and worked on. So if a non-zero value exists beyond the `maxTokens` value it's ignored completely. So if the last value is zero it can be stripped regardless of the non-zero value past the `maxTokens` value.
+Note that example #3 in the last might seem like it goes several ways. The way this code works, `maxTokens` determines how many tokens are read and worked on. So if a non-zero value exists beyond the `maxTokens` value it's ignored completely. So if the last value is zero it can be stripped regardless of the non-zero value past the `maxTokens` value.
 
 ##AD##
 
@@ -199,7 +200,9 @@ Obviously not anything earth shattering, and perhaps a very limited use case, bu
 
 And not having to figure this out all over again and not think about it again is even better!
 
-This might save you a few minutes trying to get a version string formatted correctly and with some options for multiple scenarios. I'll probably be back here and maybe I'll even remember I added this as a utility helper to [Westwind.Utilities](https://learn.microsoft.com/en-us/dotnet/api/system.version.tostring?view=net-8.0#system-version-tostring(system-int32)) 😄
+This might save you a few minutes trying to get a version string formatted correctly and with some options for multiple scenarios. I'll probably be back here and maybe I'll even remember I added this as a utility helper to [Westwind.Utilities](https://learn.microsoft.com/en-us/dotnet/api/system.version.tostring?view=net-8.0#system-version-tostring(system-int32)) 
+
+*<small>(it's 1 1/2 years later and sure enough I forgot I built this - somebody me at my own post 😄)</small>*
 
 ## Resources
 

@@ -1,12 +1,16 @@
 ---
 title: Uri.AbsoluteUri and UrlEncoding of Local File Urls
+featuredImageUrl: https://weblog.west-wind.com/images/2025/Uri.AbsoluteUri-and-UrlEncoding-of-Local-Urls/Links.jpg
 abstract: Ran into an interesting problem with the Uri class and local file URLs today. The problem is that Urls were not properly Url encoding and decoding with the Url treated incorrectly. After a bit of experimenting it turns out that the way the file URL is created is critical to the Url parsing behavior of the Uri class.
-categories: .NET
 keywords: .NET,Uri,UrlDecoding,Local File,AbsoluteUri
+categories: .NET
 weblogName: West Wind Web Log
 postId: 1363332
 permalink: https://weblog.west-wind.com/posts/2019/Aug/20/UriAbsoluteUri-and-UrlEncoding-of-Local-File-Urls
-postDate: 2019-08-20T13:34:51.6653618-07:00
+postDate: 2019-08-20T10:34:51.6653618-10:00
+postStatus: publish
+dontInferFeaturedImage: false
+stripH1Header: true
 ---
 # Uri.AbsoluteUri and UrlEncoding of Local File Urls
 
@@ -157,7 +161,7 @@ imageData = File.ReadAllBytes(uri.LocalPath);
 
 This removes any need to do explicit UrlDecoding as I was doing previously in my code.
 
-If you want to play around and see the behavior differences between the two assignment modes I've put my simple LINQPad tests [in a .NET Fiddle](https://dotnetfiddle.net/o6hIp9).
+If you want to play around and see the behavior differences between the two assignment modes I've put my simple [LinqPad](https://www.linqpad.net/?affiliate=4n4zaa6t) tests [in a .NET Fiddle](https://dotnetfiddle.net/o6hIp9).
 
 
 ## Relevant Uri Path Properties

@@ -1,12 +1,16 @@
 ﻿---
 title: Static Constructor Failures and Declaration Order
+featuredImageUrl: https://weblog.west-wind.com/images/2025/Static-Constructors-and-Declaration-Order-Errors/ConstructionFailure.jpg
 abstract: I ran into an ugly problem today with an application where nested static constructors where not doing the expected thing - failing to provide a value when one should be available. It turns out the issue has to do with constructor calls nesting and the order in which auto-initialized values are assigned.
 keywords: .NET, constructor, static, ctor, nesting, C#
 categories: .NET, C#
 weblogName: West Wind Web Log
 postId: 1706001
-permalink: https://weblog.west-wind.com/posts/2020/May/04/Static-Constructors-and-Declaration-Order-Errors
+permalink: https://weblog.west-wind.com/posts/2020/May/04/Static-Constructor-Failures-and-Declaration-Order
 postDate: 2020-05-04T14:24:32.1246327-10:00
+postStatus: publish
+dontInferFeaturedImage: false
+stripH1Header: true
 ---
 # Static Constructor Failures and Declaration Order 
 
@@ -14,7 +18,7 @@ postDate: 2020-05-04T14:24:32.1246327-10:00
 
 I ran into a weird and hard to identify error today that wasted way more time than I care to admit because you know... assumptions on what you know when you don't actually know :smile: And yes this squarely falls in the **Operator Error** category, but I think a mistake that's relatively easy to make - and miss.
 
-Check out the following bit of code and see why this would fail (you can paste this into [LinqPad](https://www.linqpad.net/) to execute):
+Check out the following bit of code and see why this would fail (you can paste this into [LinqPad](https://www.linqpad.net/?affiliate=4n4zaa6t) to execute):
 
 ```cs
 void Main()
@@ -44,7 +48,7 @@ public class LicenseConfiguration
 }
 ```
 
-In LinqPad this fails with the following error:
+In [LinqPad](https://www.linqpad.net/?affiliate=4n4zaa6t) this fails with the following error:
 
 ![](LP6_FailedStaticByteArray.png)
 

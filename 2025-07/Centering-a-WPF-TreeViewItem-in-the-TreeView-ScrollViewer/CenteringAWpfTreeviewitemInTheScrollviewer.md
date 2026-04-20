@@ -207,3 +207,12 @@ File this one away under *Things that should just work, but don't!* So many thin
 Of course if you're anything like me, you'll do this manually a 100 times before you wisen up and build something reusable. And that's the point of this post - it'll serve as a reminder to me and quickly find the solution.
 
 Or you can ask an LLM and get an incomplete solution... ask me how I know! 😂  And yeah, that's why I still bother writing helper functions like this, and even write them up in a blog post.
+
+<div style="margin-top: 30px;font-size: 0.8em;
+            border-top: 1px solid #eee;padding-top: 8px;">
+    <img src="https://markdownmonster.west-wind.com/favicon.png"
+         style="height: 20px;float: left; margin-right: 10px;"/>
+    this post created and published with the 
+    <a href="https://markdownmonster.west-wind.com" 
+       target="top">Markdown Monster Editor</a> 
+</div>

@@ -312,3 +312,12 @@ The good news is in some cases you can work around the limitations even generica
 
 * [ZipFile class](https://learn.microsoft.com/en-us/dotnet/api/system.io.compression.zipfile?view=net-9.0)
 * [Integrating Long Path Names in Windows Applications](https://weblog.west-wind.com/posts/2022/Jan/03/Integrating-Long-Path-Names-in-Windows-Applications)
+
+<div style="margin-top: 30px;font-size: 0.8em;
+            border-top: 1px solid #eee;padding-top: 8px;">
+    <img src="https://markdownmonster.west-wind.com/favicon.png"
+         style="height: 20px;float: left; margin-right: 10px;"/>
+    this post created and published with the 
+    <a href="https://markdownmonster.west-wind.com" 
+       target="top">Markdown Monster Editor</a> 
+</div>
