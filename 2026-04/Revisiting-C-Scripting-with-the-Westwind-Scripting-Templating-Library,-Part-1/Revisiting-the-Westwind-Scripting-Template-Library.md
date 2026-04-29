@@ -1,8 +1,14 @@
 ---
 title: Revisiting C# Scripting with the Westwind.Scripting Templating Library, Part 1
+featuredImageUrl: https://weblog.west-wind.com/images/2026/Revisiting-C-Scripting-with-the-Westwind-Scripting-Templating-Library,-Part-1/Scripting-Banner.jpg
 abstract: The `Westwind.Scripting` library provides runtime C# code compilation and execution as well as a C# based Script Template engine using Handlebars style syntax with pure C# code. In this post I discuss use cases for script templating and some examples of how I use in real-world applications, followed by a discussion of the engine's features and the new Layout, Section and Partials feature that was added recently.
-keywords: Script,Template, Layout, Section,Partial
+keywords: C#,Handlebars,Script,Template, Layout, Section,Partial
 categories: .NET, C#
+weblogName: West Wind Web Log
+postId: 5311031
+permalink: https://weblog.west-wind.com/posts/2026/Apr/20/Revisiting-C-Scripting-with-the-WestwindScripting-Templating-Library-Part-1
+postDate: 2026-04-20T13:35:37.6696286-07:00
+postStatus: publish
 dontInferFeaturedImage: false
 stripH1Header: true
 ---
@@ -14,8 +20,7 @@ stripH1Header: true
 > 
 > * Part 1: An introduction to Template Scripting and how it works    <small>*(this post)*</small>
 >   
-> * Part 2: Real world integration for Local Rendering and Web Site Generation
->   <small> *(coming soon)*</small>
+> * [Part 2: Real world integration for Local Rendering and Web Site Generation](https://weblog.west-wind.com/posts/2026/Apr/23/Putting-the-WestwindScripting-Templating-Library-to-work-Part-2)
 
 
 Recently I updated my [C# template scripting engine](https://github.com/RickStrahl/Westwind.Scripting/blob/master/ScriptAndTemplates.md) that uses a `ScriptParser` class in [Westwind.Scripting](https://github.com/RickStrahl/Westwind.Scripting) by adding support for **Layout Pages** and **Sections**. 
@@ -29,16 +34,16 @@ Similar in concept to Razor, which also compiles templates down to runnable code
 There are two main features to the `Westwind.Scripting` library:
 
 * **C# Script Execution Engine**  
-This is the core execution engine that allows you to compile and run C# code at runtime. You can execute code by providing a standalone snippet, a complete method, or an entire class definition to be loaded and accessed dynamically. The engine manages the full lifecycle of the script: generating the necessary wrapper code, compiling it via Roslyn, loading dependencies, caching the resulting assemblies for performance, and executing the compiled code. All of this is covered in [the previous article](https://weblog.west-wind.com/posts/2022/Jun/07/Runtime-C-Code-Compilation-Revisited-for-Roslyn).
+This is the core execution engine that allows you to compile and run C# code from source at runtime. You can execute code by providing a standalone snippet, a complete method, or an entire class definition to be loaded and accessed dynamically. The engine manages the full lifecycle of the script: generating the necessary wrapper code, compiling it via Roslyn, loading dependencies, caching the resulting assemblies for performance, and executing the compiled code. All of this including how it works is covered in [a previous article](https://weblog.west-wind.com/posts/2022/Jun/07/Runtime-C-Code-Compilation-Revisited-for-Roslyn).
 
 * **Template Scripting Engine**  
-The template engine leverages the execution engine by first parsing a Handlebars-style template into C# code, then compiling and executing the generated code. Templates use Handlebars-style syntax with `{{ expression }}` and `{{% codeBlock }}` tags to embed C# expressions and blocks within text using a model object passed in as the execution context. Expressions and code blocks can then access the model's data and methods to expand into the output. Templates can be executed from strings or files, with the model merged into the template as its data context. Because templates can contain code blocks, they can express fairly complex logic. However, it’s preferable to execute extensive logic via model methods rather than directly embedding large blocks of code into the template.
+The template scripting engine and the focus of this post series, leverages the execution engine by first parsing a Handlebars-style template into C# code, then compiling and executing the generated code. Templates use Handlebars-style syntax with `{{ expression }}` and `{{% codeBlock }}` tags to embed C# expressions and blocks within text using a model object passed in as the execution context. Expressions and code blocks can then access the model's data and methods to expand into the output. Templates can be executed from strings or files, with the model merged into the template as its data context. Because templates can contain code blocks, they can (but probably shouldn't) express complex logic.
 
 In this post I'm only focusing on the latter Template Scripting Engine via **ScriptParser**, although that component uses the C# Script Execution after parsing.
 
-**ScriptParser** isn't new and it has undergone a number of changes over its lifetime, but I realize now that I never mentioned it outside of the documentation. Since I spent a bit of time recently adding new features that add **Layout Pages** and **Sections**, this is as good a time as any to write about what it is and why and how it's been very useful to me.
+**ScriptParser** isn't new and it has undergone a number of changes over its lifetime, but I realize now that I never mentioned it outside of the documentation. Since I spent a bit of time recently adding new features that add **Layout Pages** and **Sections**, this is as good a time as any to write about what it is and how it's been very useful to me.
 
-Here's an overview of features:
+Here's an overview of the template features:
 
 * Handlebars-like syntax using raw C# code
 * String based template execution
@@ -56,7 +61,7 @@ Here's an overview of features:
     * `{{@ commented block @}}`
 * Code blocks can be used for:
    * self contained code blocks
-   * Structured statements (for, while, if, using { } etc.)  
+   * Any C# structured statements (for, while, if, using { } etc.)  
      can split across multiple code blocks
      with literal text, expressions and code blocks  
      in between.  **It's all raw C# code!**
@@ -66,11 +71,14 @@ Here's an overview of features:
 	* Compiled code is very efficient
 		* Code is compiled on first execution
 		* First run is slightly slower
-		* Subsequent invocation is faster using cached assembly
-* Detailed Error Handling Support
+		* Subsequent invocation is faster
+		* Code is cached to avoid re-compilation and startup cost 
+		  on subsequent execution
+* Error Handling Support
 	* Captures Compilation and Runtime errors
 	* Compilation errors capture line numbers and source reference
 	* Runtime Errors can provide stack info
+	* Compiled source can be captured
 
 
 ## Why Build?
@@ -401,13 +409,15 @@ Markdown Monster has a dynamic execution feature in the [Markdown Monster for th
 Here's an example of the Snippets Addin in Markdown Monster, running user provided snippets:
 
 ![](https://weblog.west-wind.com/images/2022/Moving-old-Dynamic-Compilation-Code-to-use-Roslyn/SnippetExpansion.gif)  
-<small>**Figure 2** - Snippet Expansion in Markdown Monster uses template expansions with C# code</small>
+<small>**Figure 3** - Snippet Expansion in Markdown Monster uses template expansions with C# code</small>
+
+There's some more information in the [Markdown Monster Docs](https://markdownmonster.west-wind.com/docs/Addins/Snippets-Addin-Snippet-Template-Expansion.html).
 
 #### Documentation Monster Topic Generation
 I also use the ScriptParser to generate output for my documentation solution [Documentation Monster](https://documentationmonster.com) which creates a self-contained Web site for documentation (Examples: [here (product)](https://markdownmonster.west-wind.com/docs) and [here (product)](https://websurge.west-wind.com/docs/) and [here (generated class reference)](https://docs.west-wind.com/westwind.utilities/)). Html is generated from Templates for live previews in real time as you type and for final bulk output generation of the entire Documentation project. The process is blazing fast:  2.5k+ Html topics generated in ~10 seconds in one project.
 
 ![Documentation Monster Preview And Site Generation](./DocumentationMonsterPreviewAndSiteGeneration.png)
-<small>**Figure 3** - Documentation Monster renders topics in the previewer and eventually in a fully generated Web site of Html pages using various topic templates merged with topic content</small>
+<small>**Figure 4** - Documentation Monster renders topics in the previewer and eventually in a fully generated Web site of Html pages using various topic templates merged with topic content</small>
 
 #### Bulk E-Mail Generation for Notifications
 I also use the script engine for creating a simple mail merge engine that runs against my customer and order database. I create mailing documents with embedded data that comes from various internal databases driven through a set of business objects. Code snippets at the top of templates drive the controller code, and the template expressions do the view rendering. In this case it's a background service console app that gets called every few days to check for renewals and sends out various generated and mail merged notifications on a regular schedule.
@@ -550,14 +560,14 @@ Code Blocks can be single line blocks as shown in the first example, or multi-li
 To give you an idea of a more real world example of a template here's one of my Documentation Monster topic templates in VS Code:
 
 ![Template Example](./TemplateExample.png)  
-<small>**Figure 4** - A real world example of a template that renders a documentation topic for a Class Header. </small>
+<small>**Figure 5** - A real world example of a template that renders a documentation topic for a Class Header. </small>
 
 You can see there's a mixture of expressions and code blocks and nested code blocks. Generally the template inline code is kept very simple. While it's possible to write complex C# logic in the template, personally I prefer code helpers for complex operations. For example, generating a Child Topics List as a list, or creating a list of members for a Class Header is much better done in code than an enormouse code block inline of the template. You can do that if you want to, but it's preferred to externalize complex logic to helpers on the model. The advantage is that you get to write your code in your development IDE with all the editor tooling and completions, and you can independently test the logic. Just as importantly: You can re-use the functionality in multiple templates.
 
 Here's what this rendered template **ClassHeader** looks like:
 
 ![Template Example Rendered](./TemplateExampleRendered.png)  
-<small>**Figure 4** - The rendered template has complex page elements that are rendered in external library code rather than embedding complex code into the template</small>
+<small>**Figure 6** - The rendered template has complex page elements that are rendered in external library code rather than embedding complex code into the template</small>
 
 ### References and Namespaces
 In the first examples,  I have to explicitly add references to the model type and utility library.
@@ -730,7 +740,7 @@ Assembly caching uses a `static` object collection. Assemblies are loaded into t
 Error handling for templates is critical as you may run into compilation errors as you're creating your templates:
 
 ![Template Compilation Error With Code](./TemplateErrorWithCode.png)  
-<small>**Figure 99** - A template compilation error shows code, so that you can cross reference back into your original template</small>
+<small>**Figure 7** - A template compilation error shows code, so that you can cross reference back into your original template</small>
 
 Errors are captured on the ScriptEngine's `ErrorMessage` property. There are two `scriptParser.ScriptEngine.ErrorType` values:
 
@@ -982,6 +992,10 @@ In Part 2, I'll expand on usage in a real-world scenario for Html output generat
 Until then  give this library a try and see where it might fit for your use cases.
 
 ## Resources
+* [Part 2: Putting the Westwind.Scripting Templating Library to work](https://weblog.west-wind.com/posts/2026/Apr/23/Putting-the-WestwindScripting-Templating-Library-to-work-Part-2)
 * [Westwind.Scripting Library on GitHub](https://github.com/RickStrahl/Westwind.Scripting)
 * [Westwind.Scripting Templating Features](https://github.com/RickStrahl/Westwind.Scripting/blob/master/ScriptAndTemplates.md)
 * [Previous Post: Runtime Compilation with Roslyn and Building Westwind.Scripting](https://weblog.west-wind.com/posts/2022/Jun/07/Runtime-C-Code-Compilation-Revisited-for-Roslyn)
+* [Documentation Monster](https://documentationmonster.com)
+* [Markdown Monster](https://markdownmonster.west-wind.com)
+* [Markdown Monster Snippets Expansions](https://markdownmonster.west-wind.com/docs/Addins/Snippets-Addin-Snippet-Template-Expansion.html)
