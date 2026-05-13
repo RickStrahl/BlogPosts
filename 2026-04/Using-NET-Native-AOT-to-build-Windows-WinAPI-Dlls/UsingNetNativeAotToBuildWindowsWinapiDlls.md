@@ -233,6 +233,8 @@ That leaves environments that have good native C interfaces like Python or no ea
 ##AD##
 
 ## Summary
-In the end using AOT to create native DLLs is a very niche feature that has a very narrow optimal usage range, that probably benefits only certain bootstrapping scenarios. Almost everything else is probably better handled with full .NET interop with the same performance profile other than initial JIT compile overhead.
+In the end using AOT to create native DLLs is a very niche feature that has a very narrow optimal usage range that probably benefits only certain bootstrapping scenarios. Almost everything else is probably better handled with full .NET interop with the same performance profile other than initial JIT compile overhead.
+
+The only benefit I see here really is for people like me who dig out C++ every 5 years for some system level interface, only to take 2 weeks to create something that would take 10 seconds in .NET :smile: And with LLMs today that probably can compress down to 1 hour and some incomprehensible C/C++ code :joy:.
 
 However, if you find yourself with one of those very narrow use cases, I hope this post has given you the background for what you need to know to create your AOT DLLs...
