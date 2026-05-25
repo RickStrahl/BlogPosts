@@ -1,18 +1,20 @@
 ---
 title: FoxPro Running on a Windows ARM Device
-featuredImageUrl: https://support.west-wind.com/PostImages/2024/_MHkmIR1jOIS5yFki.png
 abstract: I recently picked up a Windows ARM 'Co-Pilot' capable laptop and took it for a spin running my typical spread of Windows applications and tools. I also checked out how well it works with FoxPro - here's what I found.
 keywords: 'ARM, Foxpro, '
 categories: FoxPro
-weblogName: Web Connection Weblog
+weblogName: Web Connection Blog (BlazePost West Wind)
 postId: 57035
-postDate: 2024-11-07T00:42:14.5736550-08:00
-postStatus: publish
-dontInferFeaturedImage: false
+permalink: https://webconnectionblog.west-wind.com/posts/2024/Nov/07/FoxPro-Running-on-a-Windows-ARM-Device
+featuredImageUrl: https://webconnectionblog.west-wind.com/imageContent/2026/FoxPro-Running-on-Windows-ARM-Device/Cors-ArmBanner.jpg
 stripH1Header: true
+postStatus: publish
+postDate: 2024-11-07T00:42:14.5736550-08:00
 dontStripH1Header: false
 ---
 # FoxPro Running on a Windows ARM Device
+
+![Cors ArmBanner](./Cors-ArmBanner.jpg)
 
 I recently picked up a Windows ARM device in the form of a [Samsung Galaxy Book 4](https://www.samsung.com/us/computing/galaxy-books/galaxy-book4-edge/buy/galaxy-book4-edge-14-qualcomm-snapdragon-x-elite-512gb-sapphire-blue-np940xma-kb1us/) with a SnapDragon X Elite chip. Best Buy had a sale going for $799 at the time, and so I 'snapped' one up. 
 

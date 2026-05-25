@@ -1,15 +1,15 @@
 ---
 title: What is CORS and how to set it up in West Wind Web Connection
-featuredImageUrl: Https://west-wind.com/wconnect/weblog/imageContent/2025/What-is-CORS-and-how-to-set-it-up-in-West-Wind-Web-Connection/PreflightOptionsRequestion.png
 abstract: If you're building REST Services that is called from a Web Browser using Http client calls via `fetch()` or `XMLHttpRequest` and that calls a domain or sub-domain other than the hosting page, you need to make sure your server implements the CORS protocol, or client requests will fail. In this post I describe the basics of CORS and how you can easily implement it Web Connection.
 keywords: CORS, Web Connection
 categories: Web Connection, Web
-weblogName: Web Connection Weblog
+weblogName: Web Connection Blog (BlazePost West Wind)
 postId: 57038
-postDate: 2025-08-03T14:38:39.8417843-10:00
-postStatus: publish
-dontInferFeaturedImage: false
+permalink: https://webconnectionblog.west-wind.com/posts/2025/Aug/04/What-is-CORS-and-how-to-set-it-up-in-West-Wind-Web-Connection
+featuredImageUrl: https://webconnectionblog.west-wind.com/imageContent/2026/What-is-CORS-and-how-to-set-it-up-in-West-Wind-Web-Connection/CORSBanner.jpg
 stripH1Header: true
+postStatus: publish
+postDate: 2025-08-03T17:38:39.8417843-07:00
 ---
 # What is CORS and how to set it up in West Wind Web Connection
 
