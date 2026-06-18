@@ -1,20 +1,35 @@
 ---
 title: Why use a dedicated Markdown Editor?
+abstract: Most generic editors have support for Markdown syntax and for many basic markdown editing tasks that might be fine. But if you're extensively working with Markdown on a regular basis it is constructive to use a dedicated Markdown editor that understands many common Markdown operations and can greatly simplify and speed them up as well as providing useful support features for linking and embedding. In this post I describe why I use a dedicated Markdown editor rather than a generic editor for my Markdown editing.
 keywords: Markdown,Markdown Monster,Editor,Productivity,Visual Studio Code
-weblogName: Markdown Monster (Medium)
+categories: Markdown, Markdown Monster
+weblogName: Markdown Monster Blog (BlazePost West Wind)
+postId: isc3be1m50tz
+permalink: https://markdownmonster.west-wind.com/blog/posts/2020/May/25/Why-use-a-dedicated-Markdown-Editor
+featuredImageUrl: https://markdownmonster.west-wind.com/blog/imageContent/2017/Why-use-a-dedicated-Markdown-Editor/Banner.jpg
+stripH1Header: true
+postStatus: publish
+postDate: 2017-07-25T23:13:42.9015818-07:00
+customFields:
+  new_key:
+    id: 
+    key: new_key
+    value: ''
 ---
 # Why use a dedicated Markdown Editor?
+
+![Banner](./Banner.jpg)
 
 I often get asked why anybody would need a dedicated Markdown Editor. After all, just about any of the many multi-purpose editors out there today provide decent Markdown editing support with basic previewing and syntax highlighting.
 
 > So why would you need a tools like [Markdown Monster](https://markdownmonster.west-wind.com) as a dedicated Markdown  editor?
 
-That's a fair question. I use multi-purpose editors most of my developer day. I use [Visual Studio Code](https://code.visualstudio.com/) as my primary text and project editor and I have it open almost continuously throughout the day for editing code and all sorts of text documents. It serves as my project browser, terminal, development tool and general purpose text and script editor. And yes, I even use it to edit Markdown text quite frequent, because frankly the [Markdown support in VS Code](https://code.visualstudio.com/Docs/languages/markdown) is pretty damn good - for a generic editor.
+That's a fair question. I use multi-purpose editors most of my developer day. I use [Visual Studio Code](https://code.visualstudio.com/) as my primary text and project editor and I have it open almost continuously throughout the day for editing code and all sorts of text documents. It serves as my project browser, terminal, development tool and general purpose text and script editor. And yes, I even use it to edit Markdown text quite frequently, because frankly the [Markdown support in VS Code](https://code.visualstudio.com/Docs/languages/markdown) is pretty decent - for a generic editor.
 
 ### So why use a Custom Editor like Markdown Monster?
-But when it comes to doing some *serious* writing, meaning I'm writing a longer piece of documentation, a blog post or article, I'll reach for Markdown Monster.
+But when it comes to doing some *serious* writing, meaning I'm writing a longer piece of documentation, a blog post or article, I'll reach for a real editor - in my case Markdown Monster (and yes I'm biased since I'm the author).
 
-Generic editor Markdown support is great, but in essence these editors are just that - generic editors that provide text editing with some additional previewing of rendered Markdown. If that's all you need - that's great - an editor will serve you well.
+Generic editor Markdown support is great, but these editors are just that - generic editors that provide text editing with some additional previewing of rendered Markdown. If quick editing of a small bit of text is all you need - that's great - an editor will serve you well for Markdown.
 
 But if you're using Markdown for more than just writing a short `Readme.md` in your favorite Github repo, you may find that there are a lot of things that can be optimized while writing Markdown text. Even though Markdown is text centric and can be entered almost entirely via keyboard entered text, that doesn't mean that there aren't a host of optimizations that you can apply to provide a better editing workflow.
 
@@ -25,13 +40,19 @@ Markdown Monster provides a host of features that you're not likely to find in a
 Here's a list of a few things that go beyond basic editing features:
 
 #### [Rich Image Support](http://markdownmonster.west-wind.com/docs/_4s01ezteq.htm)
-You can embed images into MM in a variety of ways: Using markdown text, using a smart image dialog that can detect clipboard images and image Urls, pasting images directly from the Clipboard or dragging and dropping images into markdown document directly.
+You can embed images into MM in a variety of ways: Using markdown text, using a smart image dialog that can detect clipboard images and image Urls, *pasting images directly from the Clipboard* or dragging and dropping images from Web pages, Explorer or any Shell operation into the markdown document directly.
 
 ![](ImageDialog.png)
 
 
 #### [Capture and Embed Screen Shots](http://markdownmonster.west-wind.com/docs/_4nj0wbomy.htm) 
 MM comes with a built-in Screen Capture tool that lets you select windows to capture. You can run delayed captures to capture mouse cursors and actions (like dropped down menus). If you use SnagIt MM can use it to capture screen content, or you can use trusty old Ctrl & Alt PrtScn to capture a Window or the Screen and then simply paste it into the Markdown document.
+
+The tool is basic, and you can certainly use external tools like SnagIt, the Windows Snipping tool or any other tool and copy the image to the clipboard, then paste it in Markdown document.
+
+MM also integrates directly with SnagIt so you can set up the built-in screen capture to use SnagIt instead of the integrated capture using the same capture and auto-paste workflow.
+
+> Images captured and stored to disk from clipboard or screen captured are also automatically compressed to minimize size.
 
 #### [Inline Spell Checking](http://markdownmonster.west-wind.com/docs/_4rg0wj7pb.htm)
 If you're writing Markdown content you likely are writing text, and that text should be spell checked.
@@ -43,10 +64,25 @@ MM includes a link dialog that lets you highlight text, click (or press Ctrl-K) 
 
 ![](LinkDialog.png)
 
+You can also link to in document links using the Link picker or Document Outline:
+
+![](https://github.com/RickStrahl/ImageDrop/blob/master/MarkdownMonster/Bookmarklinking.gif?raw=true)
+
+MM also includes a built-in Link Checker that makes it easy to find bad links.
+
+![](https://raw.githubusercontent.com/RickStrahl/ImageDrop/refs/heads/master/MarkdownMonster/CheckDocumentLinks.gif)
+
+
+
+
 #### Publishing Content to a Weblog
 If you're writing blog posts and you are using a service that uses Wordpress, MetaWeblog API or Medium, you can directly publish your Markdown to the Weblog using the built-in Weblog Addin.
 
 ![](WeblogDialog.png)
+
+The addin also optionally stores posts and dependencies locally so you can easily republish and search content. 
+
+If you're using static site generators like Jekyll or Ghost - that works just fine too, but you don't really need publishing tools for these platforms. 
 
 #### Paste HTML as Markdown 
 MM lets you convert HTML to Markdown. If you pick up lightly formatted HTML that uses Markdown supported HTML constructs, you can turn that HTML into Markdown simply by selecting some HTML in a browser and using the **Paste Html as Markdown** menu option to paste it. To be clear, this won't work with all HTML - any HTML that doesn't fit within the limited confines of Markdown's support HTML set is pasted as raw HTML.

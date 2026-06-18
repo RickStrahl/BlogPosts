@@ -3,7 +3,12 @@ title: Favorites for better Document Management in Markdown Monster
 abstract: Markdown Monster 1.12.6 introduces a new Favorites feature that makes it easy to add your most commonly used documents to a reusable list of file links. While this is nothing new for browsers, it's a somewhat novel idea for file management, especially when maintain a huge number of lists and notes with Markdown or other text content.
 keywords: Favorites,Notes,Todo,Lists
 categories: Markdown,Markdown Monster
-weblogName: Markdown Monster (Medium)
+weblogName: Markdown Monster Blog (BlazePost West Wind)
+postId: ksrnhkytcs3e
+permalink: https://markdownmonster.west-wind.com/blog/posts/2026/May/26/Favorites-for-better-Document-Management-in-Markdown-Monster
+featuredImageUrl: https://markdownmonster.west-wind.com/blog/imageContent/2018/Faovorites-in-Markdown-Monster/FavoritesInMarkdownMonster.png
+stripH1Header: true
+postStatus: publish
 postDate: 2018-07-11T13:13:06.5444143-07:00
 ---
 # Favorites for better Document Management in Markdown Monster

@@ -5,13 +5,13 @@ keywords: Web Connection
 categories: Web Connection, FoxPro
 weblogName: Web Connection Blog (BlazePost West Wind)
 postId: vvtierno9k12
-permalink: https://webconnectionblog.west-wind.com/posts/2026/May/25/Web-Connection-85-Release-Post
-featuredImageUrl: https://webconnectionblog.west-wind.com/imageContent/2026/Web-Connection-8-5-Release-Post/WebConnection8.5ReleaseBanner.jpg
+permalink: https://webconnection.west-wind.com/blog/posts/2026/May/25/Web-Connection-85-Release-Post
+featuredImageUrl: https://webconnection.west-wind.com/blog/imageContent/2026/Web-Connection-8-5-Release-Post/WebConnection8.5ReleaseBanner.jpg
 stripH1Header: true
 postStatus: publish
 postDate: 2026-05-25T10:52:10.9385327-07:00
 ---
-# Web Connection 5.4 Release Post
+# Web Connection 8.5 Release Post
 
 ![Web Connection8.5 Release Banner](./WebConnection8.5ReleaseBanner.jpg)
 
@@ -19,6 +19,8 @@ I've released Web Connection 8.5 which is a minor maintenance release of the Fox
 
 >  ##### @icon-warning One Potential Breaking Change
 >  There's is one potentially breaking change related to how default passwords and authentication are handled in `wwProcess` and `wwUserSecurity` Authentication. Specifically, this update by default enforces case sensitivity in passwords, which previously it was not. More info below.
+
+##AD##
 
 ## Changes 
 Here are the updated changes in Web Connection 8.5 broken out into some additional detail. As always you can look at the quick overview in the Web Connection Changelog:
@@ -31,7 +33,7 @@ Here are the updated changes in Web Connection 8.5 broken out into some addition
 CORS rules have gotten more strict in browsers recently, with certain browsers disallowing the catch-all `Access-Control-Allow-Origin: *` rule. Previous versions of Web Connection used the `*` value by default to allow all traffic through by default and left customization to you. 
 
 CORS is used by client side Web browser applications typically using JavaScript that use the browser's Http client via the `fetch()` function or the old `XmlHttpRequest` object. 
-The problem with  `*` is that **recent changes** in Web Browser security restrictions do not allow this value longer as a catch-all value. Using that header breaks with an Http `401 Unauthorized` result in the browser.
+The problem with  `*` is that **recent changes** in Web Browser security restrictions do not allow this value any longer as a catch-all value. Using that header breaks with an Http `401 Unauthorized` result in the browser.
 
 The updated CORS configuration fixes this by explicitly specifying the caller's domain, which has the same effect but requires a little bit of extra code.
 
@@ -79,9 +81,9 @@ the code now uses the original user's origin domain:
 Response.AppendHeader("Access-Control-Allow-Origin", lcOrigin)  
 ```
 
-There's also a new `Request.GetOrigin()` method that makes it easier to retrieve `HTTP_ORIGIN` header.
+There's also a new `Request.GetOrigin()` method that makes it easier to retrieve `HTTP_ORIGIN` header. Web Connection now checks for the `HTTP_ORIGIN` header and if not present no longer produces the CORS output as it's not required. The browser only sends the origin header when it needs a CORS response - if it's missing the request doesn't have to produce CORS headers for requests. All of this can improve throughput on plain GET requests for example as the logic and header output is bypassed and not added to the request payload.
 
-There's also an updated topic in the documentation that describes the CORS setup for those of you that need to add or update it in existing applications:
+The CORS documentation topic has been updated to describes the CORS setup for those of you that need to add or update it in existing applications:
 
 * [Adding CORS Support to a REST Service](https://webconnection.west-wind.com/docs/Walk-Through-Tutorials/Step-by-Step-Creating-a-JSON-REST-Service/Step-7-Adding-CORS-support.html)
 
@@ -96,7 +98,7 @@ In essence the default error handle is now wrapped in a secondary try/catch/fina
 > #### @icon-warning You're on your Own if you override wwProcess::OnError
 > Last resort error handling runs through `wwProcess::OnError` which can - and frankly should be - overriden in applications. If you override you become responsible for the error returns so make sure you follow the base class' structure for exception handling. 
 
-### [wwRestProcess::OnJsonError Handler](dm-topic://_o7b75vrgfd)
+### [wwRestProcess::OnJsonError Handler](https://webconnection.west-wind.com/docs/Framework-Classes/Class-wwRestProcess/wwRestProcessOnJsonError.html)
 On a related note REST services now get a new `OnJsonError` method which allows you to intercept REST service errors so you can easily log failures. 
 
 Unlike the page `OnError()` handler, this handler method doesn't generate any output - it only provides a mechanism for capturing the error and potentially logging it. If you want to look at generated output, and based on the headers do error management of some sort you can do so in the [wwRestProcess::OnAfterCallMethod()](https://webconnection.west-wind.com/docs/Framework-Classes/Class-wwRestProcess/wwRestProcessOnAfterCallMethod.html) which provides you the generated output as input.
@@ -117,17 +119,19 @@ You can force all passwords in the DB to lower case and then force the user's in
 You can always subclass the `wwUserSecurity` class and use a customized version that does the lookup in `Authenticate()` exactly as you want it to. The default implementation has now removed the lower casing match for the password when doing the lookup but your version can put that lower casing right back in.
 
 
+##AD##
+
 ## Client Framework Changes
 
 
-### Explicit wwDotnetBridge [GetField()](dm-topic://_70y19t8wr) and [SetField()](dm-topic://_s850mn6vv) Methods
+### Explicit wwDotnetBridge [GetField()](https://webconnection.west-wind.com/docs/Utility-Classes/Class-wwDotnetBridge/wwDotNetBridge-GetField.html) and [SetField()](https://webconnection.west-wind.com/docs/Utility-Classes/Class-wwDotnetBridge/wwDotNetBridge-SetField.html) Methods
 Several people ran into issues with wwDotnetBridge due to a  (not so) recent change that removed the ability to for `GetProperty()` and `SetProperty()` to also access fields. Although it's really not recommended to use fields instead of Properties for public and external access, some people can't resist :smile:
 
 So due to those recent changes, there are now dedicated `GetField()` and `SetField()` methods to that explicitly allow you to retrieve field values including private fields. 
 
 > Note: The original reasoning for field removal from the Property methods was to improve Reflection performance on fewer members to parse.
 
-### [wwSQL::cDefaultLocalServerName - Configurable `Server=` when not provided](../Utility-Classes/Class-wwSQL/wwSqlcDefaultLocalServerName.md)
+### [wwSQL::cDefaultLocalServerName - Configurable `Server=` when not provided](https://webconnection.west-wind.com/docs/Utility-Classes/Class-wwSQL/wwSqlcDefaultLocalServerName.html)
 I recently ran into an issue with a local SQL Server installation that did not - for some reason - work with TCP/IP connections. A botched install that didn't have access to the SQL configuration didn't allow access via TCP/IP and no way to set it. As an aside [Windows ARM devices may also not work TCP/IP with local SQL server installations](https://weblog.west-wind.com/posts/2024/Oct/24/Using-Sql-Server-on-Windows-ARM).
 
 Long story short because TCP/IP failed the default local server name of `server=.` that wwSQL uses didn't work.
@@ -166,7 +170,7 @@ In the end this change allowed us to make a single change in the `wconnect.h` he
 
 > Ideally you should **always** parameterize your connection strings. In a configuration file (create and use `Server.oConfig.cAppConnectionString` or similar) or Environment variables or whatever. Never hardcode connection strings or any potentially configurable value if at all possible. Thank me later! 😄
 
-### [wwFtpClient::AddCertificateFromCertificateStore()](dm-topic://_8ea3e8k6o2) and     [wwFtpClient.AddCertificate()](https://webconnection.west-wind.com/docs/Utility-Classes/West-Wind-Internet-Protocols/Class-wwFtpClient/wwFtpClient-AddCertificate.html)
+### [wwFtpClient::AddCertificateFromCertificateStore()](https://webconnection.west-wind.com/docs/Utility-Classes/West-Wind-Internet-Protocols/Class-wwFtpClient/AddCertificateFromCertificateStore.html) and  [wwFtpClient.AddCertificate()](https://webconnection.west-wind.com/docs/Utility-Classes/West-Wind-Internet-Protocols/Class-wwFtpClient/wwFtpClient-AddCertificate.html)
 Added a new methods that can be used to add a certificate from the certificate store or from `.pfx` files to the connection. 
 
 For the `.AddCertificateFromCertificateStore()` version the certificate has to be installed in the appropriate user or machine certificate store. By default the User Store is used, unless you pass the `llUseMachineName` option as `.T.`.
@@ -185,17 +189,17 @@ For `.AddCertificate()` you need to provide a `.pfx` file. Pfx is a Windows spec
 
 Both of the methods that add certificates have to be called before sending any commands over the `wwFtpClient` connection.
 
-### Fix: [wwSFtpClient::UploadFile](dm-topic://_6wr0zm6jl) and [wwSftpClient::DownloadFile()](dm-topic://_6wr0zm6jk) now preserve File Time  
+### Fix: [wwSFtpClient::UploadFile](https://webconnection.west-wind.com/docs/Utility-Classes/West-Wind-Internet-Protocols/Class-wwFtpClient/wwFtpClient-UploadFile.html) and [wwSftpClient::DownloadFile()](https://webconnection.west-wind.com/docs/Utility-Classes/West-Wind-Internet-Protocols/Class-wwSftpClient/wwSFtpClientDownloadFile.html) now preserve File Time  
 These methods now preserve the uploaded or downloaded file's time stamp on the receiving end when the file is saved. 
 
 SFTP natively is a streaming API and doesn't support automatic timestamps, but wwSftpClient now explicit calls the server API to match the client and server dates by default. If you need different dates, you can use the new `SetFileTime()` method to explicitly change the date.
 
-### [wwSftpClient::SetFileTime()](dm-topic://_octus3bcc6)
+### [wwSftpClient::SetFileTime()](https://webconnection.west-wind.com/docs/Utility-Classes/West-Wind-Internet-Protocols/Class-wwSftpClient/wwSftpClientSetFileTime.html)
 Added new method to allow setting the file time of a server file more easily. 
 
 Note that `UploadFile()` and `DownloadFile()` now preserve file dates by default so there should be less need for this method, but it can be used if you different behavior than our new imposed default of time preservation.
 
-### Fix: Implement missing [wwSftpClient::GetDirectory()](dm-topic://_idnh36dbs9)
+### Fix: Implement missing [wwSftpClient::GetDirectory()](https://webconnection.west-wind.com/docs/Utility-Classes/West-Wind-Internet-Protocols/Class-wwSftpClient/wwSFtpClientGetDirectory.html)
 Added missing `GetDirectory()` method that returns the currently active SFTP directory name as a string. 
 
 Note that to return the files in a directory with its directory and file details, use the `ListFiles()` method.
@@ -216,8 +220,8 @@ The typography has also been updated with more readable fonts, and sizing of the
 
 Finally the tree navigation now manages topic positioning better, both when jumping in to specific topic links from outside of the docs site as well as when searching in the topic tree. Tree searches should also be significantly faster now than before.
 
-### [Web Connection Weblog Facelift](https://webconnectionblog.west-wind.com)
-I've migrated the Web Connection Weblog to my main Weblog engine that I also use and have recently updated on my [main weblog](https://weblog.west-wind.com).
+### [Web Connection Weblog Facelift](https://webconnection.west-wind.com/blog)
+I've migrated the Web Connection Weblog to my main Weblog engine that I also use and have recently updated on my [on my Main Weblog Web Site](https://weblog.west-wind.com).
 
 As a result the blog now has a more modern look with all old content migrated into the new engine. All old links now forward to the new blog site.
 
@@ -227,12 +231,13 @@ The old Web Connection blog site was getting a bit long in the tooth and was a b
 
 The new site has been re-homed at:
 
-https://webconnectionblog.west-wind.com
+https://webconnection.west-wind.com/blog
 
 and all old links into the old site now forward to the new site.
 
 If you run into any dead links, please let me know...
 
+##AD##
 
 ## Summary
 As I mentioned in the beginning, it's been a while since the last release, so a lot of the small fixes have been building up making this is a bigger release than many of the preceding small releases.
@@ -240,3 +245,12 @@ As I mentioned in the beginning, it's been a while since the last release, so a 
 However, none of these updated features and enhancements have any significant impact on existing applications in terms of changes required, with the potential exception of the the password behavior in `wwUserSecurity.Authenticate()`  and by association default `wwUserSecurity` Authentication in `wwProcess`.
 
 Until next time...
+
+<div style="margin-top: 30px;font-size: 0.8em;
+            border-top: 1px solid #eee;padding-top: 8px;">
+    <img src="https://markdownmonster.west-wind.com/favicon.png"
+         style="height: 20px;float: left; margin-right: 10px;"/>
+    this post created and published with the 
+    <a href="https://markdownmonster.west-wind.com" 
+       target="top">Markdown Monster Editor</a> 
+</div>

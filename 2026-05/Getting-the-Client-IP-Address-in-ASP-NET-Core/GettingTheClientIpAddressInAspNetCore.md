@@ -25,7 +25,7 @@ It's simple enough:
 HttpContext?.Connection?.RemoteIpAddress
 ```
 
-but I never remember to look on the context object as I expect it to be on the Request :smile:.
+but I never remember to look on the context object as I expect it to be on the Request 😄.
 
 It's also useful to remember that if requests are proxied, we need to return the **forwarded IP address**, rather than the proxy's IP Address. Finally, in most cases you'd likely want the ipv4 address rather than an IPv6 address.
 
@@ -186,7 +186,7 @@ Nothing new here, but given how often I fumble around with this value, creating 
             border-top: 1px solid #eee;padding-top: 8px;">
     <img src="https://markdownmonster.west-wind.com/favicon.png"
          style="height: 20px;float: left; margin-right: 10px;"/>
-    this post created and published with the 
+    this post was created and published with the 
     <a href="https://markdownmonster.west-wind.com" 
        target="top">Markdown Monster Editor</a> 
 </div>

@@ -1,15 +1,20 @@
 ---
 title: Create a .NET PlantUML Markdown Render Extension
-featuredImageUrl: https://weblog.west-wind.com/images/2024/Create-a-PlantUML-RenderExtension-in-Markdown-Monster/PlantUMLBanner.png
 abstract: PlantUML is a Web based diagramming markup language that can be used to create diagrams using text descriptions that are rendered into images via a PlantUML server. In this post I describe how you can integrate PlantUML image rendering into your .NET application, specifically from a Markdown rendering perspective as Markdown documents are the most common mechanism that PlantUML output is delivered.
 keywords: PlantUml,Markdown,.NET
 categories: .NET, Markdown Monster
-weblogName: West Wind Web Log
-postId: 4512301
-permalink: https://weblog.west-wind.com/posts/2024/Jul/29/Create-a-PlantUML-Markdown-RenderExtension
-postDate: 2024-07-29T12:16:35.2155537-07:00
+weblogName: Markdown Monster Blog (BlazePost West Wind)
+postId: j28zz98icr72
+permalink: https://markdownmonster.west-wind.com/blog/posts/2024/Jul/29/Create-a-Dotnet-PlantUML-Markdown-Render-Extension
+featuredImageUrl: https://weblog.west-wind.com/images/2024/Create-a-PlantUML-RenderExtension-in-Markdown-Monster/PlantUMLBanner.png
+stripH1Header: true
 postStatus: publish
-dontInferFeaturedImage: false
+postDate: 2024-07-29T12:16:35.2155537-07:00
+customFields:
+  mt_date:
+    id: 
+    key: mt_date
+    value: 2024-07-29T12:16:35.2155537-07:00
 dontStripH1Header: false
 ---
 # Create a .NET PlantUML Markdown Render Extension 

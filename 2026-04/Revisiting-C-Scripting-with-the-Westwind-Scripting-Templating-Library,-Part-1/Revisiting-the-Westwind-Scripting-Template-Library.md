@@ -1,16 +1,15 @@
 ---
 title: Revisiting C# Scripting with the Westwind.Scripting Templating Library, Part 1
-featuredImageUrl: https://weblog.west-wind.com/images/2026/Revisiting-C-Scripting-with-the-Westwind-Scripting-Templating-Library,-Part-1/Scripting-Banner.jpg
 abstract: The `Westwind.Scripting` library provides runtime C# code compilation and execution as well as a C# based Script Template engine using Handlebars style syntax with pure C# code. In this post I discuss use cases for script templating and some examples of how I use in real-world applications, followed by a discussion of the engine's features and the new Layout, Section and Partials feature that was added recently.
 keywords: C#,Handlebars,Script,Template, Layout, Section,Partial
 categories: .NET, C#
-weblogName: West Wind Web Log
+weblogName: West Wind Weblog (BlazePost API)
 postId: 5311031
 permalink: https://weblog.west-wind.com/posts/2026/Apr/20/Revisiting-C-Scripting-with-the-WestwindScripting-Templating-Library-Part-1
-postDate: 2026-04-20T13:35:37.6696286-07:00
-postStatus: publish
-dontInferFeaturedImage: false
+featuredImageUrl: https://weblog.west-wind.com/images/2026/Revisiting-C-Scripting-with-the-Westwind-Scripting-Templating-Library,-Part-1/Scripting-Banner.jpg
 stripH1Header: true
+postStatus: publish
+postDate: 2026-04-20T13:35:37.6696286-07:00
 ---
 # Revisiting C# Scripting with the Westwind.Scripting Templating Library, Part 1
 
@@ -999,3 +998,12 @@ Until then  give this library a try and see where it might fit for your use case
 * [Documentation Monster](https://documentationmonster.com)
 * [Markdown Monster](https://markdownmonster.west-wind.com)
 * [Markdown Monster Snippets Expansions](https://markdownmonster.west-wind.com/docs/Addins/Snippets-Addin-Snippet-Template-Expansion.html)
+
+<div style="margin-top: 30px;font-size: 0.8em;
+            border-top: 1px solid #eee;padding-top: 8px;">
+    <img src="https://markdownmonster.west-wind.com/favicon.png"
+         style="height: 20px;float: left; margin-right: 10px;"/>
+    this post was created and published with the 
+    <a href="https://markdownmonster.west-wind.com" 
+       target="top">Markdown Monster Editor</a> 
+</div>

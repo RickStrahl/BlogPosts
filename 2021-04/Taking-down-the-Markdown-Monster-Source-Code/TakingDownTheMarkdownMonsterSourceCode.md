@@ -1,16 +1,20 @@
 ---
 title: Taking down the Markdown Monster Source Code
 abstract: With a heavy heart and a lot of hand wringing, I decided last week to take down the Markdown Monster source code from the public GitHub repository due to rampant abuse of the code to get around licensing restrictions. In this post I give some insight on why I made this decision and provide some general thoughts around the state of software development for software tools.
-categories: Software Development
 keywords: Licensing, Abuse, Markdown Monster, Source Code, OSS, FOSS
-weblogName: West Wind Web Log
-postId: 2567901
-dontInferFeaturedImage: false
-dontStripH1Header: false
+categories: Markdown Monster, Software Development
+weblogName: Markdown Monster Blog (BlazePost West Wind)
+postId: 0zdrjmu7db6y
+permalink: https://markdownmonster.west-wind.com/blog/posts/2021/May/05/Taking-down-the-Markdown-Monster-Source-Code
+featuredImageUrl: https://markdownmonster.west-wind.com/blog/imageContent/2021/Taking-down-the-Markdown-Monster-Source-Code/Denied.png
+stripH1Header: true
 postStatus: publish
-featuredImageUrl: https://weblog.west-wind.com/images/2021/Taking-down-the-Markdown-Monster-Source-Code/Denied.png
-permalink: https://weblog.west-wind.com/posts/2021/May/05/Taking-down-the-Markdown-Monster-Source-Code
 postDate: 2021-05-05T15:51:41.5577294-07:00
+customFields:
+  mt_date:
+    id: 
+    key: mt_date
+    value: 2021-05-05T15:51:41.5577294-07:00
 ---
 # Taking down the Markdown Monster Source Code
 

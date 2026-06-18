@@ -1,11 +1,20 @@
 ﻿---
 title: Introducing Markdown Monster - a new Markdown Editor
-featuredImageUrl: https://weblog.west-wind.com/images/2016/Introducing%20Markdown%20Monster/MarkdownMonster.png
 abstract: I'm happy to announce Version 1.0 of Markdown Monster a Markdown Editor and Weblog Publishing tool for Windows. In this post I give a quick tour of Markdown Monster and provide links to all you need to know to check out this great new Markdown editor.
 keywords: Markdown,Editor,Weblog,Publishing,Documentation
-categories: Markdown,Markdown Monster,Windows
-weblogName: West Wind Web Log
-postId: 55857
+categories: Windows
+weblogName: Markdown Monster Blog (BlazePost West Wind)
+postId: 2h5mvowifrb8
+permalink: https://markdownmonster.west-wind.com/blog/posts/2017/Feb/23/Introducing-Markdown-Monster-a-new-Markdown-Editor
+featuredImageUrl: https://markdownmonster.west-wind.com/blog/imageContent/2017/Introducing-Markdown-Monster/MarkdownMonster.png
+stripH1Header: true
+postStatus: publish
+postDate: 2017-02-23T11:13:01.0035442-08:00
+customFields:
+  mt_date:
+    id: 
+    key: mt_date
+    value: 2017-02-23T12:00:00
 ---
 # Introducing Markdown Monster - a new Markdown Editor
 
@@ -173,31 +182,3 @@ Markdown Monster has become an integral part of my toolset and I use it constant
 Give Markdown Monster a try and see if you can't improve your writing productivity with some of its helpful features and functionality.
 
 Chomp!
-
-
-<!-- Post Configuration -->
-<!--
-```xml
-<blogpost>
-<title>Introducing Markdown Monster - a new Markdown Editor</title>
-<abstract>
-I'm happy to announce Version 1.0 of Markdown Monster a Markdown Editor and Weblog Publishing tool for Windows. In this post I give a quick tour of Markdown Monster and provide links to all you need to know to check out this great new Markdown editor.
-</abstract>
-<categories>
-Windows
-</categories>
-<keywords>
-Markdown,Editor,Weblog,Publishing,Documentation
-</keywords>
-<isDraft>False</isDraft>
-<featuredImage>https://weblog.west-wind.com/images/2016/Introducing%20Markdown%20Monster/MarkdownMonster.png</featuredImage>
-<weblogs>
-<postid>55857</postid>
-<weblog>
-West Wind Web Log
-</weblog>
-</weblogs>
-</blogpost>
-```
--->
-<!-- End Post Configuration -->

@@ -1,4 +1,19 @@
+---
+title: Getting Images into Markdown Documents and Weblog Posts with Markdown Monster
+abstract: One good justification for using a rich editor for editing Markdown or a Weblog entry is that you can provide some additional features above and beyond what a simple text or code editor can provide.  When you're creating content you are usually dealing with a number of things beyond plain text like code snippets, feature widgets and most importantly - **images**. Markdown Monster
+keywords: Markdown,Images,Pasting,Drag and Drop,Markdown Monster,Editor,Weblog
+categories: ''
+weblogName: Markdown Monster Blog (BlazePost West Wind)
+postId: yk57daadf8r3
+permalink: https://markdownmonster.west-wind.com/blog/posts/2017/Mar/14/Getting-Images-into-Markdown-Documents-and-Weblog-Posts-with-Markdown-Monster
+featuredImageUrl: https://markdownmonster.west-wind.com/blog/imageContent/2017/Getting-images-into-Posts-with-Markdown-Monster/PostBanner.jpg
+stripH1Header: true
+postStatus: publish
+postDate: 2017-03-14T12:04:43.4753228-07:00
+---
 # Getting Images into Markdown Documents and Weblog Posts with Markdown Monster
+
+![Post Banner](./PostBanner.jpg)
 
 One good justification for using a rich editor for editing Markdown or a Weblog entry is that you can provide some additional features above and beyond what a simple text or code editor can provide.  When you're creating content you are usually dealing with a number of things beyond plain text like code snippets, feature widgets and most importantly - **images**.
 
@@ -189,39 +204,3 @@ So if you haven't checked into the image embedding features in Markdown Monster,
 ### Resources
 * [Markdown Monster](https://markdownmonster.west-wind.com)
 * [Save Image to Azure Blob Storage Addin](https://github.com/RickStrahl/SaveToAzureBlob-MarkdownMonster-Addin)
-
-
-<!-- Post Configuration -->
-<!--
-```xml
-<blogpost>
-<title>Getting Images into Markdown Documents and Weblog Posts with Markdown Monster</title>
-<abstract>
-One good justification for using a rich editor for editing Markdow or a Weblog entry is that you can provide some additional features above and beyond what a simple text or code editor can provide.  When you're creating content you are usually dealing with a number of things beyond plain text like code snippets, feature widgets and most importantly - **images**. Markdown Monster
-</abstract>
-<categories>
-
-</categories>
-<keywords>
-Markdown,Images,Pasting,Drag and Drop,Markdown Monster,Editor,Weblog
-</keywords>
-<isDraft>False</isDraft>
-<featuredImage></featuredImage>
-<customFields>
-	<customField>
-		<key>mt_custom</key>
-		<value>My custom value</value>
-		<id>771</id>
-	</customField>
-</customFields>
-
-<weblogs>
-<postid>245</postid>
-<weblog>
-Rick Strahl WordPress
-</weblog>
-</weblogs>
-</blogpost>
-```
--->
-<!-- End Post Configuration -->

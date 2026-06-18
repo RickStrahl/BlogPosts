@@ -1,21 +1,24 @@
 ---
 title: Putting the Westwind.Scripting C# Templating Library to work, Part 2
-featuredImageUrl: https://weblog.west-wind.com/images/2026/Revisiting-C-Scripting-with-the-Westwind-Scripting-Templating-Library,-Part-1/Part2-Banner.jpg
 abstract: In part 2 of this post series I look at some of the issues you may have to deal with when using the Westwind.Scripting library as an offline document or Web site creation engine. While running simple templates is easy enough, when generating static output for Web site publishing or local preview requires some special considerations.
 keywords: Script,Template, Layout, Section,Partial, Handlebars
 categories: .NET, C#
-weblogName: West Wind Web Log
+weblogName: West Wind Weblog (BlazePost API)
 postId: 5314605
 permalink: https://weblog.west-wind.com/posts/2026/Apr/23/Putting-the-WestwindScripting-Templating-Library-to-work-Part-2
-postDate: 2026-04-23T16:04:43.1775050-07:00
-postStatus: publish
-dontInferFeaturedImage: false
+featuredImageUrl: https://weblog.west-wind.com/images/2026/Revisiting-C-Scripting-with-the-Westwind-Scripting-Templating-Library,-Part-1/Part2-Banner.jpg
 stripH1Header: true
+postStatus: publish
+postDate: 2026-04-23T16:04:43.1775050-07:00
 customFields:
   mt_location:
     id: 
     key: mt_location
     value: Hood River, Oregon
+  mt_githuburl:
+    id: 
+    key: mt_githuburl
+    value: https://github.com/RickStrahl/BlogPosts/blob/master/2026-04/Revisiting-C-Scripting-with-the-Westwind-Scripting-Templating-Library%2C-Part-1/Using-Westwind-Scripting-Template-Library-In-The-Real%20World.md
 ---
 
 # Putting the Westwind.Scripting C# Templating Library to work, Part 2
@@ -700,3 +703,13 @@ I've been very happy with how using ScriptParser with its new features of Layout
 * [Previous Post: Runtime Compilation with Roslyn and Building Westwind.Scripting](https://weblog.west-wind.com/posts/2022/Jun/07/Runtime-C-Code-Compilation-Revisited-for-Roslyn)
 * [Documentation Monster](https://documentationmonster.com)
 * [Markdown Monster](https://markdownmonster.west-wind.com)
+
+
+<div style="margin-top: 30px;font-size: 0.8em;
+            border-top: 1px solid #eee;padding-top: 8px;">
+    <img src="https://markdownmonster.west-wind.com/favicon.png"
+         style="height: 20px;float: left; margin-right: 10px;"/>
+    this post was created and published with the 
+    <a href="https://markdownmonster.west-wind.com" 
+       target="top">Markdown Monster Editor</a> 
+</div>

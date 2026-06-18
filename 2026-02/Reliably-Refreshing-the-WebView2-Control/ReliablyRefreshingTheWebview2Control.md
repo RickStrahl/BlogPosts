@@ -1,16 +1,15 @@
 ---
 title: Reliably Refreshing the WebView2 Control
-featuredImageUrl: https://weblog.west-wind.com/images/2026/Reliably-Refreshing-the-WebView2-Control/WebViewRefreshBanner.jpg
 abstract: The WebView2 control lacks a direct `Reload(noCache)` overload that forces a browser hard reload of the current page. Instead content is loaded with a soft refresh that - hopefully - reloads the current page and its dependencies dependent on WebView environment and server cache policies. In this post we'll look at how to work around this limitation and force a hard refresh in several different ways.
 keywords: WebView, Reload, Caching, Cache Policy, Hard Refresh
 categories: WebView, Windows, WPF
-weblogName: West Wind Web Log
+weblogName: West Wind Weblog (BlazePost API)
 postId: 5204283
 permalink: https://weblog.west-wind.com/posts/2026/Feb/04/Reliably-Refreshing-the-WebView2-Control
-postDate: 2026-02-04T21:53:22.2637324-10:00
-postStatus: publish
-dontInferFeaturedImage: false
+featuredImageUrl: https://weblog.west-wind.com/images/2026/Reliably-Refreshing-the-WebView2-Control/WebViewRefreshBanner.jpg
 stripH1Header: true
+postStatus: publish
+postDate: 2026-02-04T23:53:22.2637324-08:00
 customFields:
   mt_location:
     id: 
@@ -53,7 +52,7 @@ But much worse is that even if the content page itself refreshes with `Reload()`
 
 This can be really annoying if you're using the browser as a previewer. For example, in Markdown editing you might paste an image into the editor and it displays fine. Then you make a change to the underlying image, refresh the browser and... the image does not update which is an annoying fail!
 
-![MarkdownMonster Image Updates](./MarkdownMonster%20Image%20Updates.png)  
+![MarkdownMonster Image Updates](./MarkdownMonsterImageUpdates.png)  
  <small>**Figure 1** - Markdown Monster images don't update if using only `CioreWebView2.Reload()`.</small>
 
 This happens even if the content page refreshes. Incidentally the same thing happens in a desktop browser, unless you hard refresh. And even then sometimes images do not refresh. But again, `Reload()` is not a hard refresh so by default support resources and in some cases even the main content do not refresh.

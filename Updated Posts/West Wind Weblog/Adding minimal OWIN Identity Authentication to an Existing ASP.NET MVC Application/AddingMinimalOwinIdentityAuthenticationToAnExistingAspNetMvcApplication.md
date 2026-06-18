@@ -1,21 +1,22 @@
 ---
 title: Adding minimal OWIN Identity Authentication to an Existing ASP.NET MVC Application
-featuredImageUrl: https://weblog.west-wind.com/images/2015Windows-Live-Writer/Adding-oAuth-Authent.NET-MVC-Application_CC2E/AccountControllerOverview_thumb.png
 abstract: ASP.NET 4 provides a new Identity Authentication/Authorization framework that's very comprehensive and works reasonably well for new applications. However, if you have existing applications or use  custom user management, it's not very clear how to use just the basic OWIN  Authentication/Authorization layer without the full UserManager and Entity Framework implementation. In this post I describe how to use the bare minimum Identity features to hook up a custom domain model for both local and external logins in an ASP.NET MVC application.
 keywords: OWIN,Identity,Minimal,SignIn,SignOut,Google,Twitter,GitHub
 categories: ' ASP.NET,MVC,OWIN'
-weblogName: West Wind Web Log
+weblogName: West Wind Weblog (BlazePost API)
 postId: 1123302
 permalink: https://weblog.west-wind.com/posts/2015/Apr/29/Adding-minimal-OWIN-Identity-Authentication-to-an-Existing-ASPNET-MVC-Application
-postDate: 2018-05-28T22:33:21.7555082-07:00
-postStatus: publish
-dontInferFeaturedImage: false
+featuredImageUrl: https://weblog.west-wind.com/imageContent/2018/Adding-minimal-OWIN-Identity-Authentication-to-an-Existing-ASP.NET-MVC-Application/Banner.jpg
 stripH1Header: true
+postStatus: publish
+postDate: 2018-05-28T22:33:21.7555082-07:00
 dontStripH1Header: false
 ---
 # Adding minimal OWIN Identity Authentication to an Existing ASP.NET MVC Application
 
-<small style="color: firebrick">Note: This article applies to **classic .NET Frameworks based ASP.NET MVC applications only**. It **does not work with .NET Core**.</small>
+![Banner](./Banner.jpg)
+
+<small style="color: firebrick">Note: This article applies to **classic .NET Frameworks based ASP.NET MVC applications only**. It **does not work with .NET Core**. For ASP.NET Core the base concepts of self-contained cookie and token authentication are covered in <a href="https://weblog.west-wind.com/posts/2022/Mar/29/Combining-Bearer-Token-and-Cookie-Authentication-in-ASPNET">this post</a></small>
 
 As of ASP.NET 4, ASP.NET provides a fairly useful identity system. If you create a new project and choose an MVC project and choose to add both internal and external authentication, it’s fairly straight forward to get a reasonable identity implementation into your application.
 
@@ -903,7 +904,8 @@ I hope that this post provides a good summary of what’s required and especiall
 
 ### Resources
 
-*   [**CodePaste.NET Project on GitHub**](https://github.com/RickStrahl/CodePaste.NET)
+* [Combining Bearer Token and Cookie Authentication in ASP.NET](https://weblog.west-wind.com/posts/2015/Apr/29/Adding-minimal-OWIN-Identity-Authentication-to-an-Existing-ASPNET-MVC-Application)
+* [**CodePaste.NET Project on GitHub**](https://github.com/RickStrahl/CodePaste.NET)
 
 
 <div style="margin-top: 30px;font-size: 0.8em;

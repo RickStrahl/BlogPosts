@@ -1,9 +1,24 @@
 ---
 title: FolderBrowser Enhancements in Markdown Monster
+abstract: The latest version of Markdown Monster (v1.8.12) significantly upgrades the Folder Browser, turning it into a more capable file management hub. The update adds a modern UI with descriptive file icons, smarter navigation with autocomplete paths and environment variable support, and dynamic loading for improved performance in large folders. New productivity features include Find in Files, tighter drag-and-drop image support, and expanded Terminal, Explorer, and Git integration—making project asset management faster and more intuitive directly within the editor.
 keywords: Release Notes,FolderBrowser,Navigation,Markdown
-weblogName: Markdown Monster (Medium)
+categories: Markdown Monster
+weblogName: Markdown Monster Blog (BlazePost West Wind)
+postId: c4k6wc8s8jk2
+permalink: https://markdownmonster.west-wind.com/blog/posts/2018/Jan/10/FolderBrowser-Enhancements-in-Markdown-Monster
+featuredImageUrl: https://markdownmonster.west-wind.com/blog/imageContent/2018/FolderBrowser-Enhancements-in-Markdown-Monster-1.8.12/PostBanner.jpg
+stripH1Header: true
+postStatus: publish
+postDate: 2018-01-10T11:13:01.0035442-08:00
+customFields:
+  mt_date:
+    id: 
+    key: mt_date
+    value: 2018-01-10T12:00:00
 ---
 # FolderBrowser Enhancements in Markdown Monster
+
+![Post Banner](./PostBanner.jpg)
 
 The folder browser may not be a very high profile feature in Markdown Monster, but there have been a surprising number of requests around the folder browser behavior and operation. In **version 1.8.12** I've done a lot of work to address a number of the issues that were brought up and added a ton of new useful features as well as cleaning up the user interface to be a bit more intuitive. 
 

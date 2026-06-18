@@ -1,4 +1,17 @@
-﻿# ASP.NET Core and CORS Gotchas
+﻿---
+title: ASP.NET Core and CORS Gotchas
+abstract: CORS is a requirement for cross domain XHR calls, and when you use Angular 2.0 default dev server and talk to an ASP.NET Core application you'll need to use CORS to get XHR to talk across the domain boundaries. Here's how to set up CORS and how to test it.
+keywords: CORS,ASP.NET Core,Security,XHR,Cross Site
+categories: ASP.NET Core,ASP.NET,Security
+weblogName: West Wind Weblog (BlazePost API)
+postId: 22759
+permalink: https://weblog.west-wind.com/posts/2016/Sep/26/ASPNET-Core-and-CORS-Gotchas
+featuredImageUrl: https://weblog.west-wind.com/imageContent/2026/ASP.NET-Core-and-CORS-Gotchas/Connected.png
+stripH1Header: true
+postStatus: publish
+postDate: 2026-05-26T13:24:33.4987913-07:00
+---
+# ASP.NET Core and CORS Gotchas
 
 ![Interconnected](Connected.png)
 
@@ -122,28 +135,3 @@ So, if you're going to test CORS operation the only effective way to do is is **
 
 ### Resources
 * [Official ASP.NET CORS documentation](https://docs.asp.net/en/latest/security/cors.htmlhttps://docs.asp.net/en/latest/security/cors.html)
-
-
-<!-- Post Configuration -->
-<!--
-```xml
-<blogpost>
-<abstract>
-CORS is a requirement for cross domain XHR calls, and when you use Angular 2.0 default dev server and talk to an ASP.NET Core application you'll need to use CORS to get XHR to talk across the domain boundaries. Here's how to set up CORS and how to test it.
-</abstract>
-<categories>
-ASP.NET Core,ASP.NET,Security
-</categories>
-<keywords>
-CORS,ASP.NET Core,Security,XHR,Cross Site
-</keywords>
-<weblogs>
-<postid>22759</postid>
-<weblog>
-Rick Strahl's Weblog
-</weblog>
-</weblogs>
-</blogpost>
-```
--->
-<!-- End Post Configuration -->

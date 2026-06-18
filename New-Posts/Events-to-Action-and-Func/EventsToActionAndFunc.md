@@ -1,5 +1,5 @@
 ---
-title: Events to Action and Func
+title: Back to Basics: Events to Action and Func
 abstract: 
 keywords: 
 categories: 
@@ -10,12 +10,7 @@ postStatus: publish
 dontInferFeaturedImage: false
 dontStripH1Header: false
 ---
-# Events to Action and Func
-
-
-
-
-
+# Back to Basics: Events to Action and Func
 
 
 
@@ -163,7 +158,8 @@ void Main()
 
 What makes this code more compact primarily is the ability to replace the `delegate event` syntax with an `Action` delegate that doesn't need to be explicitly declared. Additionally the introduction of the nullable operator (`?.`) lets you easily check for whether the handler is active so the an explicit `OnEvent` handler is usually not required.
 
-> Note also that you use `+=` to chain multiple delegate handlers to the `Action` property which provides the same functionality as an event. `Action` is in effect a delegate so whenever you see an action property or variable you can chain multiple 
+> ##### @icon-lightbulb Actions support `+=` Chaining
+> You can use `+=` to chain multiple delegate handlers to an `Action`  or `Func` property, which provides for the same chaining features that you get with events. All the actions hooked up via `+=` are fired in the order assigned and can be unassigned by `-=`. `Action` and `Func` are in effect delegates, so it's not surprising they behave the same as events which are syntax wrapper around delegates.
 
 ### Modern Eventing using Action, Func and Direct Delegates
 

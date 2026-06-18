@@ -1,15 +1,15 @@
 ---
 title: Sharing Tab Missing in Windows 11 Folder Properties
-featuredImageUrl: https://weblog.west-wind.com/images/2024/Sharing-Tab-Missing-in-Windows-Folder-Properties/BrokenConnectionBanner.jpg
 abstract: For some unfathomable reason, Windows 11 has removed the Sharing Tab on the Explorer Properties Context menu by default. The Sharing Tab allows you to shared folders and drives for remote access. In this post I discuss how to get the Sharing Tab back and also touch on how to make sure your machine can actually accept remote connections so you can share your folders and drives.
 keywords: Folder Sharing,Sharing Tab,Remote Access
 categories: Windows
-weblogName: West Wind Web Log
+weblogName: West Wind Weblog (BlazePost API)
 postId: 4187850
-permalink: https://weblog.west-wind.com/posts/2024/Jan/10/Sharing-Tab-Missing-in-Windows-Folder-Properties
-postDate: 2024-01-10T10:54:27.6724851-10:00
+permalink: https://weblog.west-wind.com/posts/2024/Jan/10/Sharing-Tab-Missing-in-Windows-11-Folder-Properties
+featuredImageUrl: https://weblog.west-wind.com/images/2024/Sharing-Tab-Missing-in-Windows-Folder-Properties/BrokenConnectionBanner.jpg
+stripH1Header: true
 postStatus: publish
-dontInferFeaturedImage: false
+postDate: 2024-01-10T12:54:27.6724851-08:00
 dontStripH1Header: false
 ---
 # Sharing Tab Missing in Windows 11 Folder Properties
@@ -58,6 +58,7 @@ Powershell has a specific command for managaging shares in use `SMBShare` group 
 
 > **Note:** Make sure you run these commands **as Administrator** using an Admin shell or using a tool like [gsudo](https://github.com/gerardog/gsudo) to elevate  within the prompt.
 
+##AD##
 
 ## Enabling the Sharing Tab in the Registry
 Command line is easy enough, but if you want to bring back the Sharing Tab so you don't have to remember a command that you use once every 5 years, here's how to do it.
@@ -119,14 +120,14 @@ You can find a big block of Firewall rules in the **Advanced Firewall Settings**
 ![File and Folder Sharing Firewall Rules](FirewallRules.png)  
 <small>**Figure 9** - Firewall rules related to file and printer sharing - there are a lot of them. `Private` as in `Private network` disables many of the restrictions.</small>
 
-##AD##
-
 ## Remember Security
 Folder/drive sharing is useful when you need it, but make sure you don't allow access to your machine if you're not using a trusted network. If you open up your machine to allow sharing access, File and Printer Sharing and Network discovery, you potentially open up an attack surface for your machine. This is likely why the Sharing Tab is not available by default.
 
 By default any new network connection you connect is set to **Public network** for this reason, and other than on your home or work networks, or very specific circumstances you should probably always leave that default setting intact. 
 
 This one setting pretty much prevents remote access via OS both through the network stack and the firewall.
+
+##AD##
 
 ## Summary
 The reason for this post is that if you're like me and not directly involved in network management and security, all of these overlapping features and settings can be confusing and easy to forget even if you've figured it all out once and then don't get back to it for another few years. It doesn't help that Microsoft has been moving the location for these settings around constantly in the latest updates of Windows. 

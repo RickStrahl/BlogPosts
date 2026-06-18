@@ -1,10 +1,20 @@
 ---
 title: 'Creating a Markdown Monster Addin: Save Images to Azure Blob Storage'
 abstract: The Markdown Monster Markdown Editor and Weblog Publishing tool has a .NET based addin model that makes it relatively easy to extend its core feature set with custom functionality. In this post I show how you can quickly create an addin of your own, and then show a practical example that demonstrates how add Image uploading to Azure Blob storage as an interactive addin.
-categories: .NET, Markdown Monster
 keywords: Markdown Monster, Azure Blob Storage, Image, Addin, C#, .NET, Clipboard
-weblogName: West Wind Web Log (Local)
-postId: 47417
+categories: .NET, Markdown Monster
+weblogName: Markdown Monster Blog (BlazePost West Wind)
+postId: isunhapaf1jx
+permalink: https://markdownmonster.west-wind.com/blog/posts/2017/Apr/17/Creating-a-Markdown-Monster-Addin-Save-Images-to-Azure-Blob-Storage
+featuredImageUrl: https://markdownmonster.west-wind.com/blog/imageContent/2017/Creating-a-Markdown-Monster-Addin-Save-Images-to-Azure-Blob-Storage/PluginExtensions.jpg
+stripH1Header: true
+postStatus: publish
+postDate: 2017-04-17T12:13:01.0035442-07:00
+customFields:
+  mt_date:
+    id: 
+    key: mt_date
+    value: 2017-04-17T12:00:00
 ---
 # Creating a Markdown Monster Addin: Save Images to Azure Blob Storage
 
