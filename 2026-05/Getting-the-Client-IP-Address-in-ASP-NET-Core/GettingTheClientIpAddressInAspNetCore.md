@@ -15,9 +15,7 @@ postDate: 2026-05-13T13:35:12.0797363-07:00
 
 ![Client Ip Banner](./ClientIpBanner.jpg)
 
-##AD##
-
-When I need to pick up the client IP Address in ASP.NET Core I always forget where to find the connection information. 
+When I need to pick up the client IP Address in ASP.NET Core I always forget where to find the connection information.
 
 It's simple enough:
 
@@ -25,9 +23,11 @@ It's simple enough:
 HttpContext?.Connection?.RemoteIpAddress
 ```
 
-but I never remember to look on the context object as I expect it to be on the Request 😄.
+but I never remember to look on the context *object* as I expect it to be on the Request 😄.
 
 It's also useful to remember that if requests are proxied, we need to return the **forwarded IP address**, rather than the proxy's IP Address. Finally, in most cases you'd likely want the ipv4 address rather than an IPv6 address.
+
+##AD##
 
 Here's ready to use helper extension method for the `HttpRequest` class that makes this more easily accessible:
 
@@ -182,11 +182,13 @@ Nothing new here, but given how often I fumble around with this value, creating 
 * [Configure ASP.NET Core to work with proxy servers and load balancers](https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer?view=aspnetcore-10.0)
 
 
-<div style="margin-top: 30px;font-size: 0.8em;
-            border-top: 1px solid #eee;padding-top: 8px;">
+<div style="margin-top: 30px;font-size: 0.8em; border-top: 1px solid #eee;padding-top: 8px;"
+    class="testing" >
     <img src="https://markdownmonster.west-wind.com/favicon.png"
          style="height: 20px;float: left; margin-right: 10px;"/>
+    
     this post was created and published with the 
-    <a href="https://markdownmonster.west-wind.com" 
-       target="top">Markdown Monster Editor</a> 
+    
+    <a href="https://markdownmonster.west-wind.com"
+       target="top">Markdown Monster Editor</a>
 </div>

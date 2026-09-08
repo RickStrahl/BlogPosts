@@ -12,7 +12,7 @@ dontStripH1Header: false
 ---
 # Some useful String Helpers
 
-I'm a sucker for string helper functions because I build a lot of applications that deal with heavy text manipulation and in app 'templating'. 
+I'm a sucker for string helper functions because I build a lot of applications that deal with heavy text manipulation and in app 'templating'.
 
 Today I was mucking around with a [Markdown Monster](https://markdownmonster.west-wind.com/) Render extension I'm working on that had some code like this to parse out a short hand icon syntax and turn it into FontAwesome icons.
 

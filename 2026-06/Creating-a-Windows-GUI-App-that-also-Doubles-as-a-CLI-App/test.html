@@ -1,0 +1,299 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="file:///C:/Users/rstrahl/Dropbox/Markdown%20Monster%20Weblog%20Posts/New-Posts/Creating-a-Windows-GUI-App-that-also-Doubles-as-a-CLI-App/" />
+    <title>Creating a Windows GUI App that also Doubles as a CLI App</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta charset="utf-8" />
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link href="file:///C:\Users\rstrahl\Dropbox\Markdown Monster\PreviewThemes\scripts\fontawesome\css\font-awesome.min.css" rel="stylesheet" />
+    <link href="file:///C:\Users\rstrahl\Dropbox\Markdown%20Monster\PreviewThemes\Blue%20Lagoon\Theme.css" rel="stylesheet" />
+
+    <script src="file:///C:\Users\rstrahl\Dropbox\Markdown Monster\PreviewThemes\scripts\jquery.min.js"></script>
+    <link href="file:///C:\Users\rstrahl\Dropbox\Markdown Monster\PreviewThemes\scripts\highlightjs/styles/vs2015.css" rel="stylesheet" />
+    <script src="file:///C:\Users\rstrahl\Dropbox\Markdown Monster\PreviewThemes\scripts\highlightjs/highlight.pack.js"></script>
+    <script src="file:///C:\Users\rstrahl\Dropbox\Markdown Monster\PreviewThemes\scripts\highlightjs-badge.js"></script>
+    <script src="file:///C:\Users\rstrahl\Dropbox\Markdown Monster\PreviewThemes\scripts\preview.js" id="PreviewScript"></script>
+    
+</head>
+<body>
+<div id="MainContent">
+    <!-- Markdown Monster Content -->
+    <h1 id="creating-a-windows-gui-app-that-also-doubles-as-a-cli-app">Creating a Windows GUI App that also Doubles as a CLI App</h1>
+<p><img src="./GuiConsoleAppBanner.png" alt="Gui Console App Banner" /></p>
+<p>In <a href="https://weblog.west-wind.com/posts/2026/Jun/13/Creating-a-Packaged-Single-File-Web-Site-Viewer-Executable">my last post</a> I described a <a href="https://github.com/RickStrahl/WebPackageViewer">WebPackageViewer tool</a> tool that acts as a static Web site packager and self-contained Web site viewer all contained in a single Executable.</p>
+<p>One feature of this single file tool is that it acts both as a GUI application (the Web site viewer) and as a CLI application (the package/unpackage tooling) from a single EXE. However, using both GUI and CLI interface from a single EXE is challenging and doesn't have a 100% clean solution. In this post I'll describe several options that make this work with an <strong>as clean as possible</strong> approach as well as some alternatives that I've used in other applications.</p>
+<p>If you think this is an off the wall concept, all of my commercial desktop applications <a href="https://markdownmonster.west-wind.com">Markdown Monster</a>, <a href="https://websurge.west-wind.com">WebSurge</a> and <a href="https://documentationmonster.com">Documentation Monster</a> have a support CLI for exposing common functionality in a scriptable way. But... in all of these latter cases I actually chose a different approach of using separate EXEs for the GUI app and CLI app with the CLI app driving the GUI app features. It's a very different use case than the simple single Exe WebPackager tool and it works well for full fledged applications that expose a CLI.</p>
+<p>I'll also cover that approach in some detail.</p>
+<p>##AD##</p>
+<h2 id="cli-interfaces">CLI Interfaces</h2>
+<p>So in this post I'll discuss 4 different approaches. None of them are what I would consider perfect, which would be if Windows simply supported some way to cleanly service both GUI and Console apps from a single Exe.</p>
+<p>But alas, it's Windows so we have to live with the trade-offs:</p>
+<ul>
+<li>Create a GUI application with a Console interface</li>
+<li>Create a Console Application and launch GUI from Console</li>
+<li>Create separate CLI and GUI applications with shared functionality</li>
+</ul>
+<p>I've used all of these approaches now at some point or another, and it depends on the type of application or tool that you're building which makes most sense.</p>
+<h3 id="gui-application-with-cli-interface-option">GUI Application with CLI Interface Option</h3>
+<p>Mixed mode GUI app that also supports CLI output is the most tricky of these approaches, because Windows makes this sort of thing difficult with <strong>choose-one-or-the-other</strong> situation.</p>
+<p>When you build a Windows .NET application (or any Windows application for that matter) you get to specify whether it's a <code>WinExe</code> (GUI) or <code>Exe</code> (Console) application. The type of app is written into the PE header when the EXE is created.</p>
+<p>In .NET you can specify this in the project's header:</p>
+<pre><code class="language-xml">&lt;Project Sdk=&quot;Microsoft.NET.Sdk&quot;&gt;
+	&lt;PropertyGroup&gt;
+		&lt;!-- Windows GUI app - Exe for Console --&gt;
+		&lt;OutputType&gt;WinExe&lt;/OutputType&gt;
+		
+		&lt;TargetFramework&gt;net472&lt;/TargetFramework&gt;
+		&lt;UseWPF&gt;true&lt;/UseWPF&gt;
+		&lt;Version&gt;1.1.5.2&lt;/Version&gt;
+</code></pre>
+<p>This affects SubSystem value of the Windows PE header that gets generated into Windows Exes:</p>
+<p><img src="./ConsoleGuiPeHeader.jpg" alt="Console Gui Pe Header" />
+<small><strong>Figure 1</strong> - GUI and Console apps have different startup semantics in how they related to Consoles that are attached or loaded based on the SubSystem value in the PE header.</small></p>
+<p>When you launch a Console application a new Console is started if none is active. That's when you invoke via the Windows shell or Explorer. If launched from an existing Console in the Terminal the Console app attaches to the existing Console and pipes output into it including all the Console streams (Input/Output/Error).</p>
+<p>When you launch a GUI app no Console is launched so by default there's no Console - the Console points at a null console if you write to it and that output goes nowhere.</p>
+<p>Where it gets weird is if you launch a GUI app from a Console and you then write to the console which is the exact scenario that I'm using in <strong>WebPackageViewer</strong>.</p>
+<p>By default the launching Console and the GUI exe are not connected. However, it's possible to attach to an existing Console using  a native <code>AttachConsole()</code> call from a GUI application when the application starts up, which effectively allows your GUI application to send Console output and input to and from the console.</p>
+<p>You can use the following two P/Invoke calls (on Windows) to attach and release the Console:</p>
+<pre><code class="language-cs">[DllImport(&quot;kernel32.dll&quot;, SetLastError = true)]
+static extern bool FreeConsole();
+
+[DllImport(&quot;kernel32.dll&quot;, SetLastError = true)]
+static extern bool AttachConsole(int dwProcessId);
+</code></pre>
+<p>Then as part of your application's startup code you can attach the Console:</p>
+<pre><code class="language-csharp">protected override void OnStartup(StartupEventArgs e)
+{
+    bool attached = AttachConsole(-1);
+    ...
+     
+    if (attached)
+		Console.Write(&quot;\n✅ Launching Web Viewer...&quot;);
+	
+	...
+	
+	// when done
+	if(attached)
+		FreeConsole();
+</code></pre>
+<p>This sorta works.</p>
+<p>The problem is that Console output goes into the active console that the application was started from, but if the application runs for any sort of duration, the console output gets mixed up with the existing prompt:</p>
+<p><img src="./ConsoleFail.png" alt="Console Fail" /><br />
+<small><strong>Figure 2</strong> - Console Fail - In a GUI Application you can attach to a console, but the output gets very janky and the Console doesn't always return to the prompt after completion</small></p>
+<p>The reason for this is that a console launched GUI application <strong>returns almost immediately to the console</strong> while the GUI app continues running in the background. The end result is that you get a new prompt that appears to be mixed into your Console output.</p>
+<p>Depending on where the prompt occurs, it looks like the existing console's prompt is now overwriting your  content but really the prompt is left behind while your output continued into no-man's land.</p>
+<p>Furthermore, once the native prompt has completed if you call <code>FreeConsole()</code> the console has now <em>lost the prompt</em> and essentially hangs until you press a key. While it looks like the prompt is lost what's really happening is that the cursor appears to be at the end, of the output, but the actual prompt is the prompt above in the middle of the Console output.</p>
+<p>Yeah, it's bloody mess!</p>
+<p>To fix this somewhat we can use a helper to release the console rather than just calling <code>FreeConsole()</code>:</p>
+<pre><code class="language-csharp">[DllImport(&quot;user32.dll&quot;)] static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, nuint dwExtraInfo);
+
+const byte VK_RETURN = 0x0D;
+
+static void ReleaseConsolePrompt()
+{
+    Console.WriteLine();  // force another line break so that the prompt is on a new line
+    FreeConsole();
+    
+    // force a CR into the console
+    keybd_event(VK_RETURN, 0, 0, 0);         // key down
+    keybd_event(VK_RETURN, 0, 0x0002, 0);    // key up (KEYEVENTF_KEYUP)
+}
+</code></pre>
+<p>which ends up showing a new prompt at the bottom with the cursor at the active new prompt!</p>
+<h4 id="can-you-live-with-it">Can you live with it?</h4>
+<p>In a pinch, this sort of funky output works for internal applications where you have a very short output, but for a commercial tool or something that has a lot of output that takes a bit to run, that's not really an option as it just looks like shit.</p>
+<p>What's annoying is that the behavior of the prompt can vary. I can run the same command multiple times and sometimes it'll get interrupted by the prompt, sometimes not. If your app's CLI commands run very fast within a few milliseconds you can preempt the console prompt interference. If it's very slow you can be sure it'll show up in an unexpected location.</p>
+<p>For some applications that only occasionally use the CLI or that are driven via automation this may not matter and is acceptable. It's the easiest path of providing a CLI interface to a GUI application and may just be <strong>Good Enough</strong>.</p>
+<h4 id="hackery">Hackery!</h4>
+<p>For slight performance trade off you can make this a little better by essentially <strong>forcing the Console to show the new prompt immediately</strong>. The idea is that you preemptively force the Console to show a new prompt so it doesn't overwrite your Console output in the middle of your content.</p>
+<p>So in <code>WebPackageViewer</code> I essentially do this:</p>
+<pre><code class="language-csharp">protected override void OnStartup(StartupEventArgs e)
+{            
+    IsConsoleApp =  AttachConsole(-1);
+    if (IsConsoleApp)
+    {
+        // delay slightly to let existing prompt finish and then show our prompt
+        System.Threading.Thread.Sleep(20);
+        
+        // Insert a line to clear the &gt; prompt
+        Console.WriteLine();
+    }
+</code></pre>
+<p>Here's what that looks like in PowerShell with a custom OhMyPosh prompt:</p>
+<p><img src="./HackedGuiConsole.png" alt="Hacked Gui Console" />
+<small><strong>Figure 3</strong> - A GUI app with Console output that delays slightly to force the completing existing Console prompt to display immediately, which avoids overwriting our Console output.</small></p>
+<p>Here's what it looks like in a plain Command prompt:</p>
+<p><img src="./HackedGuiConsoleCommand.png" alt="Hacked Gui Console Command" /><br />
+<small><strong>Figure 4</strong> - Plain Command Prompt with the same delayed Console display. </small></p>
+<p>If you look close you see the original Console prompt finish, and <strong>then</strong> our actual Console output is displayed. I added an extra <code>Console.WriteLine()</code> into the code to skip down over the prompt line (<code>&gt;</code>).</p>
+<p>Is that perfect? No, but it looks a lot cleaner than having the prompt injected in the middle or weird line breaks showing up in your Console output. While we still can't avoid the extra prompt, at least now it's in a predictable location at the very top where it's not interfering with our Console content. And if you don't pay close attention you may not even notice that it's happening... 😉</p>
+<p>If you want to see this all working together you can take a look in <a href="https://github.com/RickStrahl/WebPackageViewer"><code>App.xaml.cs</code> in the  WebPackageViewer project</a>.</p>
+<h4 id="is-console-interface-important">Is Console Interface Important?</h4>
+<p>When building CLI tools, the use case is often about automation. For many CLI tools actual Console interaction may be rare anyway because the primary use case is automation.</p>
+<p>For example, in Documentation Monster (a desktop application) I automate the packager from the application. I generate the Html Output in the application, package up the files explicitly into a Zip file, then use the packager to package the single file Exe. I'm using the CLI but I'm not ever actually looking at the Console.</p>
+<p>In the end having a Console that doesn't behave 100% correctly may not be a big deal, especially when you can get it close enough as described above.</p>
+<h4 id="when-to-use-this">When to use this</h4>
+<p>If the primary application you are creating is a GUI app and the CLI functionality is secondary, then this approach can work very well for you.</p>
+<p>For my use case in <code>WebPackageViewer</code> I used this approach as it was the best choice for this utility for the following reasons:</p>
+<ul>
+<li>I <strong>absolutely</strong> need a single Executable</li>
+<li>The GUI interface is the primary feature users see</li>
+<li>The CLI interface is likely  automated and not actually visibly running from the command line</li>
+<li>The CLI is output works well enough with the embellishments described in this post</li>
+</ul>
+<p>This integration ticks all of these points and the only real downside is the slightly messy CLI interface with the duplicated prompt line. I can live with that!</p>
+<h3 id="console-application-that-hosts-a-gui-interface">Console Application that hosts a GUI Interface</h3>
+<p>As I've described above it's possible to create a GUI app that can interact with the Console, but you can also create the reverse: A Console application that can run a GUI application.</p>
+<p>This might seem counter-intuitive and most likely this will come up <strong>after</strong> you've decided to build the entire application as a GUI app - as it did for me!</p>
+<p>Realistically though the differences between a Windows GUI and Console application are relatively minor from an implementation perspective. It comes down to specifying the Windows Subsystem used during build time.</p>
+<p>For .NET projects this means <code>&lt;OutputType&gt;Exe&lt;/OutputType&gt;</code>. This here is from the <code>WebPackageViewer</code> which deliberately builds a .NET Framework Executable to remove any runtime requirements:</p>
+<pre><code class="language-xml">&lt;Project Sdk=&quot;Microsoft.NET.Sdk&quot;&gt;
+	&lt;PropertyGroup&gt;
+		&lt;!-- Exe: Console - WinExe: GUI --&gt;
+		&lt;OutputType&gt;Exe&lt;/OutputType&gt;
+		&lt;TargetFramework&gt;net472&lt;/TargetFramework&gt;
+		&lt;UseWPF&gt;true&lt;/UseWPF&gt;
+		...
+	&lt;/PropertyGroup&gt;		
+&lt;/Project&gt;	
+</code></pre>
+<blockquote>
+<p>If you're using ILMerge or ILRepack to package a single file binary, the final EXE and its PE Header is actually determined by those tools not your project. In ILRepack this is the <code>/target:exe</code> or <code>/target:winexe</code> parameter. This means if you use these tools, it doesn't matter what you set for <code>&lt;OutputType&gt;</code> in the .NET project as the assignment overrides that value in ILMerge/ILRepack scripting!</p>
+</blockquote>
+<p>The other thing that has to change is that a Console application has to start with a <code>static int Main()</code> method, so you have to explicitly add this to your application, in this case for a WPF application:</p>
+<pre><code class="language-csharp">using System;
+using System.IO;
+using System.Runtime.InteropServices;
+using WebPackageViewer;
+
+class Program
+{
+    [STAThread]
+    static int Main(string[] args)
+    {
+        var app = new App();
+        app.InitializeComponent();
+        app.Run();
+
+        return 0;
+    }
+}
+</code></pre>
+<p>and you should explicitly specify that in the .csproj file:</p>
+<pre><code class="language-xml">&lt;Project Sdk=&quot;Microsoft.NET.Sdk&quot;&gt;
+	&lt;PropertyGroup&gt;
+		&lt;StartupObject&gt;Program&lt;/StartupObject&gt;
+	&lt;/PropertyGroup&gt;
+&lt;/Project&gt;
+</code></pre>
+<p>Incidentally this also works for GUI mode applications and in fact I launch all of my GUI apps this way as I generally have a few startup checks that I include before the app actually gets launched. Also a great location for a launch screen that pops quicker here than once the WPF, WinForms or WinUi frameworks start up.</p>
+<p>If you go this route, you don't need to <code>AttachConsole()</code> and <code>FreeConsole()</code>. Any Console commands work as you'd expect including having all the Console Streams hooked up as you'd expect.</p>
+<h4 id="whats-the-downside-of-a-console-gui-application">What's the Downside of a Console GUI Application?</h4>
+<p>Unfortunately, there is one downside to a Console application that doubles as a GUI application: A Console compiled application <strong>always</strong> displays a Console window and there's no good way to <strong>completely</strong> hide the window when the app starts up.</p>
+<p>You can hide the Console window immediately after startup using code like this:</p>
+<pre><code class="language-csharp">class Program
+{
+    [STAThread]
+    static int Main(string[] args)
+    {         
+        if (!StartedFromConsole())
+        {
+            // hide the Console window immediately
+            ShowWindow(GetConsoleWindow(), 0); // hide console flash
+        }
+
+        var app = new App();
+        app.InitializeComponent();
+        app.Run();
+
+        return 0;
+    }
+
+    [DllImport(&quot;kernel32.dll&quot;, SetLastError = true)]
+    static extern bool AttachConsole(int dwProcessId);
+
+    [DllImport(&quot;kernel32.dll&quot;)]
+    static extern bool FreeConsole();
+
+    [DllImport(&quot;kernel32.dll&quot;)] static extern IntPtr GetConsoleWindow();
+    [DllImport(&quot;user32.dll&quot;)] static extern bool ShowWindow(IntPtr h, int cmd);
+
+
+    static bool StartedFromConsole()
+    {
+        if (AttachConsole(-1))
+        {
+            FreeConsole();
+            return true;
+        }
+
+        // Already attached to a console also means console-launched.
+        return Marshal.GetLastWin32Error() == 5;
+    }
+}
+</code></pre>
+<p>But even with this code at the very earliest possible point of .NET code entry, you'll get a brief flash or worse a fadeout animation of the Console Window.</p>
+<p>The code above is also a bit simplistic as it universally hides the Console window. In reality you want to hide it selectively only when you're actually going to display UI, and leave it when you're working with the Console, which may cause you to delay the hiding a little bit longer yet, making the window flash even more pronounced.</p>
+<p>In WebPackageViewer when I was experimenting with this, I ended up sticking the window hiding right before the Main Window of the Viewer is created:</p>
+<pre><code class="language-csharp">// code in OnStartup that handles CommandLine Parsing and execution
+// and UI operations
+
+// check and hide only before actual GUI operation
+if (!StartedFromConsole())
+{
+    // hide the Console window immediately
+    ShowWindow(GetConsoleWindow(), 0); // hide console flash
+}
+
+MainWindow mainWindow = new MainWindow(config);
+mainWindow.Show();
+</code></pre>
+<p>But even that may not be quite the right behavior because if you actually launch the UI application from the Console explicitly via keyboard, then you'd want the Console to stay active. There's no easy way to determine whether the Console was created by your application or an existing console.</p>
+<h4 id="when-to-use-this-1">When to use this</h4>
+<p>Functionally, a Console application with a GUI interface ticks all the boxes and gives you the best of both Console and GUI applications, except for the initial Console Window popup.</p>
+<p>If you can live with the Console popup and it isn't a distraction to you, or if your app is primarily a Console interface, then using a Console app is the way to go.</p>
+<p>But for me personal, I find the brief Console popup annoying and unprofessional for a GUI app, so other than for applications that are entirely CLI driven I would probably not opt for this choice.</p>
+<h3 id="separate-cli-application">Separate CLI Application</h3>
+<p>Another option for creating both a GUI and Console interface is to create two completely separate applications. As I've shown above both GUI app with CLI and CLI with GUI apps have some quirks that make them behave not quite right for the CLI or UI scenario.</p>
+<p>By separating out the GUI and CLI into completely separate applications you can avoid any of these ambiguities by giving each it's dedicated target Subsystem type.</p>
+<p>This works particularly well if your CLI interface is fairly sophisticated and requires the full Console experience including the ability to be driven to Console IO.</p>
+<p>I'm using this type of two separate EXE interface in Markdown Monster, WebSurge and Documentation Monster and it's a relatively simple setup in that the CLI project can simply import the GUI project (or 'business' project) as a reference and get all of the same functionality as the main GUI app.</p>
+<p>So, using the <a href="https://markdownmonster.west-wind.com/docs/Startup-and-Command-Line-Options/Command-Line-Operations.html">Markdown Monster CLI Example</a> I have two projects:</p>
+<ul>
+<li>MarkdownMonster</li>
+<li>mmcli</li>
+</ul>
+<p><code>mmcli</code> references <code>MarkdownMonster</code> which is a single assembly monolith to use all of the built in operational logic to handle many system operations related to installation,  generate html and pdf output, start and stop the internal Web server and so on. Operations here can be anything that you want to expose on the command line.</p>
+<p>In the past I've always created a separate executable that links in the main applications' interfaces and then uses that functionality to drive the CLI.</p>
+<p>I did this primarily because I didn't know any better having tried running both a CLI interface and GUI interface from the same <code>WinExe</code> style SDK project application, which produces a Windows Application (more on that in a minute).</p>
+<p>Separating out the CLI into a separate 'command' Executable is not necessarily a bad idea. If you have a sufficiently sophisticated CLI with many operations it might make perfect sense to have a separate executable to drive that CLI.</p>
+<h2 id="summary">Summary</h2>
+<p><strong>GUI App with Console Interaction</strong></p>
+<ul>
+<li>use for UI primary application (ie. a Viewer)</li>
+<li>easy to build</li>
+<li><code>AttachConsole()</code> and <code>FreeConsole()</code></li>
+<li>CLI is least desirable but works for 'quick and dirty use'</li>
+</ul>
+<p><strong>Console Application that Launches a GUI</strong></p>
+<ul>
+<li>use for Console centric applications that also have UI</li>
+<li>requires <code>program.cs</code> launch for GUI (ie. a little non-standard)</li>
+<li>easy to build but need to isolate GUI from Console commandlines</li>
+<li>for GUI apps shows or at least flashes the Terminal Window</li>
+</ul>
+<p><strong>Separate GUI and CLI Application</strong></p>
+<ul>
+<li>two Separate Exes</li>
+<li>no 'routing' required</li>
+<li>Separates concerns</li>
+<li>CLI can link in GUI app or library features</li>
+<li>no UI oddities for either GUI and CLI</li>
+</ul>
+
+    <!-- End Markdown Monster Content -->
+</div>
+</body>
+</html>

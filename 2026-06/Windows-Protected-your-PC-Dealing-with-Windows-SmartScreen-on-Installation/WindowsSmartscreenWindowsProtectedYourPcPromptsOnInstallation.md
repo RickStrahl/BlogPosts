@@ -15,9 +15,9 @@ postDate: 2026-06-01T14:52:06.3398334-07:00
 ![Smart Screen Banner](./SmartScreenBanner.jpg)
 Windows SmartScreen also known as the  **Windows protected your PC** screen, is a scourge on users and small software publishers as it is a reputation based mechanism that Windows uses to scare people from installing external software. 
 
-The warning dialog is one thing as it is a valid concern to warn people about installing software from unknown locations. But using provocative colors (blue screen anybody?), scary language and making the step around procedure un-obvious is to essentially scare people out of installing external software, which is a age-old staple of Windows usage.
+And yeah, while it's fine to notify users that software loaded from an Internet download can potentially cause harm, it's a pain to users unfamiliar with how SmartScreen works or how you can bypass it to install software, despite the scary warning because they trust the source.
 
-It's a pain to users who often get scared away from installing software that is legitimate and it's a pain to developers who have to deal with lost users and the support that comes from questions around why the application won't install. 
+That said - always do your **Due Diligence** and make sure you trust the vendor and the Web site. If not sure, do your research, check reviews and make sure the software is downloaded from the vendor directly or from a reputable alternate source like a package manager, or a trusted download site.
 
 ##AD## 
 
@@ -28,7 +28,7 @@ If you've run into the lovely Blue **Windows protected your PC** screen when ins
 
 you know what I mean.
 
-As publisher of small software packages like [Markdown Monster](https://markdownmonster.west-wind.com),  [Documentation Monster](https://documentationmonster.com) and [West Wind WebSurge](https://websurge.west-wind.com) I run into this issue **every single time I upload a new release** for public downloads. These are small vendor software applications and because SmartScreen keys of downloaded files and successful installations, they are very negatively affected by 'scary' SmartScreen popups, scaring off customers when initial versions are posted or updated. If users get scared off they're not likely to return.
+As publisher of small software packages like [Markdown Monster](https://markdownmonster.west-wind.com),  [Documentation Monster](https://documentationmonster.com) and [West Wind WebSurge](https://websurge.west-wind.com) I run into this issue **every single time I upload a new release** for public downloads. These are small vendor software applications and because SmartScreen keys of downloaded files and successful installations, they are very negatively affected by 'scary' SmartScreen popups, scaring off customers when initial versions are posted or updated. If users get scared off they're unlikely to return.
 
 Eventually as reputation of the downloads improves due to successful installations, SmartScreen backs off, but the cycle repeats next time a new version is uploaded. In a couple of words: It sucks!
 
@@ -51,40 +51,48 @@ SmartScreen is meant to prevent you from doing a drive-by install of software by
 
 **Fair enough** - if you install software directly from the Internet, it's possible to install unsafe software that can do bad things to your computer and installed software.
 
-I don't have an issue with popping up the warning screen because that's a legitimate concern. The way it's done - well, that's a different story as it's clearly designed to scare users out of installing apps not coming from the Windows Store.
+I don't have an issue with popping up the warning screen, because that's a legitimate concern. The way it's done - well, that's a different story - as that form is one big scare tactic from the blue screen to the lack of information about **why** you might be careful, and how you should proceed. Instead this window works through obfuscation by seemingly just giving one choice: **Don't run**.
+
+As you've seen you can bypass, but you should most definitely be careful and check the source.
+
 
 > ##### @icon-warning Make sure you Trust the Vendor!
-> You want to make absolutely sure you trust the vendor and the site of the software that you're trying to install. Bad things can happen if you install Malware and there's no vetting process if you download from the Web.
+> You want to make absolutely sure you trust the vendor and the site of the software that you're trying to install. Bad things can happen if you install Malware, and there's no vetting process for any software directly downloaded from the Web.
 > 
-> Make sure that if you do use the bypass described above you are familiar with the vendor and that the signature of the package matches the vendors contact information.
+> If you use the bypass described above, make sure you are familiar with the vendor or the product and check that the signature of the package matches the vendors contact information.
 >
-> It's good practice when installing software from an unknown vendor, to check reviews or online discussions around the product to ensure the software is legit and comes from a vendor approved download location!
+> It's good practice when installing software from an unknown vendor, to check reviews or online discussions around the product to ensure the software is legit and comes from a vendor approved download location! There's a surprising amount of information available to let you know if specific software is problematic. Better safe than sorry!
 
 ### Better Vetting and Local Installs for Software: Use a Package Manager
-One way to have a more secure experience is to install software from the Windows Store (if available) or from a Package Manager like WinGet or [Chocolatey](https://community.chocolatey.org/). These stores and platforms review software before it's published, run malware checks and run through automated tests that check for successful installations and side effects. It's not full proof - but you do get at least some vetting of software.
+One way to have a more secure experience is to install software from the Windows Store (if available) or from a Package Manager like WinGet or [Chocolatey](https://community.chocolatey.org/). These stores and package manager platforms review software before it's published, run malware checks and run through automated tests that check for successful installations and side effects on the system. This process isn't fool proof - but it's often a lot better than installing a random product from a random Web site.
 
 > ##### @icon-lightbulb UniGetUi - A Manager for Windows Store and Package Managers
-> If you want to install from any of these sources check out [UniGetUi](https://devolutions.net/unigetui/), which is a free desktop application that lets you search for, install and update software from a number of different stores and package managers.
+> If you want to install from any of these sources check out [UniGetUi](https://devolutions.net/unigetui/), which is a free desktop application that lets you search for, install and update software from a number of different stores and package managers. It's a great one-stop tool that lets you hit all sources in one place.
 
-Package managers have an additional advantage over straight downloaded software in that they typically avoid SmartScreen due to Mark of the Web. Because these managers internally download software rather than pulling it down through a browser, installers are run as local executables that don't have a Mark of the Web.
+Package managers have an additional advantage over straight downloaded software in that they typically avoid SmartScreen due to Mark of the Web. Because these managers internally download software rather than pulling it down through a browser, installers are run as local executables that don't have a Mark of the Web that triggers SmartScreen (among other things).
 
-This bypasses most of the SmartScreen security flags.
-Here are a couple of examples you can run from the Windows Terminal:
+Essentially this means, package managers typically bypasses most of the SmartScreen security flags. 
+
+Here are a couple of examples of package managers you can run from the Windows Terminal:
 
 ```ps
 winget install MarkdownMonster
 choco install DocumentationMonster
 ```
 
-All of the managers include commands to update and list already installed components.
+... or you can use UniGetUi if you prefer a GUI application.
 
-Package Managers provide some basic curation for published packages, doing virus scanning  and associating publishers with products consistently and removing packages and publishers that are problematic. So there's some pre-validation happening by the provider that provides a better pre-requisite for security than you get directly downloading software.
+All of these package managers and the store include commands to update and list already installed components, which is an additional benefit.
 
-For this to work, software publishers of Software have to ensure that their software is published on these package managers. Unlike Windows Store however, the process of publishing to package managers - while not exactly simple - is usually well defined and can be completely automated making it something that is a viable alternative for downloads for publishers. You often find way more software on the package managers than you will find in the Windows Store because of it's restrictive requirements.
+Package Managers provide some basic curation for published packages, doing virus scanning  and associating publishers with products consistently and removing packages and publishers that are problematic quickly. Before packages are published there's some pre-validation happening by the provider that provides to at least a base level of security compared to what you get directly downloading software.
 
-All of the West Wind product download pages have links for Chocolatey and WinGet installers as alternatives to the direct download. Even so I'm always surprised that the vast majority of users are installing directly - I guess there's some trust there which is good :smile:
+For this to work, software publishers of Software have to ensure that their software is published on these package managers and kept up to date. Unlike Windows Store however, the process of publishing to package managers - while not exactly simple - is usually well defined and can be completely automated making it something that is a viable alternative for downloads for publishers. You often find way more software on the package managers than you will find in the Windows Store because of it's restrictive requirements.
 
-If you are a vendor linking the various package managers supported on the download page is a good idea as users that get SmartScreen'd can use it as an alternative that is likely to work better.
+In short, if you're not sure about some software you're trying to download, downloading froma package manager is often the best approach.
+
+All of the West Wind product download pages have links for Chocolatey and WinGet installers as alternatives to the direct download. Even so, I'm always surprised that the vast majority of users are installing directly from the download - I guess there's some trust there which is good :smile:
+
+If you are a vendor linking the various package managers supported on the download page is a good idea, so users that run into problems with your direct download can try the alternate potentially less intrusive package installs.
 
 ### Remove Mark-Of-The-Web
 Another option is to download installers and explicitly remove the Mark-of-the-Web attached to downloaded binaries and installers.
@@ -99,8 +107,10 @@ You can also remove this mark yourself on any downloaded file that gives you sec
 
 This removes the Mark-Of-The-Web and likely will not trigger SmartScreen on install, even if the required reputation level has not been achieved.
 
+Mark of the Web is not the only criterion but it's a big contributor for SmartScreen popups especially with new downloads.
+
 ### Windows Store
-Microsoft suggests publishing apps through the Windows Store. Windows Store is a curated platform, and software has to go through a thourough vetting process. The problem is that this process is both slow and cumbersome and there are a million different rules that have to be followed including some restrictions the software can and can't do in some cases requiring that Windows Store versions have to be dumbed down to be eligible for Store publishing.
+Microsoft suggests publishing apps through the Windows Store. Windows Store is a curated platform, and software has to go through a very thorough vetting process. The problem is that this process is both slow and cumbersome and there are a million different rules that have to be followed including some restrictions the software can and can't do in some cases requiring that Windows Store versions have to be dumbed down to be eligible for Store publishing.
 
 Developer and developer adjacent tools in particular have a hard time conforming to all the rules, and the lack of attention by reviewers to real-world concerns in the app publishing process make the Windows Store a time consuming pain in the ass.
 
@@ -113,10 +123,6 @@ In the case of West Wind products the effort is not worth the reward.
 ## SmartScreen Rant 
 As you can tell I'm not a big fan of SmartScreen. Few people - even users - are. I'm not against warning users of the dangers of installing software from the Web or networks in general. But heavy handely and effectively scaring users into avoiding installing software that they might even trust, is something else. And that's really what SmartScreen does.
 
-But what pisses me off though is that many users are sure they want to install, and perhaps have even installed a previous version of same software from the same site, and they are still warned away the same as everyone else. Often users don't know how to navigate past the scary blue dialog to install - most casual users are simply scared off. 
-
-The way that SmartScreen does this seems particularly nasty, clearly trying to scare users into not installing externally downloaded apps, and trying to push people to Windows Store installed apps which never are forced through this rigmarole.
-  
 The issue I have with SmartScreen and its UI are many:
 
 * It doesn't tell you anything other than *"Big Scary Warning, Don't Do it!"*
@@ -124,10 +130,6 @@ The issue I have with SmartScreen and its UI are many:
 * Conversely at first glance the only option appears to be **Don't run**
 * There's no continuity for the vendor publishing updates -   
   the more frequently you publish, the more painful SmartScreen is
-
-Essentially SmartScreen is designed to scare users, without giving any useful information and worse using a limited and flawed algorithm that doesn't take into account actual usage or continuity using forced certificates. At this point it even seems that having an Authenticode Certificate on the installer has no retention value for reputation whatsoever, even or maybe especially when using Microsoft's own Trusted Signing support. 
-
-Having no certificate is still worse though, because unsigned installers automatically throw up SmartScreen regardless of reputation.
 
 ## How does SmartScreen Work
 The actual semantics behind how SmartScreen are not officially disclosed by Microsoft, but based on observation I can make some guesses. At the end of the day SmartScreen is a reputation based system.
@@ -154,7 +156,7 @@ New software with a scary blue screen pop up, is simply not a great recipe for g
 ##AD##
 
 ## Summary
-At the end of the day SmartScreen is just something developers and end users have to put up with. It's frustrating that Microsoft has taken such an aggressive approach with SmartScreen rather than providing a more productive approach of providing a Warning Screen with more information and a clearer way to allow for bypassing the warnings.
+At the end of the day SmartScreen is just something developers and end users have to put up with. It's frustrating that Microsoft has taken such an aggressive approach with SmartScreen rather than providing a more productive approach of providing a Warning Screen with more information and a clearer way to allow for bypassing the warnings when you are sure you want to install anyway.
 
 But alas here we are...
 

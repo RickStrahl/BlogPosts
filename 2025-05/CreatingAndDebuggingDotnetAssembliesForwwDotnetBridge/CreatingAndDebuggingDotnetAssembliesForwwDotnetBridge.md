@@ -1,15 +1,15 @@
 ---
 title: Creating and Debugging .NET Assemblies for wwDotnetBridge and Visual FoxPro
-featuredImageUrl: https://west-wind.com/wconnect/weblog/imageContent/2025/CreatingAndDebuggingDotnetAssembliesForwwDotnetBridge/HackingBanner.jpg
 abstract: wwDotnetBridge lets you interface with .NET code directly, but if need to access more than a handful of lines of .NET code from FoxPro, it's a good idea to create a separate dedicated .NET component and call that instead. There are many benefits to easier and more discoverable access to functionality, better performance and support for a few features that don't work well through wwDotnetBridge. In this post I show how to create a .NET component, build and run it, and how debug it as well.
 keywords: .NET, Assembly, compile, dotnet, build, Visual Studio, VS Code
 categories: FoxPro, wwDotnetBridge
-weblogName: Web Connection Weblog
+weblogName: Web Connection Blog (BlazePost West Wind)
 postId: 57036
-postDate: 2025-05-22T20:49:41.7087582-07:00
-postStatus: publish
-dontInferFeaturedImage: false
+permalink: https://webconnection.west-wind.com/blog/posts/2025/May/23/Creating-and-Debugging-Dotnet-Assemblies-for-wwDotnetBridge-and-Visual-FoxPro
+featuredImageUrl: https://webconnection.west-wind.com/blog/imageContent/2025/CreatingAndDebuggingDotnetAssembliesForwwDotnetBridge/HackingBanner.jpg
 stripH1Header: true
+postStatus: publish
+postDate: 2025-05-22T20:49:41.7087582-07:00
 ---
 # Creating and Debugging .NET Assemblies for wwDotnetBridge and Visual FoxPro
 
@@ -19,11 +19,11 @@ If you're using [wwDotnetBridge](https://github.com/RickStrahl/wwDotnetBridge) w
 
 Additionally using .NET natively gives you much easier discovery of what's available via the .NET IDE tools that provide rich Intellisense, code completion, CoPilot, Refactoring and easy code navigation. All of this adds up to a richer experience.
 
-Now if you're making only one or two calls into a .NET library from FoxPro it's probably not worth creating a separate .NET component. But if you're making a lot of calls back and forth or the code is performance sensitive, then it may very well be worth your time to create a wrapper .NET compoent that you make one or two consolidated calls to and which then handles many .NET operations or entire component functionality.
+Now if you're making only one or two calls into a .NET library from FoxPro it's probably not worth creating a separate .NET component. But if you're making a lot of calls back and forth or the code is performance sensitive, then it may very well be worth your time to create a wrapper .NET component that you make one or two consolidated calls to and which then handles many .NET operations or entire component functionality.
 
-I am a big fan of building wrapper components in .NET where you can pass a few key values of input to the wrapper from FoxPro using COM optimized types, and the wrapper then does the brunt of work using native .NET code. If you look at most West Wind components like `wwSmtp`, `wwFtpClient`, `MarkdownParser`, this is exactly how those components are built - there's a .NET class that exposes most of the functionality with a few very focused method calls that combine hundreds of .NET calls and a FoxPro front end abstraction that calls into the wrapper. This is by far my preferred way of exposing functionality from .NET libraries to FoxPro as it optimizes each platform for what it does best.
+I am a big fan of building wrapper components in .NET where you can pass a few key values of input to the wrapper from FoxPro using COM optimized types, and the wrapper then does the brunt of work using native .NET code. If you look at most .NET based West Wind components like `wwSmtp`, `wwFtpClient`, `MarkdownParser`, this is exactly how those components are built - there's a .NET class that exposes most of the functionality with a few very focused method calls that - in some cases - combine hundreds of .NET calls and a FoxPro front end abstraction that calls into the wrapper. This is by far my preferred way of exposing functionality from .NET libraries to FoxPro as **it optimizes each platform for what it does best**.
 
-I know many of you old FoxPro dogs want to do everything in FoxPro, but one of the big advantages of wwDotnetBridge is that it lets you bridge the gap between FoxPro and .NET. It provides an easy on-ramp for experimenting and integrating .NET code into your own applications one piece of code at a time. Whether you implement a single .NET method that you call from FoxPro, a full class, or a whole complex API of components or business objects - you can choose your own pace. Because you're calling a library you can choose how modular you want to go. It's a practical way to create small islands of functionality outside of FoxPro that still can easily integrate with your FoxPro application transparently.
+I know many of you old FoxPro dogs want to do everything in FoxPro, but one of the big advantages of wwDotnetBridge is that it lets you bridge the gap between FoxPro and .NET. It provides an easy on-ramp for experimenting and integrating .NET code into your own applications, one piece of code at a time. Whether you implement a single .NET method that you call from FoxPro, a full class, or a whole complex API of components or business objects - you can choose your own pace. Because you're calling a library you can choose how modular you want to go. It's a practical way **to create small islands of functionality outside of FoxPro** that still can easily integrate with you existing FoxPro application transparently.
 
 ##AD##
 
@@ -49,25 +49,40 @@ loPerson.Entered = DATETIME()
 loPerson.Save()
 ```
 
-To create a minimal .NET project literally takes two files: A project file and a source code file that contains one or more classes  that can be called. If you need more classes or components you can add them to the same file or create new classes. The new .NET project system automatically picks up and compiles all source files it finds so it's easy to add functionality.
+To create a minimal .NET project literally takes two files: 
 
-There are a number of ways to create a new project, but due to the fact that recent versions of Visual Studio and the `dotnet new` CLI don't include templates for new .NET Framework (net4.x) projects.
+* A `.csproj` Project files
+* One or more `.cs` Code file with your logic
 
-While you can use the tooling, but my preferred way of doing this is just creating the project file and the main class by hand (or [copying an existing project template from here](https://github.com/RickStrahl/swfox2024-wwdotnetbridge-revisited/tree/master/Dotnet/New%20Project%20net472%20Template)). 
+If you need more classes or components you can add them to the same file or create new classes in `.cs` files. Any code files in the same folder hierarchy are automatically found and built when compiling, there's no need to explicitly add them to the projects. The new .NET project system automatically picks up and compiles all source files it finds so it's easy to add functionality. You can optionally and explicitly exclude files via directives in the project file which is typically rare.
+
+There are a number of ways to create a new project, but due to the fact that recent versions of Visual Studio and the `dotnet new` CLI don't include templates for new .NET Framework (net4.x) projects, if you use the official tooling in Visual Studio or the dotnet CLI, you have to create a project for **.NET Standard** (`netstandard2.0`) and then replace the target with `net472` (or later version).
+
+While you can use the Visual Studio or CLI tooling, personally I prefer just creating the project file and the main class by hand (or [copying an existing project template from here](https://github.com/RickStrahl/swfox2024-wwdotnetbridge-revisited/tree/master/Dotnet/New%20Project%20net472%20Template)). 
 
 There are two reasons for this :
 
-* .NET Tools (Visual Studio and the dotnet CLI) don't support creating new .NET 4.x projects
-* It's easy to copy a couple of files to disk
+* CLI doesn't support `net472` projects directly
+* It's quicker and easier to copy a couple of files to disk
 
-Although neither Visual Studio, the `dotnet` command line or VS Code support creating .NET Framework projects, you can definitely build them once created. They are just hiding .NET Framework projects because Microsoft is trying to push everyone to .NET Core.
+Once created, you can most definitely compile/build a .NET Framework using either Visual Studio or the dotnet CLI. 
 
-However, I **highly recommend** that you create .NET Framework (.NET 4.x) projects rather than .NET Core projects for your components unless you have a pressing need for .NET Core features or you need to interface with another library that does not support .NET 4.x or .NET Standard 2.0 which both can be used with the built-in .NET Framework. 
+> Microsoft is hiding .NET Framework projects for creation, which makes sense for most use cases: Any new standalone .NET development should use .NET Core. But FoxPro Interop usage is a special use case, and so for FoxPro integration in particular you should prefer .NET Framework components. 
 
-The reason is simply that the .NET Framework is built-into Windows so there's nothing to install. You can create a .NET Framework project compile and run without any other requirements other than the tiny DLL created (plus any dependent assemblies your component references). .NET Core on the other hand requires that a compatible runtime is installed, which means you have to make sure that your application checks and deploys the right runtime. There's no such requirement for .NET Framework.
+That said, you can also create and then use .NET Core components with wwDotnetBridge, but using them generically is more complex as you have to ensure that the .NET appropriate runtimes are installed. .NET Core components may also require additional runtime dependencies that aren't automatically loaded. It can be done but there are more moving pieces involved in that process.
 
-> If you build for .NET Framework chances are that you can also move the code to .NET Core easily by adding a second target, so this is not a 1-way street or you can multi-target and actually support both. Difference between them are slight especially if you stick to core functionality.
+**The benefit of .NET Framework is that it's built into Windows**, so there's nothing to install to run a component. You can create a .NET Framework project compile into a tiny executable DLL, and run without any other requirements other than the DLL created. 
 
+For this reason I **highly recommend** that you create .NET Framework projects rather than .NET Core projects for your Interop components, unless **you have a specific pressing need** for .NET Core features, or you need to interface with another library that does not support .NET 4.x or .NET Standard 2.0 which both can be used with the built-in .NET Framework. 
+
+.NET Core on the other hand requires that a compatible .NET runtime is installed, which means you have to make sure that your application checks for and/or deploys the right runtime. There's no such requirement for .NET Framework.
+
+> ##### @icon-lightbulb .NET Supports Multi-Targeting
+> If you build for .NET Framework chances are that you can also move the code to .NET Core easily by adding a second build target, so this is not a 1-way street as you can multi-target both `net472` and `net10.0` from the same project. Difference between them are slight especially if you stick to core functionality.
+> 
+> ```xml
+> <TargetFrameworks>net472;net10.0</TargetFrameworks>
+> ```
 
 ##AD##
 
@@ -84,7 +99,7 @@ I use either a template from disk or manually create the files and copy in the s
 
 Start by creating creating a new folder for your project and opening an editor there:
 
-```ps
+```powershell
 # create and goto  directory
 cd D:\wwapps\Conf\wwDotnetBridgeRevisited\Dotnet\FirstLibrary
 

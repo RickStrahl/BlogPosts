@@ -1,16 +1,16 @@
 ---
-title: ' Back to Basics: Rendering Razor Views to String in ASP.NET Core'
+title: 'Back to Basics: Rendering Razor Views to String in ASP.NET Core'
 abstract: Rendering a Razor View to string can be very useful to create string output from Views that you can capture and then use for things like Email confirmations or saved receipts that can be accessed 'offline' from the application. In this post I show you how to capture views to string and a few caveats you have to watch out for if you're generating self-contained HTML output to string.
-categories: ASP.NET Core
 keywords: View, Rendering, String, RazorViewEngine, RenderView
-weblogName: West Wind Web Log
+categories: ASP.NET Core
+weblogName: West Wind Weblog (BlazePost API)
 postId: 3233375
-dontInferFeaturedImage: false
-dontStripH1Header: false
-postStatus: publish
-featuredImageUrl: https://weblog.west-wind.com/images/2022/Rendering-a-Razor-View-to-String-in-ASP.NET-Core/Razors_Banner.jpg
 permalink: https://weblog.west-wind.com/posts/2022/Jun/21/Back-to-Basics-Rendering-Razor-Views-to-String-in-ASPNET-Core
+featuredImageUrl: https://weblog.west-wind.com/images/2022/Rendering-a-Razor-View-to-String-in-ASP.NET-Core/Razors_Banner.jpg
+stripH1Header: true
+postStatus: publish
 postDate: 2022-06-21T17:04:52.9291199-07:00
+dontStripH1Header: false
 ---
 #  Back to Basics: Rendering Razor Views to String in ASP.NET Core
 
@@ -132,7 +132,7 @@ The string rendered view looks very similar, but you can see it's a bit stripped
 
 The self-contained view explicitly removes the Site Layout page and explicitly adds all needed CSS inline:
 
-```html
+```razor
 <!--  EmailConfirmation.cshtml -->
 @model OrderProfileViewModel
 @{
@@ -170,7 +170,7 @@ The self-contained view explicitly removes the Site Layout page and explicitly a
 
 Then any links or references that are embedded in the page are fixed up with the application's full URL base path:
 
-```html
+```razor
 <div class="d-flex" style="display: flex">
 @if (!Model.NoItemImages) {
     <div style="max-height: 3em; max-width: 3em; min-width: 3em; margin-right: 1.7em; margin-top: 0.3em">
@@ -208,12 +208,11 @@ I've found View string rendering useful in just about any application - it's one
 
 Hopefully this View Rendering helper will be helpful to a few of you, given that its an easy drop-in component you can quickly plug into an existing application. 
 
-No running with scissors... uh, razors, folks!
+No running with scissors... uh, razors... folks!
 
 ## Resources
 
 * [Original Stackoverflow Post](https://stackoverflow.com/a/40932984/11197)
-* [Full Source Code on GitHub]()
 * [Part of Westwind.AspNetCore NuGet](https://www.nuget.org/packages/Westwind.AspNetCore/)
 
 

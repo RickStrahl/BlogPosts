@@ -1,16 +1,15 @@
 ---
 title: Azure Trusted Signing Revisited with Dotnet Sign
-featuredImageUrl: https://weblog.west-wind.com/images/2026/Azure-Trusted-Signing-Revisited-with-Dotnet-Sign/TrustedSigningBanner.jpg
 abstract: In this follow-up post to my previous guide on Azure Trusted Signing, I  explore how the new `dotnet sign` tool significantly simplifies the code signing process compared to the traditional `SignTool` workflow. The post identifies `dotnet sign` using `artifact-signing` as a faster, more efficient alternative.
 keywords: Code Signing, Azure Trusted Signing, dotnet-sign, Sign
 categories: Windows, Security, WPF
-weblogName: West Wind Web Log
+weblogName: West Wind Weblog (BlazePost API)
 postId: 5249291
 permalink: https://weblog.west-wind.com/posts/2026/Mar/02/Azure-Trusted-Signing-Revisited-with-Dotnet-Sign
-postDate: 2026-03-02T10:10:23.0747139-10:00
-postStatus: publish
-dontInferFeaturedImage: false
+featuredImageUrl: https://weblog.west-wind.com/images/2026/Azure-Trusted-Signing-Revisited-with-Dotnet-Sign/TrustedSigningBanner.jpg
 stripH1Header: true
+postStatus: publish
+postDate: 2026-03-02T12:10:23.0747139-08:00
 ---
 # Azure Trusted Signing Revisited with Dotnet Sign  
 
@@ -117,6 +116,7 @@ A full signing command for a binary file looks like this:
 
 ```powershell
 sign code artifact-signing  `
+   --azure-credential-type azure-cli `
    --verbosity warning `
    --timestamp-url http://timestamp.digicert.com `
    --artifact-signing-endpoint https://eus.codesigning.azure.net/ `
@@ -191,6 +191,7 @@ $tsCertProfile = $metadata.CertificateProfileName
 $timeServer = "http://timestamp.digicert.com"
 
 $signArgs = @(
+    "--azure-credential-type", "azure-cli" 
     "--verbosity", "warning",
     "--timestamp-url", $timeServer,
     "--artifact-signing-endpoint", $tsEndpoint,

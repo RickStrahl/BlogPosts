@@ -17,6 +17,8 @@ stripH1Header: true
 
 FoxPro string processing generally is reasonably fast. String processing has always been optimized with a number of optimizations that make FoxPro - despite its age - reasonably competitive when it comes to effective string processing.
 
+
+
 But there's an Achilles heel in the string processing support: There's no decent high performance way to iterate a string character by character. If you are building system components like parsers that's a key feature and it's one that FoxPro - and there is no other way to say this - sucks at.
 
 ##AD## 

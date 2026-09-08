@@ -1,16 +1,15 @@
 ---
 title: Avoiding WPF Image Control Local File Locking
-featuredImageUrl: https://weblog.west-wind.com/images/2025/WPF-Image-Control-Local-File-Locking/LockedImageFiles.jpg
 abstract: WPF locks local images when referenced via a Source attribute. In this post I discuss why this might be a problem and how you can work around it using native XAML and custom binding converter that provides a consolidated approach that includes image caching for better performance of reused images.
 keywords: Image, Lock, WPF, XAML, Binding Converter, LocalFileImageConverter
 categories: WPF .NET Windows
-weblogName: West Wind Web Log
+weblogName: West Wind Weblog (BlazePost API)
 postId: 4838355
 permalink: https://weblog.west-wind.com/posts/2025/Apr/28/WPF-Image-Control-Local-File-Locking
-postDate: 2025-04-28T12:01:46.4594270-07:00
-postStatus: publish
-dontInferFeaturedImage: false
+featuredImageUrl: https://weblog.west-wind.com/images/2025/WPF-Image-Control-Local-File-Locking/LockedImageFiles.jpg
 stripH1Header: true
+postStatus: publish
+postDate: 2025-04-28T12:01:46.4594270-07:00
 customFields:
   mt_githuburl:
     id: 
@@ -153,6 +152,21 @@ public class LocalFileImageConverter : IValueConverter
         throw new NotImplementedException("LocalFileImageConverter: Two way conversion is not supported.");
     }
 }
+```
+
+Note that you can also use this converter from code by explicitly executing the `.Convert()` method and then assigning the value explicitly:
+
+```csharp
+var conv = new UriToCachedImageConverter();
+var source = conv.Convert(logoFile, typeof(BitmapImage), null, CultureInfo.CurrentCulture) as BitmapImage ;
+
+img = new Image
+{
+    Source = source,
+    Width = 31,
+    Margin = new Thickness(0, 5, 12, 0),                        
+    VerticalAlignment = VerticalAlignment.Top
+};
 ```
 
 #### Non-locking Image Loading

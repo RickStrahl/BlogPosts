@@ -44,7 +44,7 @@ In practice I use this tool as part of my [Documentation Monster](https://docume
 
 This generates a self-contained Windows Exe that essentially lets you run the Web site in an application locally. Here's what the Viewer looks like running a packaged Web site:
 
-![Documentation Monster Web Viewer](./DocumentationMonsterWebViewer.png)
+![Documentation Monster Web Viewer](https://documentationmonster.com/docs/Output-Generation/OfflineDocumentationViewer.png)
 <small>**Figure 2** - The Documentation Monster Web Viewer packages the generated Html Web site into a single Exe that can be run offline.</small>
 
 You can see what that looks like [here](https://markdownmonster.west-wind.com/docs/MarkdownMonster-Documentation-Viewer.exe).  
